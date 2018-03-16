@@ -9,6 +9,7 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
     /**
      * @param uid
      * @return boolean
+     * check exists of a UID
      */
     boolean existsByUid(String uid);
 }

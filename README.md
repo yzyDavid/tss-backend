@@ -1,4 +1,4 @@
-# tss-backend
+# Teaching Service System - Backend
 ZJU Software Engineering course project, Teaching Service System.
 
 ## Usage

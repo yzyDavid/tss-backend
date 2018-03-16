@@ -28,4 +28,10 @@ public class UserController {
         userRepository.save(user);
         return new ResponseEntity<>(new AddUserMessage("OK", uid, user.getName()), HttpStatus.CREATED);
     }
+
+    @PostMapping(path = "/login")
+    @Deprecated
+    public ResponseEntity<Object> login() {
+        return new ResponseEntity<>(new Object(), HttpStatus.OK);
+    }
 }

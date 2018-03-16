@@ -28,10 +28,13 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web")
+    compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.springframework:spring-context:5.0.4.RELEASE'
+    compile 'org.springframework.session:spring-session-core:2.0.2.RELEASE'
+    compile 'org.springframework.session:spring-session-jdbc:2.0.2.RELEASE'
     compile 'mysql:mysql-connector-java'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
