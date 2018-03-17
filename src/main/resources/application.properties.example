@@ -2,9 +2,3 @@ spring.jpa.hibernate.ddl-auto=create
 spring.datasource.url=jdbc:mysql://localhost:3306/tss
 spring.datasource.username=
 spring.datasource.password=
-
-spring.session.store-type=jdbc
-server.servlet.session.timeout=1800s
-spring.session.jdbc.initialize-schema=always
-spring.session.jdbc.schema=classpath:org/springframework/session/jdbc/schema-mysql.sql
-spring.session.jdbc.table-name=SPRING_SESSION

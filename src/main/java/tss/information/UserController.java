@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * @author yzy
+ *
+ * For management of User register, delete and query, etc.
+ * NOT for sessions.
  */
 @Controller
 @RequestMapping(path = "/user")
@@ -27,12 +30,5 @@ public class UserController {
         }
         userRepository.save(user);
         return new ResponseEntity<>(new AddUserMessage("OK", uid, user.getName()), HttpStatus.CREATED);
-    }
-
-    @PostMapping(path = "/login")
-    public ResponseEntity<Object> login(@RequestBody LoginMessage login) {
-        // TODO: check valid
-
-        return new ResponseEntity<>(new Object(), HttpStatus.OK);
     }
 }
