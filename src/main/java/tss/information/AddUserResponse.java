@@ -1,10 +1,13 @@
 package tss.information;
 
+import org.jetbrains.annotations.Nls;
+
 /**
  * @author yzy
  */
 public class AddUserResponse {
-    private final String status;
+    private final @Nls
+    String status;
     private final String uid;
     private final String name;
 

@@ -7,7 +7,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import tss.information.UserEntity;
 import tss.information.UserRepository;
+import tss.utils.SecurityUtils;
+import tss.utils.SessionUtils;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * @author yzy
@@ -28,9 +34,29 @@ public class SessionController {
     }
 
     @PostMapping(path = "/login")
-    public ResponseEntity<SetTokenMessage> login(@RequestBody LoginMessage login) {
-        // TODO: check valid
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest login) {
+        if (!userRepository.existsByUid(login.getUid())) {
+            return new ResponseEntity<>(new LoginResponse("", "", "User not exists"), HttpStatus.BAD_REQUEST);
+        }
 
-        return new ResponseEntity<>(new SetTokenMessage("", ""), HttpStatus.OK);
+        UserEntity user = userRepository.findByUid(login.getUid());
+        if (!user.getHashedPassword().equals(SecurityUtils.getHashedPasswordByPasswordAndSalt(login.getPassword(), user.getSalt()))) {
+            return new ResponseEntity<>(new LoginResponse("", "", "Password incorrect"), HttpStatus.BAD_REQUEST);
+        }
+
+        SessionEntity session = new SessionEntity();
+        session.setUid(login.getUid());
+        session.setToken(SessionUtils.getToken());
+        session.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+
+        if (sqlSessionRepository.existsByUid(login.getUid())) {
+            // TODO: process with duplicated insert.
+            SessionEntity sessionToRemove = sqlSessionRepository.findByUid(login.getUid());
+            sqlSessionRepository.delete(sessionToRemove);
+        }
+
+        sqlSessionRepository.save(session);
+
+        return new ResponseEntity<>(new LoginResponse(login.getUid(), session.getToken(), "OK"), HttpStatus.OK);
     }
 }

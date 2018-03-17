@@ -1,15 +1,15 @@
 package tss.session;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
 
 /**
  * @author yzy
  */
 @Entity
+@Table(indexes = {
+        @Index(name = "uidIndex", columnList = "uid", unique = true)
+})
 public class SessionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -17,7 +17,7 @@ public class SessionEntity {
 
     private String uid;
 
-    @GeneratedValue
+    @GeneratedValue()
     private Timestamp timestamp;
 
     private String token;
