@@ -19,12 +19,12 @@ import tss.information.UserRepository;
 public class SessionController {
     private final UserRepository userRepository;
 
-    private final SessionRepository sessionRepository;
+    private final SqlSessionRepository sqlSessionRepository;
 
     @Autowired
-    public SessionController(UserRepository userRepository, SessionRepository sessionRepository) {
+    public SessionController(UserRepository userRepository, SqlSessionRepository sqlSessionRepository) {
         this.userRepository = userRepository;
-        this.sessionRepository = sessionRepository;
+        this.sqlSessionRepository = sqlSessionRepository;
     }
 
     @PostMapping(path = "/login")

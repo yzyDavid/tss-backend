@@ -5,5 +5,5 @@ import org.springframework.data.repository.CrudRepository;
 /**
  * @author yzy
  */
-public interface SessionRepository extends CrudRepository<SessionEntity, Long> {
+public interface SqlSessionRepository extends CrudRepository<SessionEntity, Long> {
 }

@@ -12,4 +12,6 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
      * check exists of a UID
      */
     boolean existsByUid(String uid);
+
+    UserEntity findByUid(String uid);
 }

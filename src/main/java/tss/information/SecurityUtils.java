@@ -22,7 +22,9 @@ public class SecurityUtils {
         return new BASE64Encoder().encode(salt);
     }
 
-    public static @Nullable String getHashedPasswordByPasswordAndSalt(@NotNull String password, @NotNull @NonNls String salt) {
+    public static @Nullable
+    @NonNls
+    String getHashedPasswordByPasswordAndSalt(@NotNull String password, @NotNull @NonNls String salt) {
         String plain = salt + password;
         MessageDigest messageDigest;
         String cipher = null;
