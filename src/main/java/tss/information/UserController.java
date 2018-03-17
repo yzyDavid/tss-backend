@@ -6,9 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import static tss.utils.SecurityUtils.getHashedPasswordByPasswordAndSalt;
+import static tss.utils.SecurityUtils.getSalt;
+
 /**
  * @author yzy
- *
+ * <p>
  * For management of User register, delete and query, etc.
  * NOT for sessions.
  */
@@ -22,13 +25,22 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    @PutMapping(path = "/add")
-    public ResponseEntity<AddUserMessage> add(@RequestBody UserEntity user) {
+    @PutMapping(path = "")
+    public ResponseEntity<AddUserResponse> add(@RequestBody AddUserRequest user) {
         String uid = user.getUid();
         if (userRepository.existsByUid(uid)) {
-            return new ResponseEntity<>(new AddUserMessage("failed with duplicated uid", "", ""), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AddUserResponse("failed with duplicated uid", "", ""), HttpStatus.BAD_REQUEST);
         }
-        userRepository.save(user);
-        return new ResponseEntity<>(new AddUserMessage("OK", uid, user.getName()), HttpStatus.CREATED);
+
+        UserEntity entity = new UserEntity();
+        entity.setUid(uid);
+        entity.setName(user.getName());
+        String salt = getSalt();
+        String hashedPassword = getHashedPasswordByPasswordAndSalt(user.getPassword(), salt);
+        entity.setSalt(salt);
+        entity.setHashedPassword(hashedPassword);
+
+        userRepository.save(entity);
+        return new ResponseEntity<>(new AddUserResponse("OK", uid, user.getName()), HttpStatus.CREATED);
     }
 }

@@ -1,4 +1,4 @@
-package tss.information;
+package tss.utils;
 
 import org.jetbrains.annotations.*;
 import sun.misc.BASE64Encoder;

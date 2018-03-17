@@ -3,12 +3,12 @@ package tss.information;
 /**
  * @author yzy
  */
-public class AddUserMessage {
+public class AddUserResponse {
     private final String status;
     private final String uid;
     private final String name;
 
-    public AddUserMessage(String status, String uid, String name) {
+    public AddUserResponse(String status, String uid, String name) {
         this.status = status;
         this.uid = uid;
         this.name = name;
