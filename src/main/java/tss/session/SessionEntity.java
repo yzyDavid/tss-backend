@@ -5,10 +5,13 @@ import java.sql.Timestamp;
 
 /**
  * @author yzy
+ *
+ * TODO: index not auto created.
  */
 @Entity
 @Table(indexes = {
-        @Index(name = "uidIndex", columnList = "uid", unique = true)
+        @Index(name = "uidIndex", columnList = "uid", unique = true),
+        @Index(name = "tokenIndex", columnList = "token", unique = true)
 })
 public class SessionEntity {
     @Id
@@ -17,6 +20,9 @@ public class SessionEntity {
 
     private String uid;
 
+    /**
+     * TODO: expire control
+     */
     @GeneratedValue()
     private Timestamp timestamp;
 

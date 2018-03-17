@@ -7,6 +7,8 @@ import javax.persistence.Id;
 
 /**
  * @author yzy
+ *
+ * TODO: index
  */
 @Entity
 public class UserEntity {
