@@ -30,8 +30,9 @@ public class UserController {
     }
 
     @PostMapping(path = "/login")
-    @Deprecated
-    public ResponseEntity<Object> login() {
+    public ResponseEntity<Object> login(@RequestBody LoginMessage login) {
+        // TODO: check valid
+
         return new ResponseEntity<>(new Object(), HttpStatus.OK);
     }
 }
