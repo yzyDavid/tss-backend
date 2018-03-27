@@ -14,4 +14,5 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
     boolean existsByUid(String uid);
 
     UserEntity findByUid(String uid);
+
 }
