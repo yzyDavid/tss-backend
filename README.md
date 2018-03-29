@@ -1,4 +1,4 @@
-# Teaching Service System - Backend
+# Teaching Service System - Backend [![Build Status](https://www.travis-ci.org/yzyDavid/tss-backend.svg?branch=master)](https://www.travis-ci.org/yzyDavid/tss-backend)
 ZJU Software Engineering course project, Teaching Service System.
 
 ## Usage
