@@ -100,4 +100,7 @@ gradle-app.setting
 
 # manually added:
 src/main/resources/application.properties
+.settings/
+.classpath
+.project
 
