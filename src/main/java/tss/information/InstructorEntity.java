@@ -1,23 +1,24 @@
 package tss.information;
 
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
+@Table(name = "instructor")
 public class InstructorEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private long teacherId;
+    private UserEntity teacher;
+    private CourseEntity course;
     private Integer date;
     private Integer beginTime;
     private Integer duration;
-    private String building;
-    private String classroom;
+    private String classroom; //TODO: replace it with class Classroom
+    private Set<TakesEntity> takes = new HashSet<>();
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public long getId() {
         return id;
     }
@@ -26,14 +27,40 @@ public class InstructorEntity {
         this.id = id;
     }
 
-    public long getTeacherId() {
-        return teacherId;
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "course_id")
+    public CourseEntity getCourse() {
+        return course;
     }
 
-    public void setTeacherId(long teacherId) {
-        this.teacherId = teacherId;
+    public void setCourse(CourseEntity course) {
+        this.course = course;
     }
 
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "teacher_id")
+    public UserEntity getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(UserEntity teacher) {
+        this.teacher = teacher;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "instructor")
+    public Set<TakesEntity> getTakes() {
+        return takes;
+    }
+
+    public void setTakes(Set<TakesEntity> takes) {
+        this.takes = takes;
+    }
+
+    public void addTake(TakesEntity take) {
+        takes.add(take);
+    }
+
+    @Column(name = "date")
     public int getDate() {
         return date;
     }
@@ -43,6 +70,7 @@ public class InstructorEntity {
             this.date = date;
     }
 
+    @Column(name = "begin_time")
     public int getBeginTime() {
         return beginTime;
     }
@@ -51,6 +79,7 @@ public class InstructorEntity {
         this.beginTime = beginTime;
     }
 
+    @Column(name = "duaration")
     public int getDuration() {
         return duration;
     }
@@ -59,14 +88,7 @@ public class InstructorEntity {
         this.duration = duration;
     }
 
-    public String getBuilding() {
-        return building;
-    }
-
-    public void setBuilding(String building) {
-        this.building = building;
-    }
-
+    @Column(name = "classroom")
     public String getClassroom() {
         return classroom;
     }

@@ -1,45 +1,26 @@
 package tss.information;
 
 import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.Nullable;
 
-
-import java.io.InputStream;
-
-public class GetInfoResponse {
+public class GetUserResponse {
     private final @Nls
     String status;
-    @Nullable
     private final String uid;
-    @Nullable
     private final String name;
-    @Nullable
     private final Integer type;
-    @Nullable
     private final String email;
-    @Nullable
     private final String telephone;
-    @Nullable
     private final String intro;
 
-    GetInfoResponse(String status, final UserEntity user) {
+    GetUserResponse(String status, String uid, String name, int type, String email,
+                    String telephone, String intro) {
         this.status = status;
-        if(user != null) {
-            uid = user.getUid();
-            name = user.getName();
-            type = user.getType();
-            email = user.getEmail();
-            telephone = user.getTelephone();
-            intro = user.getIntro();
-            }
-        else {
-            uid = null;
-            name = null;
-            type = null;
-            email = null;
-            telephone = null;
-            intro = null;
-        }
+        this.uid = uid;
+        this.name = name;
+        this.type = type;
+        this.email = email;
+        this.telephone = telephone;
+        this.intro = intro;
     }
 
     public String getStatus() {

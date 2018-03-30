@@ -2,13 +2,13 @@ package tss.information;
 
 import org.jetbrains.annotations.Nls;
 
-public class ModifyInfoResponse {
+public class ModifyUserResponse {
     private final @Nls
     String status;
     private final String uid;
     private final String name;
 
-    public ModifyInfoResponse(String status, String uid, String name) {
+    public ModifyUserResponse(String status, String uid, String name) {
         this.status = status;
         this.uid = uid;
         this.name = name;

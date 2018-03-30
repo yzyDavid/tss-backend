@@ -1,30 +1,33 @@
 package tss.information;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
+@Table(name = "course")
 public class CourseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private String cid;
     private String name;
     private Integer credit;
     private Integer semester;
     private String intro;
-    private Integer examBeginTime;
-    private Integer examDuration;
+    private Integer capacity;
+    private Set<InstructorEntity> instructors = new HashSet<>();
+    //private Integer examBeginTime;
+    //private Integer examDuration;
 
-    public long getId() {
-        return id;
+    @Id
+    @Column(name = "course_id", length = 10)
+    public String getCid() {
+        return cid;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setCid(String cid) {
+        this.cid = cid;
     }
 
+    @Column(name = "course_name", nullable = false)
     public String getName() {
         return name;
     }
@@ -33,23 +36,26 @@ public class CourseEntity {
         this.name = name;
     }
 
-    public int getCredit() {
+    @Column(name = "course_credit", nullable = false)
+    public Integer getCredit() {
         return credit;
     }
 
-    public void setCredit(int credit) {
+    public void setCredit(Integer credit) {
         this.credit = credit;
     }
 
-    public int getSemester() {
+    @Column(name = "course_semester", nullable = false)
+    public Integer getSemester() {
         return semester;
     }
 
-    public void setSemester(int semester) {
+    public void setSemester(Integer semester) {
         if(0 <= semester && semester < 4)
             this.semester = semester;
     }
 
+    @Column(name = "course_intro")
     public String getIntro() {
         return intro;
     }
@@ -58,20 +64,42 @@ public class CourseEntity {
         this.intro = intro;
     }
 
-    public int getExamBeginTime() {
+    @Column(name = "course_capacity", nullable = false)
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
+    public Set<InstructorEntity> getInstructors() {
+        return instructors;
+    }
+
+    public void setInstructors(Set<InstructorEntity> instructors) {
+        this.instructors = instructors;
+    }
+
+    public void addInstructors(InstructorEntity instructor) {
+        instructors.add(instructor);
+    }
+
+    /*public Integer getExamBeginTime() {
         return examBeginTime;
     }
 
-    public void setExamBeginTime(int examBeginTime) {
+    public void setExamBeginTime(Integer examBeginTime) {
         this.examBeginTime = examBeginTime;
     }
 
-    public int getExamduration() {
+    public Integer getExamduration() {
         return examDuration;
     }
 
-    public void setExamduration(int examDuration) {
+    public void setExamduration(Integer examDuration) {
         this.examDuration = examDuration;
-    }
+    }*/
 }
 

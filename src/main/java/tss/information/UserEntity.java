@@ -1,9 +1,6 @@
 package tss.information;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +11,7 @@ import java.util.Set;
  * TODO: index
  */
 @Entity
+@Table(name = "user")
 public class UserEntity {
     public static final int TYPE_MANAGER = 0;
     public static final int TYPE_TEACHER = 1;
@@ -55,7 +53,11 @@ public class UserEntity {
 
     private String photo; //fileName
 
-    private Set<Integer> rights;
+    private Set<Integer> rights = new HashSet<>();
+
+    private Set<InstructorEntity> instructors = null;
+
+    private Set<TakesEntity> takes = null;
 
     //TODO : photo, rights, department etc.
 
@@ -63,16 +65,14 @@ public class UserEntity {
         Set<Integer> manager = new HashSet<>();
         manager.add(MODIFY_OTHERS_INFO);
         manager.add(MODIFY_OTHERS_PWD);
+        typeRights.put(TYPE_MANAGER, manager);
 
         Set<Integer> teacher = new HashSet<>();
-
-        Set<Integer> TA = new HashSet<>();
+        typeRights.put(TYPE_TEACHER, teacher);
 
         Set<Integer> student = new HashSet<>();
-
-        rights = new HashSet<>();
+        typeRights.put(TYPE_STUDENT, student);
     }
-
 
     public String getName() {
         return name;
@@ -124,7 +124,7 @@ public class UserEntity {
                 rights.remove(right);
             this.type = type;
             for(Integer right : typeRights.get(this.type))
-                rights.add(right);
+                rights.add(right); //modify rights
         }
     }
 
@@ -182,5 +182,29 @@ public class UserEntity {
         return this.rights.contains(right);
     }
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "student")
+    public Set<TakesEntity> getTakes() {
+        return takes;
+    }
 
+    public void setTakes(Set<TakesEntity> takes) {
+        this.takes = takes;
+    }
+
+    public void addTake(TakesEntity take) {
+        takes.add(take);
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher")
+    public Set<InstructorEntity> getInstructors() {
+        return instructors;
+    }
+
+    public void setInstructors(Set<InstructorEntity> instructors) {
+        this.instructors = instructors;
+    }
+
+    public void getInstructors(InstructorEntity instructor) {
+        instructors.add(instructor);
+    }
 }

@@ -105,14 +105,14 @@ public class UserController {
 
     @PostMapping(path = "")
     @Authorization
-    public ResponseEntity<ModifyInfoResponse> modifyInfo(@CurrentUser UserEntity user,
-                                                         @RequestBody ModifyInfoRequest request) {
+    public ResponseEntity<ModifyUserResponse> modifyInfo(@CurrentUser UserEntity user,
+                                                         @RequestBody ModifyUserRequest request) {
 
         if (!userRepository.existsByUid(request.getUid())) {
-            return new ResponseEntity<>(new ModifyInfoResponse("non-existent uid", "", ""), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ModifyUserResponse("non-existent uid", "", ""), HttpStatus.BAD_REQUEST);
         }
         else if(user.getType() != UserEntity.TYPE_MANAGER && user.getUid() != request.getUid() )
-            return new ResponseEntity<>(new ModifyInfoResponse("permission denied", "", ""), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(new ModifyUserResponse("permission denied", "", ""), HttpStatus.FORBIDDEN);
 
         user = userRepository.findByUid(user.getUid());
 
@@ -123,17 +123,19 @@ public class UserController {
         if(request.getIntro() != null)
             user.setIntro(request.getIntro());
 
-        return new ResponseEntity<>(new ModifyInfoResponse("OK", user.getUid(), user.getName()), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ModifyUserResponse("OK", user.getUid(), user.getName()), HttpStatus.CREATED);
     }
 
     @GetMapping(path = "")
-    public ResponseEntity<GetInfoResponse> getInfo(@RequestBody GetInfoRequest request) {
+    public ResponseEntity<GetUserResponse> getInfo(@RequestBody GetUserRequest request) {
         String uid = request.getUid();
         if (!userRepository.existsByUid(uid)) {
-            return new ResponseEntity<>(new GetInfoResponse("non-existent uid", null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new GetUserResponse("non-existent uid", "", "", -1,
+            "", "", ""), HttpStatus.BAD_REQUEST);
         }
         UserEntity user = userRepository.findByUid(uid);
-        return new ResponseEntity<>(new GetInfoResponse("OK", user), HttpStatus.CREATED);
+        return new ResponseEntity<>(new GetUserResponse("OK", user.getUid(), user.getName(), user.getType(),
+                user.getEmail(), user.getTelephone(), user.getIntro()), HttpStatus.CREATED);
     }
 
     @PostMapping(path = "")

@@ -2,7 +2,7 @@ package tss.information;
 
 import org.springframework.lang.Nullable;
 
-public class ModifyInfoRequest {
+public class ModifyUserRequest {
     private String uid;
     @Nullable
     private String email;
