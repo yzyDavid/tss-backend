@@ -31,15 +31,18 @@ import static tss.utils.SecurityUtils.getSalt;
 @RequestMapping(path = "/user")
 public class UserController {
     private final UserRepository userRepository;
+    private final InstructorRepository instructorRepository;
     private final ResourceLoader resourceLoader;
 
     @Autowired
-    public UserController(UserRepository userRepository, ResourceLoader resourceLoader) {
+    public UserController(UserRepository userRepository, ResourceLoader resourceLoader,
+                          InstructorRepository instructorRepository) {
         this.userRepository = userRepository;
         this.resourceLoader = resourceLoader;
+        this.instructorRepository = instructorRepository;
     }
 
-    @PutMapping(path = "")
+    @PutMapping(path = "/add")
     @Authorization
     public ResponseEntity<AddUserResponse> addUser(@CurrentUser UserEntity user,
                                                    @RequestBody AddUserRequest request) {
@@ -58,13 +61,13 @@ public class UserController {
         String hashedPassword = getHashedPasswordByPasswordAndSalt(request.getPassword(), salt);
         entity.setSalt(salt);
         entity.setHashedPassword(hashedPassword);
-        entity.setType(request.getType());
+        //entity.setType(request.getType());
 
         userRepository.save(entity);
         return new ResponseEntity<>(new AddUserResponse("OK", uid, user.getName()), HttpStatus.CREATED);
     }
 
-    @DeleteMapping(path = "/")
+    @DeleteMapping(path = "/delete")
     @Authorization
     public ResponseEntity<DeleteUserResponse> deleteUser(@CurrentUser UserEntity user,
                                                          @RequestBody DeleteUserRequest request) {
@@ -83,7 +86,7 @@ public class UserController {
         return new ResponseEntity<>(new DeleteUserResponse("OK", uid, name), HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping(path = "")
+    @PostMapping(path = "/pwd")
     @Authorization
     public ResponseEntity<ModifyPwdResponse> modifyPwd(@CurrentUser UserEntity user,
                                                        @RequestBody ModifyPwdRequest request) {
@@ -103,7 +106,7 @@ public class UserController {
         return new ResponseEntity<>(new ModifyPwdResponse("OK", uid, name), HttpStatus.CREATED);
     }
 
-    @PostMapping(path = "")
+    @PostMapping(path = "/info")
     @Authorization
     public ResponseEntity<ModifyUserResponse> modifyInfo(@CurrentUser UserEntity user,
                                                          @RequestBody ModifyUserRequest request) {
@@ -126,7 +129,7 @@ public class UserController {
         return new ResponseEntity<>(new ModifyUserResponse("OK", user.getUid(), user.getName()), HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "")
+    @GetMapping(path = "/info")
     public ResponseEntity<GetUserResponse> getInfo(@RequestBody GetUserRequest request) {
         String uid = request.getUid();
         if (!userRepository.existsByUid(uid)) {
@@ -138,7 +141,7 @@ public class UserController {
                 user.getEmail(), user.getTelephone(), user.getIntro()), HttpStatus.CREATED);
     }
 
-    @PostMapping(path = "")
+    @PostMapping(path = "/photo")
     @Authorization
     public ResponseEntity<ModifyPhotoResponse> modifyPhoto(@CurrentUser UserEntity user,
                                                            @RequestBody ModifyPhotoRequest request) {

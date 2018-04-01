@@ -3,6 +3,7 @@ package tss.information;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "takes")
 public class TakesEntity {
     private long id;
     private InstructorEntity instructor;

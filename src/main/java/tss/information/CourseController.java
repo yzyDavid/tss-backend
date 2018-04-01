@@ -17,17 +17,17 @@ import java.util.List;
 public class CourseController {
     private CourseRepository courseRepository;
     private InstructorRepository instructorRepository;
-    private TakesRepository takesRepository;
+    /*private TakesRepository takesRepository;*/
 
     @Autowired
-    CourseController(CourseRepository courseRepository, InstructorRepository instructorRepository,
-                     TakesRepository takesRepository) {
+    CourseController(CourseRepository courseRepository, InstructorRepository instructorRepository/*,
+                     TakesRepository takesRepository*/) {
         this.courseRepository = courseRepository;
         this.instructorRepository = instructorRepository;
-        this.takesRepository = takesRepository;
+        /*this.takesRepository = takesRepository;*/
     }
 
-    @PutMapping(path = "")
+    @PutMapping(path = "/add")
     @Authorization
     public ResponseEntity<AddCourseResponse> addCourse(@CurrentUser UserEntity user,
                                                    @RequestBody AddCourseRequest request) {
@@ -49,7 +49,7 @@ public class CourseController {
 
     }
 
-    @DeleteMapping(path = "")
+    @DeleteMapping(path = "/delete")
     @Authorization
     public ResponseEntity<DeleteCourseResponse> deleteCourse(@CurrentUser UserEntity user,
                                                        @RequestBody DeleteCourseRequest request) {
@@ -67,7 +67,7 @@ public class CourseController {
     }
 
 
-    @PostMapping(path = "")
+    @PostMapping(path = "/info")
     @Authorization
     public ResponseEntity<ModifyCourseResponse> modifyInfo(@CurrentUser UserEntity user,
                                                        @RequestBody ModifyCourseRequest request) {
@@ -89,7 +89,7 @@ public class CourseController {
 
     }
 
-    @PostMapping(path = "")
+    @GetMapping(path = "/info")
     public ResponseEntity<GetCourseResponse> getInfo(@RequestBody GetCourseRequest request) {
         String cid = request.getCid();
         if(!courseRepository.existsById(cid))

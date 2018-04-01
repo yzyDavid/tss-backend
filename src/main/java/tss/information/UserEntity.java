@@ -29,10 +29,7 @@ public class UserEntity {
     public static final int ADD_STUDENT = 7;
     // all kinds of operation
 
-    private static Map<Integer, Set<Integer>> typeRights;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    //private static Map<Integer, Set<Integer>> typeRights;
     private Long id;
 
     private String uid;
@@ -53,26 +50,13 @@ public class UserEntity {
 
     private String photo; //fileName
 
-    private Set<Integer> rights = new HashSet<>();
+    //private Set<Integer> rights = new HashSet<>();
 
-    private Set<InstructorEntity> instructors = null;
+    private Set<InstructorEntity> instructors = new HashSet<>();
 
-    private Set<TakesEntity> takes = null;
+    private Set<TakesEntity> takes = new HashSet<>();
 
     //TODO : photo, rights, department etc.
-
-    public UserEntity() {
-        Set<Integer> manager = new HashSet<>();
-        manager.add(MODIFY_OTHERS_INFO);
-        manager.add(MODIFY_OTHERS_PWD);
-        typeRights.put(TYPE_MANAGER, manager);
-
-        Set<Integer> teacher = new HashSet<>();
-        typeRights.put(TYPE_TEACHER, teacher);
-
-        Set<Integer> student = new HashSet<>();
-        typeRights.put(TYPE_STUDENT, student);
-    }
 
     public String getName() {
         return name;
@@ -90,6 +74,8 @@ public class UserEntity {
         this.uid = uid;
     }
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getId() {
         return id;
     }
@@ -120,11 +106,11 @@ public class UserEntity {
 
     public void setType(int type) {
         if(0 < type && type < TYPE_NUM) {
-            for(Integer right : typeRights.get(this.type))
-                rights.remove(right);
+            /*for(Integer right : typeRights.get(this.type))
+                rights.remove(right);*/
             this.type = type;
-            for(Integer right : typeRights.get(this.type))
-                rights.add(right); //modify rights
+            /*for(Integer right : typeRights.get(this.type))
+                rights.add(right); //modify rights*/
         }
     }
 
@@ -160,7 +146,7 @@ public class UserEntity {
         this.photo = photo;
     }
 
-    public Set<Integer> getRights() {
+    /*public Set<Integer> getRights() {
         return rights;
     }
 
@@ -180,7 +166,7 @@ public class UserEntity {
 
     public boolean hasRight(int right) {
         return this.rights.contains(right);
-    }
+    }*/
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "student")
     public Set<TakesEntity> getTakes() {
@@ -204,7 +190,7 @@ public class UserEntity {
         this.instructors = instructors;
     }
 
-    public void getInstructors(InstructorEntity instructor) {
+    public void addInstructors(InstructorEntity instructor) {
         instructors.add(instructor);
     }
 }
