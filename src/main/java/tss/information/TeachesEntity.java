@@ -16,7 +16,7 @@ public class TeachesEntity {
     private Set<TakesEntity> takes = new HashSet<>();
 
         //this.id = new CompositeKeys(user.getUid(), course.getCid());
-    TeachesEntity(UserEntity user, String cid) {
+        public TeachesEntity(UserEntity user, String cid) {
         this.cid = cid;
         this.teacher = user;
     }

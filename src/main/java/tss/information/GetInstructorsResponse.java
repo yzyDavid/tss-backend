@@ -17,8 +17,8 @@ public class GetInstructorsResponse {
     @Nullable
     private final List<List<String>> classrooms;
 
-    GetInstructorsResponse(String status, List<String> tids, List<String> names,
-                           List<List<String>> times, List<List<String>> classrooms) {
+    public GetInstructorsResponse(String status, List<String> tids, List<String> names,
+                                  List<List<String>> times, List<List<String>> classrooms) {
         this.status = status;
         this.tids = tids;
         this.names = names;

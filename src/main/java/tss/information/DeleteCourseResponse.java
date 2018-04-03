@@ -8,7 +8,7 @@ public class DeleteCourseResponse {
     final String cid;
     final String name;
 
-    DeleteCourseResponse(String status, String cid, String name) {
+    public DeleteCourseResponse(String status, String cid, String name) {
         this.status = status;
         this.cid = cid;
         this.name = name;

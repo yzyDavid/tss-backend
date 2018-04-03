@@ -8,7 +8,7 @@ public class ModifyCourseResponse {
     final String cid;
     final String name;
 
-    ModifyCourseResponse(String status, String cid, String name) {
+    public ModifyCourseResponse(String status, String cid, String name) {
         this.status = status;
         this.cid = cid;
         this.name = name;

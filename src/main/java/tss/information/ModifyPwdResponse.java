@@ -8,7 +8,7 @@ public class ModifyPwdResponse {
     private final String uid;
     private final String name;
 
-    ModifyPwdResponse(String status, String uid, String name) {
+    public ModifyPwdResponse(String status, String uid, String name) {
         this.status = status;
         this.uid = uid;
         this.name = name;

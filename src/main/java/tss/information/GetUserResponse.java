@@ -12,8 +12,8 @@ public class GetUserResponse {
     private final String telephone;
     private final String intro;
 
-    GetUserResponse(String status, String uid, String name, int type, String email,
-                    String telephone, String intro) {
+    public GetUserResponse(String status, String uid, String name, int type, String email,
+                           String telephone, String intro) {
         this.status = status;
         this.uid = uid;
         this.name = name;

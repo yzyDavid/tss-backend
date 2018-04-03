@@ -10,8 +10,8 @@ public class GetCourseResponse {
     private final Character semester;
     private final String intro;
 
-    GetCourseResponse(String status, String cid, String name, Float credit,
-                      Character semester, String intro) {
+    public GetCourseResponse(String status, String cid, String name, Float credit,
+                             Character semester, String intro) {
         this.status = status;
         this.cid = cid;
         this.name = name;

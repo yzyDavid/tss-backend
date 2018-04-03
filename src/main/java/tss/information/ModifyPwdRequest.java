@@ -15,7 +15,7 @@ public class ModifyPwdRequest {
         this.uid = uid;
     }
 
-    String getUid() {
+    public String getUid() {
         return uid;
     }
 
@@ -23,7 +23,7 @@ public class ModifyPwdRequest {
         this.oldPwd = oldPwd;
     }
 
-    String getOldPwd() {
+    public String getOldPwd() {
         return oldPwd;
     }
 
@@ -31,7 +31,7 @@ public class ModifyPwdRequest {
         this.newPwd = newPwd;
     }
 
-    String getNewPwd() {
+    public String getNewPwd() {
         return newPwd;
     }
 

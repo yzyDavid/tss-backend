@@ -10,7 +10,7 @@ public class GetPhotoResponse {
     @Nullable
     private final Resource resource;
 
-    GetPhotoResponse(String status, Resource resource) {
+    public GetPhotoResponse(String status, Resource resource) {
         this.status = status;
         this.resource = resource;
     }

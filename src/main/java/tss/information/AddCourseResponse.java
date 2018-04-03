@@ -7,7 +7,7 @@ public class AddCourseResponse {
     private final String cid;
     private final String name;
 
-    AddCourseResponse(String status, String cid, String name) {
+    public AddCourseResponse(String status, String cid, String name) {
         this.status = status;
         this.cid = cid;
         this.name = name;

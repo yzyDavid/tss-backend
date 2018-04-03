@@ -6,7 +6,7 @@ public class ModifyInstructorResponse {
     @Nls
     private final String status;
 
-    ModifyInstructorResponse(String status) {
+    public ModifyInstructorResponse(String status) {
         this.status = status;
     }
 

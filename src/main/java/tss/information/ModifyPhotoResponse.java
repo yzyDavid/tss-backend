@@ -6,7 +6,7 @@ public class ModifyPhotoResponse {
     private final @Nls
     String status;
 
-    ModifyPhotoResponse(String status) {
+    public ModifyPhotoResponse(String status) {
         this.status = status;
     }
 
