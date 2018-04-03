@@ -9,13 +9,13 @@ public class GetTchCoursesResponse {
     private final String status;
     private final List<String> cid;
     private final List<String> name;
-    private final List<Integer> credit;
-    private final List<Integer> semester;
+    private final List<Float> credit;
+    private final List<Character> semester;
     private final List<Integer> capacity;
 
 
-    GetTchCoursesResponse(String status, List<String> cid, List<String> name, List<Integer> credit,
-                          List<Integer> semester, List<Integer> capacity) {
+    GetTchCoursesResponse(String status, List<String> cid, List<String> name, List<Float> credit,
+                          List<Character> semester, List<Integer> capacity) {
         this.status = status;
         this.cid = cid;
         this.name = name;
@@ -36,11 +36,11 @@ public class GetTchCoursesResponse {
         return name;
     }
 
-    public List<Integer> getCredit() {
+    public List<Float> getCredit() {
         return credit;
     }
 
-    public List<Integer> getSemester() {
+    public List<Character> getSemester() {
         return semester;
     }
 

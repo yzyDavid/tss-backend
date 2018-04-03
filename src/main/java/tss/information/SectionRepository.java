@@ -2,5 +2,5 @@ package tss.information;
 
 import org.springframework.data.repository.CrudRepository;
 
-public interface TakesRepository extends CrudRepository<TakesEntity, Long> {
+public interface SectionRepository extends CrudRepository<SectionEntity, Long> {
 }

@@ -1,10 +1,10 @@
 package tss.information;
 
-import java.util.List;
+import java.util.Set;
 
 public class DeleteInstructorsRequest {
     private String cid;
-    private List<String> uid;
+    private Set<String> uids;
 
     public String getCid() {
         return cid;
@@ -14,11 +14,11 @@ public class DeleteInstructorsRequest {
         this.cid = cid;
     }
 
-    public List<String> getUid() {
-        return uid;
+    public Set<String> getUids() {
+        return uids;
     }
 
-    public void setUid(List<String> uid) {
-        this.uid = uid;
+    public void setUids(Set<String> uids) {
+        this.uids = uids;
     }
 }

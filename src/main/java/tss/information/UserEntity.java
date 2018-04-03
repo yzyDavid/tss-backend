@@ -2,7 +2,6 @@ package tss.information;
 
 import javax.persistence.*;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,7 +29,6 @@ public class UserEntity {
     // all kinds of operation
 
     //private static Map<Integer, Set<Integer>> typeRights;
-    private Long id;
 
     private String uid;
 
@@ -40,7 +38,7 @@ public class UserEntity {
 
     private String salt;
 
-    private int type;
+    private Integer type;
 
     private String email;
 
@@ -52,7 +50,7 @@ public class UserEntity {
 
     //private Set<Integer> rights = new HashSet<>();
 
-    private Set<InstructorEntity> instructors = new HashSet<>();
+    private Set<TeachesEntity> instructors = new HashSet<>();
 
     private Set<TakesEntity> takes = new HashSet<>();
 
@@ -66,6 +64,8 @@ public class UserEntity {
         this.name = name;
     }
 
+    @Id
+    @Column(name = "course_id", length = 10)
     public String getUid() {
         return uid;
     }
@@ -74,15 +74,6 @@ public class UserEntity {
         this.uid = uid;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getHashedPassword() {
         return hashedPassword;
@@ -100,11 +91,11 @@ public class UserEntity {
         this.salt = salt;
     }
 
-    public int getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(Integer type) {
         if(0 < type && type < TYPE_NUM) {
             /*for(Integer right : typeRights.get(this.type))
                 rights.remove(right);*/
@@ -182,15 +173,15 @@ public class UserEntity {
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher")
-    public Set<InstructorEntity> getInstructors() {
+    public Set<TeachesEntity> getInstructors() {
         return instructors;
     }
 
-    public void setInstructors(Set<InstructorEntity> instructors) {
+    public void setInstructors(Set<TeachesEntity> instructors) {
         this.instructors = instructors;
     }
 
-    public void addInstructors(InstructorEntity instructor) {
+    public void addInstructors(TeachesEntity instructor) {
         instructors.add(instructor);
     }
 }

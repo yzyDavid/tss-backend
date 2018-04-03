@@ -1,15 +1,17 @@
 package tss.information;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "takes")
 public class TakesEntity {
     private long id;
-    private InstructorEntity instructor;
+    private TeachesEntity instructor;
     private UserEntity student;
     private Integer score;
     private Integer year;
+    private Set<SectionEntity> sections;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,11 +35,11 @@ public class TakesEntity {
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "instructor_id")
-    public InstructorEntity getInstructor() {
+    public TeachesEntity getInstructor() {
         return instructor;
     }
 
-    public void setInstructor(InstructorEntity instructor) {
+    public void setInstructor(TeachesEntity instructor) {
         this.instructor = instructor;
     }
 
@@ -59,5 +61,14 @@ public class TakesEntity {
 
     public void setYear(Integer year) {
         this.year = year;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "takes")
+    public Set<SectionEntity> getSections() {
+        return sections;
+    }
+
+    public void setSections(Set<SectionEntity> sections) {
+        this.sections = sections;
     }
 }

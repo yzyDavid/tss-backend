@@ -1,14 +1,16 @@
 package tss.information;
 
 import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.Set;
 
-public class DeleteInstructorsResponse {
+public class AddInstructorsResponse {
     @Nls private final String status;
-    private final List<String> failUids;
+    @Nullable
+    private final Set<String> failUids;
 
-    public DeleteInstructorsResponse(String status, List<String> failUids) {
+    public AddInstructorsResponse(String status, Set<String> failUids) {
         this.status = status;
         this.failUids = failUids;
     }
@@ -17,7 +19,7 @@ public class DeleteInstructorsResponse {
         return status;
     }
 
-    public List<String> getFailUids() {
+    public Set<String> getFailUids() {
         return failUids;
     }
 }

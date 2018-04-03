@@ -7,8 +7,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "instructor")
-public class InstructorEntity {
+public class TeachesEntity {
     private long id;
+    //private CompositeKeys id;
     private UserEntity teacher;
     private CourseEntity course;
     private Integer date;
@@ -16,6 +17,14 @@ public class InstructorEntity {
     private Integer duration;
     private String classroom; //TODO: replace it with class Classroom
     private Set<TakesEntity> takes = new HashSet<>();
+    private Set<SectionEntity> sections = new HashSet<>();
+
+    TeachesEntity(UserEntity user, CourseEntity course) {
+        //this.id = new CompositeKeys(user.getUid(), course.getCid());
+        this.teacher = user;
+        this.course = course;
+    }
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,6 +35,15 @@ public class InstructorEntity {
     public void setId(long id) {
         this.id = id;
     }
+
+    /*@Id
+    public CompositeKeys getId() {
+        return id;
+    }
+
+    public void setId(CompositeKeys id) {
+        this.id = id;
+    }*/
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "course_id")
@@ -58,6 +76,12 @@ public class InstructorEntity {
 
     public void addTake(TakesEntity take) {
         takes.add(take);
+    }
+
+    public void deleteTakes(Set<String> uids) {
+        for(TakesEntity take : takes)
+            if(uids.equals(take.getStudent().getUid()))
+                takes.remove(take);
     }
 
     @Column(name = "date")
@@ -96,4 +120,24 @@ public class InstructorEntity {
     public void setClassroom(String classroom) {
         this.classroom = classroom;
     }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teaches")
+    public Set<SectionEntity> getSections() {
+        return sections;
+    }
+
+    public void setSections(Set<SectionEntity> sections) {
+        this.sections = sections;
+    }
+
+    public void addSection(SectionEntity section) {
+        this.sections.add(section);
+    }
+
+    public void deleteSection(Set<String> cids) {
+        /*for(String cid : cids) {
+            if()
+        }*/
+    }
+
 }

@@ -6,13 +6,13 @@ public class GetCourseResponse {
     @Nls private final String status;
     private final String cid;
     private final String name;
-    private final int credit;
-    private final int semester;
-    private final int capacity;
+    private final Float credit;
+    private final Character semester;
+    private final Integer capacity;
     private final String intro;
 
-    GetCourseResponse(String status, String cid, String name, int credit,
-                      int semester, int capacity, String intro) {
+    GetCourseResponse(String status, String cid, String name, Float credit,
+                      Character semester, Integer capacity, String intro) {
         this.status = status;
         this.cid = cid;
         this.name = name;
@@ -34,15 +34,15 @@ public class GetCourseResponse {
         return name;
     }
 
-    public int getCredit() {
+    public Float getCredit() {
         return credit;
     }
 
-    public int getSemester() {
+    public Character getSemester() {
         return semester;
     }
 
-    public int getCapacity() {
+    public Integer getCapacity() {
         return capacity;
     }
 

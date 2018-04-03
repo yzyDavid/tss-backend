@@ -1,8 +1,11 @@
 package tss.information;
 
+import java.util.List;
+import java.util.Set;
+
 public class AddInstructorsRequest {
     private String cid;
-    private String uid;
+    private Set<String> uids;
 
     public String getCid() {
         return cid;
@@ -12,11 +15,11 @@ public class AddInstructorsRequest {
         this.cid = cid;
     }
 
-    public String getUid() {
-        return uid;
+    public Set<String> getUids() {
+        return uids;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setUids(Set<String> uids) {
+        this.uids = uids;
     }
 }

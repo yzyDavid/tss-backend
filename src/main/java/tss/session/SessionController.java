@@ -35,11 +35,11 @@ public class SessionController {
 
     @PostMapping(path = "/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest login) {
-        if (!userRepository.existsByUid(login.getUid())) {
+        if (!userRepository.existsById(login.getUid())) {
             return new ResponseEntity<>(new LoginResponse("", "", "User not exists"), HttpStatus.BAD_REQUEST);
         }
 
-        UserEntity user = userRepository.findByUid(login.getUid());
+        UserEntity user = userRepository.findById(login.getUid()).get();
         if (!user.getHashedPassword().equals(SecurityUtils.getHashedPasswordByPasswordAndSalt(login.getPassword(), user.getSalt()))) {
             return new ResponseEntity<>(new LoginResponse("", "", "Password incorrect"), HttpStatus.BAD_REQUEST);
         }

@@ -7,9 +7,9 @@ public class ModifyCourseRequest {
     @Nullable
     private String name;
     @Nullable
-    private Integer credit;
+    private Float credit;
     @Nullable
-    private Integer semester;
+    private Character semester;
     @Nullable
     private Integer capacity;
     @Nullable
@@ -31,19 +31,19 @@ public class ModifyCourseRequest {
         this.name = name;
     }
 
-    public Integer getCredit() {
+    public Float getCredit() {
         return credit;
     }
 
-    public void setCredit(Integer credit) {
+    public void setCredit(Float credit) {
         this.credit = credit;
     }
 
-    public Integer getSemester() {
+    public Character getSemester() {
         return semester;
     }
 
-    public void setSemester(Integer semester) {
+    public void setSemester(Character semester) {
         this.semester = semester;
     }
 

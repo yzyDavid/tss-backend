@@ -9,11 +9,12 @@ import java.util.Set;
 public class CourseEntity {
     private String cid;
     private String name;
-    private Integer credit;
-    private Integer semester;
+    private Float credit;
+    private Character semester;
     private String intro;
     private Integer capacity;
-    private Set<InstructorEntity> instructors = new HashSet<>();
+    private Set<TeachesEntity> teaches = new HashSet<>();
+    private Set<SectionEntity> sections = new HashSet<>();
     //private Integer examBeginTime;
     //private Integer examDuration;
 
@@ -37,22 +38,21 @@ public class CourseEntity {
     }
 
     @Column(name = "course_credit", nullable = false)
-    public Integer getCredit() {
+    public Float getCredit() {
         return credit;
     }
 
-    public void setCredit(Integer credit) {
+    public void setCredit(Float credit) {
         this.credit = credit;
     }
 
     @Column(name = "course_semester", nullable = false)
-    public Integer getSemester() {
+    public Character getSemester() {
         return semester;
     }
 
-    public void setSemester(Integer semester) {
-        if(0 <= semester && semester < 4)
-            this.semester = semester;
+    public void setSemester(Character semester) {
+        this.semester = semester;
     }
 
     @Column(name = "course_intro")
@@ -74,16 +74,38 @@ public class CourseEntity {
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
-    public Set<InstructorEntity> getInstructors() {
-        return instructors;
+    public Set<TeachesEntity> getTeaches() {
+        return teaches;
     }
 
-    public void setInstructors(Set<InstructorEntity> instructors) {
-        this.instructors = instructors;
+    public void setTeaches(Set<TeachesEntity> teaches) {
+        this.teaches = teaches;
     }
 
-    public void addInstructors(InstructorEntity instructor) {
-        instructors.add(instructor);
+    public void addTeaches(TeachesEntity instructor) {
+        teaches.add(instructor);
+    }
+
+    public void deleteTeaches(Set<String> uids) {
+        for(TeachesEntity instructor : teaches)
+            if(uids.contains(instructor.getTeacher().getUid()))
+                teaches.remove(instructor);
+    }
+
+    public TeachesEntity findTeachesByUid(String uid) {
+        for(TeachesEntity instructor : teaches)
+            if(uid.equals(instructor.getTeacher().getUid()))
+                return instructor;
+        return null;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
+    public Set<SectionEntity> getSections() {
+        return sections;
+    }
+
+    public void setSections(Set<SectionEntity> sections) {
+        this.sections = sections;
     }
 
     /*public Integer getExamBeginTime() {

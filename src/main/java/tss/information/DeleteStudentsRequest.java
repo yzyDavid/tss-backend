@@ -1,11 +1,10 @@
 package tss.information;
+import java.util.Set;
 
-import java.util.List;
-
-public class AddStudentsRequest {
+public class DeleteStudentsRequest {
     private String cid;
     private String tid;
-    private List<String> sid;
+    private Set<String> sid;
 
     public String getCid() {
         return cid;
@@ -22,11 +21,11 @@ public class AddStudentsRequest {
     public void setTid(String tid) {
         this.tid = tid;
     }
-    public List<String> getSid() {
+    public Set<String> getSid() {
         return sid;
     }
 
-    public void setSid(List<String> sid) {
+    public void setSid(Set<String> sid) {
         this.sid = sid;
     }
 }
