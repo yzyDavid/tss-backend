@@ -104,3 +104,4 @@ src/main/resources/application.properties
 .classpath
 .project
 
+.DS_Store

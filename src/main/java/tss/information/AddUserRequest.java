@@ -7,6 +7,7 @@ public class AddUserRequest {
     private String uid;
     private String name;
     private String password;
+    private int type;
 
     public String getUid() {
         return uid;
@@ -20,6 +21,10 @@ public class AddUserRequest {
         return password;
     }
 
+    public int getType() {
+        return type;
+    }
+
     public void setUid(String uid) {
         this.uid = uid;
     }
@@ -30,5 +35,9 @@ public class AddUserRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }
