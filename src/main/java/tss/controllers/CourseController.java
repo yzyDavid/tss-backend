@@ -6,13 +6,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import tss.information.*;
+import tss.entities.*;
 import tss.information.untapped.ClassroomEntity;
 import tss.information.untapped.ClassroomRepository;
-import tss.session.Authorization;
-import tss.session.CurrentUser;
+import tss.repositories.*;
+import tss.requests.information.*;
+import tss.responses.information.*;
+import tss.annotations.session.Authorization;
+import tss.annotations.session.CurrentUser;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Mingqi Yi

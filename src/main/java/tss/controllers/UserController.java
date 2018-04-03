@@ -7,17 +7,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import tss.information.*;
-import tss.session.Authorization;
-import tss.session.CurrentUser;
+import tss.configs.Config;
+import tss.entities.UserEntity;
+import tss.repositories.TeachesRepository;
+import tss.repositories.UserRepository;
+import tss.requests.information.*;
+import tss.responses.information.*;
+import tss.annotations.session.Authorization;
+import tss.annotations.session.CurrentUser;
 import tss.utils.SecurityUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import tss.configs.Config;
-
 
 import static tss.utils.SecurityUtils.getHashedPasswordByPasswordAndSalt;
 import static tss.utils.SecurityUtils.getSalt;

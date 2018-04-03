@@ -1,15 +1,15 @@
-package tss.information;
+package tss.responses.information;
 
 import org.jetbrains.annotations.Nls;
 
-import java.util.List;
+import java.util.Set;
 
-public class SetGradesResponse {
+public class AddStudentsResponse {
     @Nls
     private final String status;
-    private final List<String> failUids;
+    private final Set<String> failUids;
 
-    public SetGradesResponse(String status, List<String> failUids) {
+    public AddStudentsResponse(String status, Set<String> failUids) {
         this.status = status;
         this.failUids = failUids;
     }
@@ -18,7 +18,7 @@ public class SetGradesResponse {
         return status;
     }
 
-    public List<String> getFailUids() {
+    public Set<String> getFailUids() {
         return failUids;
     }
 }

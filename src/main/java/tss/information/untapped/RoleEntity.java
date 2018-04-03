@@ -30,7 +30,7 @@ public class RoleEntity {
     }
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "role_authority", joinColumns = {@JoinColumn(name ="role_id" )}, inverseJoinColumns = { @JoinColumn(name = "authority_id") })
+    @JoinTable(name = "role_authority", joinColumns = {@JoinColumn(name = "role_id")}, inverseJoinColumns = {@JoinColumn(name = "authority_id")})
     public Set<AuthorityEntity> getAuthorities() {
         return authorities;
     }

@@ -5,7 +5,8 @@ import org.jetbrains.annotations.Nls;
 import java.util.List;
 
 public class GetStudentsResponse {
-    @Nls private final String status;
+    @Nls
+    private final String status;
     private final List<String> uids;
     private final List<String> names;
     private final List<Integer> scores;

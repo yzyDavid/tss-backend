@@ -1,6 +1,6 @@
 package tss.information.untapped;
 
-import tss.information.SectionEntity;
+import tss.entities.SectionEntity;
 
 import javax.persistence.*;
 import java.util.HashSet;

@@ -30,7 +30,7 @@ public class AuthorityEntity {
         this.uri = uri;
     }
 
-    @ManyToMany(mappedBy="authorities")
+    @ManyToMany(mappedBy = "authorities")
     public Set<RoleEntity> getRole() {
         return role;
     }
