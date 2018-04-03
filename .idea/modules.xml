@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tss.iml" filepath="$PROJECT_DIR$/.idea/modules/tss.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tss_main.iml" filepath="$PROJECT_DIR$/.idea/modules/tss_main.iml" group="tss" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tss_test.iml" filepath="$PROJECT_DIR$/.idea/modules/tss_test.iml" group="tss" />
+    </modules>
+  </component>
+</project>
