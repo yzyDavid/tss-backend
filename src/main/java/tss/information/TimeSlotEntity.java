@@ -1,4 +1,4 @@
-package tss.information.untapped;
+package tss.information;
 
 import tss.information.SectionEntity;
 
@@ -10,7 +10,7 @@ import java.util.Set;
 @Table(name = "time_slot")
 public class TimeSlotEntity {
     private short id;
-    private int day;
+    private String day;
     private int start;
     private int end;
     private Set<SectionEntity> sections = new HashSet();
@@ -25,12 +25,12 @@ public class TimeSlotEntity {
         this.id = id;
     }
 
-    @Column(name = "day")
-    public int getDay() {
+    @Column(name = "day", length = 4)
+    public String getDay() {
         return day;
     }
 
-    public void setDay(int day) {
+    public void setDay(String day) {
         this.day = day;
     }
 

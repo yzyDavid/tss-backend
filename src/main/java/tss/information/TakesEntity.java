@@ -7,11 +7,10 @@ import java.util.Set;
 @Table(name = "takes")
 public class TakesEntity {
     private long id;
-    private TeachesEntity instructor;
     private UserEntity student;
     private Integer score;
     private Integer year;
-    private Set<SectionEntity> sections;
+    private TeachesEntity teaches;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -34,17 +33,6 @@ public class TakesEntity {
     }
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "instructor_id")
-    public TeachesEntity getInstructor() {
-        return instructor;
-    }
-
-    public void setInstructor(TeachesEntity instructor) {
-        this.instructor = instructor;
-    }
-
-
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "student_id")
     public UserEntity getStudent() {
         return student;
@@ -63,12 +51,13 @@ public class TakesEntity {
         this.year = year;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "takes")
-    public Set<SectionEntity> getSections() {
-        return sections;
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "teaches_id")
+    public TeachesEntity getTeaches() {
+        return teaches;
     }
 
-    public void setSections(Set<SectionEntity> sections) {
-        this.sections = sections;
+    public void setTeaches(TeachesEntity teaches) {
+        this.teaches = teaches;
     }
 }

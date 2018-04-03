@@ -8,17 +8,15 @@ public class GetCourseResponse {
     private final String name;
     private final Float credit;
     private final Character semester;
-    private final Integer capacity;
     private final String intro;
 
     GetCourseResponse(String status, String cid, String name, Float credit,
-                      Character semester, Integer capacity, String intro) {
+                      Character semester, String intro) {
         this.status = status;
         this.cid = cid;
         this.name = name;
         this.credit = credit;
         this.semester = semester;
-        this.capacity = capacity;
         this.intro = intro;
     }
 
@@ -40,10 +38,6 @@ public class GetCourseResponse {
 
     public Character getSemester() {
         return semester;
-    }
-
-    public Integer getCapacity() {
-        return capacity;
     }
 
     public String getIntro() {

@@ -1,7 +1,6 @@
 package tss.information;
 
 import tss.information.untapped.ClassroomEntity;
-import tss.information.untapped.TimeSlotEntity;
 
 import javax.persistence.*;
 
@@ -9,13 +8,18 @@ import javax.persistence.*;
 @Table(name = "section")
 public class SectionEntity {
     private long id;
-    private char semester;
-    private int year;
+    private Character semester;
+    private Integer year;
     private TimeSlotEntity timeSlot;
     private ClassroomEntity classroom;
     private TeachesEntity teaches;
     private CourseEntity course;
     private TakesEntity takes;
+
+    public SectionEntity(TeachesEntity teaches, CourseEntity course) {
+        this.teaches = teaches;
+        this.course = course;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,19 +31,19 @@ public class SectionEntity {
         this.id = id;
     }
 
-    public char getSemester() {
+    public Character getSemester() {
         return semester;
     }
 
-    public void setSemester(char semester) {
+    public void setSemester(Character semester) {
         this.semester = semester;
     }
 
-    public int getYear() {
+    public Integer getYear() {
         return year;
     }
 
-    public void setYear(int year) {
+    public void setYear(Integer year) {
         this.year = year;
     }
 

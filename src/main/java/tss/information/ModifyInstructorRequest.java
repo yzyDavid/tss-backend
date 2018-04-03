@@ -3,10 +3,10 @@ package tss.information;
 public class ModifyInstructorRequest {
     private String uid;
     private String cid;
-    private Integer date;
-    private Integer beginTime;
-    private Integer duration;
-    private String classroom;
+    private Integer capacity;
+    private Character semester;
+    private Short timeSlotId;
+    private Short classroomId;
 
     public String getUid() {
         return uid;
@@ -24,35 +24,35 @@ public class ModifyInstructorRequest {
         this.cid = cid;
     }
 
-    public Integer getDate() {
-        return date;
+    public Integer getCapacity() {
+        return capacity;
     }
 
-    public void setDate(Integer date) {
-        this.date = date;
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
     }
 
-    public Integer getBeginTime() {
-        return beginTime;
+    public Character getSemester() {
+        return semester;
     }
 
-    public void setBeginTime(Integer beginTime) {
-        this.beginTime = beginTime;
+    public void setSemester(Character semester) {
+        this.semester = semester;
     }
 
-    public Integer getDuration() {
-        return duration;
+    public Short getTimeSlotId() {
+        return timeSlotId;
     }
 
-    public void setDuration(Integer duration) {
-        this.duration = duration;
+    public void setTimeSlotId(Short timeSlotId) {
+        this.timeSlotId = timeSlotId;
     }
 
-    public String getClassroom() {
-        return classroom;
+    public Short getClassroomId() {
+        return classroomId;
     }
 
-    public void setClassroom(String classroom) {
-        this.classroom = classroom;
+    public void setClassroomId(Short classroomId) {
+        this.classroomId = classroomId;
     }
 }

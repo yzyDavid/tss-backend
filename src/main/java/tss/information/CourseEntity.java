@@ -12,8 +12,6 @@ public class CourseEntity {
     private Float credit;
     private Character semester;
     private String intro;
-    private Integer capacity;
-    private Set<TeachesEntity> teaches = new HashSet<>();
     private Set<SectionEntity> sections = new HashSet<>();
     //private Integer examBeginTime;
     //private Integer examDuration;
@@ -62,41 +60,6 @@ public class CourseEntity {
 
     public void setIntro(String intro) {
         this.intro = intro;
-    }
-
-    @Column(name = "course_capacity", nullable = false)
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
-    }
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
-    public Set<TeachesEntity> getTeaches() {
-        return teaches;
-    }
-
-    public void setTeaches(Set<TeachesEntity> teaches) {
-        this.teaches = teaches;
-    }
-
-    public void addTeaches(TeachesEntity instructor) {
-        teaches.add(instructor);
-    }
-
-    public void deleteTeaches(Set<String> uids) {
-        for(TeachesEntity instructor : teaches)
-            if(uids.contains(instructor.getTeacher().getUid()))
-                teaches.remove(instructor);
-    }
-
-    public TeachesEntity findTeachesByUid(String uid) {
-        for(TeachesEntity instructor : teaches)
-            if(uid.equals(instructor.getTeacher().getUid()))
-                return instructor;
-        return null;
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")

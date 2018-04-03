@@ -1,4 +1,4 @@
-package tss.information.untapped;
+package tss.information;
 
 import org.springframework.data.repository.CrudRepository;
 

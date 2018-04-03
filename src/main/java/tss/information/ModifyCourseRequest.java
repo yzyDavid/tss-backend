@@ -11,8 +11,6 @@ public class ModifyCourseRequest {
     @Nullable
     private Character semester;
     @Nullable
-    private Integer capacity;
-    @Nullable
     private String intro;
 
     public String getCid() {
@@ -45,14 +43,6 @@ public class ModifyCourseRequest {
 
     public void setSemester(Character semester) {
         this.semester = semester;
-    }
-
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
     }
 
     public String getIntro() {
