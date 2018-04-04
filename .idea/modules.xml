@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tss.iml" filepath="$PROJECT_DIR$/.idea/modules/tss.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tss_main.iml" filepath="$PROJECT_DIR$/.idea/modules/tss_main.iml" group="tss" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tss_test.iml" filepath="$PROJECT_DIR$/.idea/modules/tss_test.iml" group="tss" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/528098069/Repos-tss.iml" filepath="$PROJECT_DIR$/.idea/modules/528098069/Repos-tss.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/528098069/Repos-tss_main.iml" filepath="$PROJECT_DIR$/.idea/modules/528098069/Repos-tss_main.iml" group="tss" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/528098069/Repos-tss_test.iml" filepath="$PROJECT_DIR$/.idea/modules/528098069/Repos-tss_test.iml" group="tss" />
     </modules>
   </component>
 </project>
