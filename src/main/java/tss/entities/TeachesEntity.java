@@ -11,6 +11,7 @@ public class TeachesEntity {
     private long id;
     private UserEntity teacher;
     private Integer capacity;
+    @Column(length = 10)
     private String cid;
     private Set<SectionEntity> sections = new HashSet<>();
     private Set<TakesEntity> takes = new HashSet<>();

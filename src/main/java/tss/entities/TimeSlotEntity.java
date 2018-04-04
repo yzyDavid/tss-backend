@@ -4,6 +4,9 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author Mingqi Yi
+ */
 @Entity
 @Table(name = "time_slot")
 public class TimeSlotEntity {

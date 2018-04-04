@@ -100,11 +100,7 @@ public class UserEntity {
 
     public void setType(Integer type) {
         if (0 < type && type < TYPE_NUM) {
-            /*for(Integer right : typeRights.get(this.type))
-                rights.remove(right);*/
             this.type = type;
-            /*for(Integer right : typeRights.get(this.type))
-                rights.add(right); //modify rights*/
         }
     }
 
@@ -139,28 +135,6 @@ public class UserEntity {
     public void setPhoto(String photo) {
         this.photo = photo;
     }
-
-    /*public Set<Integer> getRights() {
-        return rights;
-    }
-
-    public void setRights(Set<Integer> rights) {
-        this.rights = rights;
-    }
-
-    public void addRight(int right) {
-        this.rights.add(right);
-    }
-
-    public void addRights(Set<Integer> rights) {
-        for(Integer right : rights) {
-            this.rights.add(right);
-        }
-    }
-
-    public boolean hasRight(int right) {
-        return this.rights.contains(right);
-    }*/
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "student")
     public Set<TakesEntity> getTakes() {

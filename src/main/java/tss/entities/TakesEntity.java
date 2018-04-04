@@ -2,9 +2,16 @@ package tss.entities;
 
 import javax.persistence.*;
 
+/**
+ * @author Mingqi Yi
+ * <p>
+ * TODO: add hashCode and equals method
+ */
 @Entity
 @Table(name = "takes")
 public class TakesEntity {
+    private final int SCORE_MAX = 100;
+
     private long id;
     private UserEntity student;
     private Integer score;
@@ -27,7 +34,7 @@ public class TakesEntity {
     }
 
     public void setScore(Integer score) {
-        if (score >= 0 && score <= 100) {
+        if (score >= 0 && score <= SCORE_MAX) {
             this.score = score;
         }
     }

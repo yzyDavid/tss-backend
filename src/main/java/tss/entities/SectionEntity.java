@@ -4,6 +4,11 @@ import tss.information.untapped.ClassroomEntity;
 
 import javax.persistence.*;
 
+/**
+ * @author Mingqi Yi
+ *
+ * TODO: equals and hashCode method
+ */
 @Entity
 @Table(name = "section")
 public class SectionEntity {

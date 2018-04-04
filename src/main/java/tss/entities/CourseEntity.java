@@ -4,6 +4,9 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author Mingqi Yi
+ */
 @Entity
 @Table(name = "course")
 public class CourseEntity {
@@ -13,8 +16,6 @@ public class CourseEntity {
     private Character semester;
     private String intro;
     private Set<SectionEntity> sections = new HashSet<>();
-    //private Integer examBeginTime;
-    //private Integer examDuration;
 
     @Id
     @Column(name = "course_id", length = 10)
@@ -26,7 +27,7 @@ public class CourseEntity {
         this.cid = cid;
     }
 
-    @Column(name = "course_name", nullable = false)
+    @Column(name = "course_name", nullable = false, length = 30)
     public String getName() {
         return name;
     }
@@ -53,7 +54,7 @@ public class CourseEntity {
         this.semester = semester;
     }
 
-    @Column(name = "course_intro")
+    @Column(name = "course_intro", length = 200)
     public String getIntro() {
         return intro;
     }
