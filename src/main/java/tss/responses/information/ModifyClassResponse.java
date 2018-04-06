@@ -2,11 +2,11 @@ package tss.responses.information;
 
 import org.jetbrains.annotations.Nls;
 
-public class ModifyInstructorResponse {
+public class ModifyClassResponse {
     @Nls
-    private final String status;
+    final String status;
 
-    public ModifyInstructorResponse(String status) {
+    public ModifyClassResponse(String status) {
         this.status = status;
     }
 
@@ -14,3 +14,4 @@ public class ModifyInstructorResponse {
         return status;
     }
 }
+

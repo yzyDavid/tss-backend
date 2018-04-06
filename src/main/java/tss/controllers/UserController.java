@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tss.configs.Config;
 import tss.entities.UserEntity;
-import tss.repositories.TeachesRepository;
 import tss.repositories.UserRepository;
 import tss.requests.information.*;
 import tss.responses.information.*;
@@ -34,15 +33,12 @@ import static tss.utils.SecurityUtils.getSalt;
 @RequestMapping(path = "/user")
 public class UserController {
     private final UserRepository userRepository;
-    private final TeachesRepository teachesRepository;
     private final ResourceLoader resourceLoader;
 
     @Autowired
-    public UserController(UserRepository userRepository, ResourceLoader resourceLoader,
-                          TeachesRepository teachesRepository) {
+    public UserController(UserRepository userRepository, ResourceLoader resourceLoader) {
         this.userRepository = userRepository;
         this.resourceLoader = resourceLoader;
-        this.teachesRepository = teachesRepository;
     }
 
     @PutMapping(path = "/add")

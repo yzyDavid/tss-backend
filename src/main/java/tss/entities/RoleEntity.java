@@ -1,4 +1,6 @@
-package tss.information.untapped;
+package tss.entities;
+
+import tss.entities.UserEntity;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -10,6 +12,7 @@ public class RoleEntity {
     private short id;
     private String name;
     private Set<AuthorityEntity> authorities = new HashSet<>();
+    private Set<UserEntity> users = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,6 +24,7 @@ public class RoleEntity {
         this.id = id;
     }
 
+    @Column(length = 15, nullable = false)
     public String getName() {
         return name;
     }
@@ -29,7 +33,7 @@ public class RoleEntity {
         this.name = name;
     }
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(name = "role_authority", joinColumns = {@JoinColumn(name = "role_id")}, inverseJoinColumns = {@JoinColumn(name = "authority_id")})
     public Set<AuthorityEntity> getAuthorities() {
         return authorities;
@@ -37,5 +41,14 @@ public class RoleEntity {
 
     public void setAuthorities(Set<AuthorityEntity> authorities) {
         this.authorities = authorities;
+    }
+
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH}, mappedBy = "roles")
+    public Set<UserEntity> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<UserEntity> users) {
+        this.users = users;
     }
 }

@@ -16,7 +16,9 @@ public class TakesEntity {
     private UserEntity student;
     private Integer score;
     private Integer year;
-    private TeachesEntity teaches;
+    private Character semester;
+    private String cid;
+    private ClassEntity _class;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -58,13 +60,31 @@ public class TakesEntity {
         this.year = year;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "teaches_id")
-    public TeachesEntity getTeaches() {
-        return teaches;
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH}, optional = false)
+    @JoinColumn(name = "class_id", nullable = false)
+    public ClassEntity get_class() {
+        return _class;
     }
 
-    public void setTeaches(TeachesEntity teaches) {
-        this.teaches = teaches;
+    public void set_class(ClassEntity _class) {
+        this._class = _class;
+    }
+
+    @Column(name = "semester")
+    public Character getSemester() {
+        return semester;
+    }
+
+    public void setSemester(Character semester) {
+        this.semester = semester;
+    }
+
+    @Column(name = "course_id", length = 10, nullable = false)
+    public String getCid() {
+        return cid;
+    }
+
+    public void setCid(String cid) {
+        this.cid = cid;
     }
 }

@@ -10,14 +10,11 @@ import java.util.Set;
 public class TeachesEntity {
     private long id;
     private UserEntity teacher;
-    private Integer capacity;
-    @Column(length = 10)
-    private String cid;
-    private Set<SectionEntity> sections = new HashSet<>();
-    private Set<TakesEntity> takes = new HashSet<>();
+    private CourseEntity course;
+    private Set<ClassEntity> classes = new HashSet<>();
 
-    public TeachesEntity(UserEntity user, String cid) {
-        this.cid = cid;
+    public TeachesEntity(UserEntity user, CourseEntity course) {
+        this.course = course;
         this.teacher = user;
     }
 
@@ -32,17 +29,18 @@ public class TeachesEntity {
         this.id = id;
     }
 
-    public String getCid() {
-        return cid;
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "course_id", nullable = false)
+    public CourseEntity getCourse() {
+        return course;
     }
 
-    public void setCid(String cid) {
-        this.cid = cid;
+    public void setCourse(CourseEntity course) {
+        this.course = course;
     }
-
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "teacher_id")
+    @JoinColumn(name = "teacher_id", nullable = false)
     public UserEntity getTeacher() {
         return teacher;
     }
@@ -51,30 +49,12 @@ public class TeachesEntity {
         this.teacher = teacher;
     }
 
-    @Column(name = "capacity")
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
-    }
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "teaches")
-    public Set<SectionEntity> getSections() {
-        return sections;
+    public Set<ClassEntity> getClasses() {
+        return classes;
     }
 
-    public void setSections(Set<SectionEntity> sections) {
-        this.sections = sections;
-    }
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teaches")
-    public Set<TakesEntity> getTakes() {
-        return takes;
-    }
-
-    public void setTakes(Set<TakesEntity> takes) {
-        this.takes = takes;
+    public void setClasses(Set<ClassEntity> classes) {
+        this.classes = classes;
     }
 }

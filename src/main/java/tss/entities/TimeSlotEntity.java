@@ -26,7 +26,7 @@ public class TimeSlotEntity {
         this.id = id;
     }
 
-    @Column(name = "day", length = 4)
+    @Column(name = "day", length = 4, nullable = false)
     public String getDay() {
         return day;
     }
@@ -35,7 +35,7 @@ public class TimeSlotEntity {
         this.day = day;
     }
 
-    @Column(name = "start_time")
+    @Column(name = "start_time", nullable = false)
     public int getStart() {
         return start;
     }
@@ -44,7 +44,7 @@ public class TimeSlotEntity {
         this.start = start;
     }
 
-    @Column(name = "end_time")
+    @Column(name = "end_time", nullable = false)
     public int getEnd() {
         return end;
     }
@@ -53,7 +53,7 @@ public class TimeSlotEntity {
         this.end = end;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "timeSlot")
+    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "timeSlot")
     public Set<SectionEntity> getSections() {
         return sections;
     }

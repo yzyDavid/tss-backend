@@ -1,4 +1,4 @@
-package tss.information.untapped;
+package tss.entities;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -21,7 +21,7 @@ public class AuthorityEntity {
         this.id = id;
     }
 
-    @Column(length = 32)
+    @Column(length = 31, nullable = false)
     public String getUri() {
         return uri;
     }
@@ -30,7 +30,7 @@ public class AuthorityEntity {
         this.uri = uri;
     }
 
-    @ManyToMany(mappedBy = "authorities")
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH}, mappedBy = "authorities")
     public Set<RoleEntity> getRole() {
         return role;
     }

@@ -1,4 +1,4 @@
-package tss.information;
+package tss.requests.information;
 
 public class GetStudentsRequest {
     private int year;

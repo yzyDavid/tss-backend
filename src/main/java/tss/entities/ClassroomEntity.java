@@ -1,6 +1,4 @@
-package tss.information.untapped;
-
-import tss.entities.SectionEntity;
+package tss.entities;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -11,8 +9,8 @@ import java.util.Set;
 public class ClassroomEntity {
     short id;
     private String building;
-    private short room;
-    private short capactity;
+    private Integer room;
+    private Integer capactity;
     private Set<SectionEntity> sections = new HashSet<>();
 
     @Id
@@ -25,7 +23,7 @@ public class ClassroomEntity {
         this.id = id;
     }
 
-    @Column(length = 64)
+    @Column(length = 31)
     public String getBuilding() {
         return building;
     }
@@ -34,23 +32,25 @@ public class ClassroomEntity {
         this.building = building;
     }
 
-    public short getRoom() {
+    @Column(nullable = false)
+    public Integer getRoom() {
         return room;
     }
 
-    public void setRoom(short room) {
+    public void setRoom(Integer room) {
         this.room = room;
     }
 
-    public short getCapactity() {
+    @Column(nullable = false)
+    public Integer getCapactity() {
         return capactity;
     }
 
-    public void setCapactity(short capactity) {
+    public void setCapactity(Integer capactity) {
         this.capactity = capactity;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "classroom")
+    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "classroom")
     public Set<SectionEntity> getSections() {
         return sections;
     }

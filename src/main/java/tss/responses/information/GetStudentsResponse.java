@@ -1,4 +1,4 @@
-package tss.information;
+package tss.responses.information;
 
 import org.jetbrains.annotations.Nls;
 

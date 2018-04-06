@@ -1,7 +1,5 @@
 package tss.entities;
 
-import tss.information.untapped.ClassroomEntity;
-
 import javax.persistence.*;
 
 /**
@@ -13,18 +11,9 @@ import javax.persistence.*;
 @Table(name = "section")
 public class SectionEntity {
     private long id;
-    private Character semester;
-    private Integer year;
     private TimeSlotEntity timeSlot;
     private ClassroomEntity classroom;
-    private TeachesEntity teaches;
-    private CourseEntity course;
-    private TakesEntity takes;
-
-    public SectionEntity(TeachesEntity teaches, CourseEntity course) {
-        this.teaches = teaches;
-        this.course = course;
-    }
+    private ClassEntity _class;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -36,23 +25,7 @@ public class SectionEntity {
         this.id = id;
     }
 
-    public Character getSemester() {
-        return semester;
-    }
-
-    public void setSemester(Character semester) {
-        this.semester = semester;
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(Integer year) {
-        this.year = year;
-    }
-
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
     @JoinColumn(name = "classroom_id")
     public ClassroomEntity getClassroom() {
         return classroom;
@@ -62,7 +35,7 @@ public class SectionEntity {
         this.classroom = classroom;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
     @JoinColumn(name = "time_slot_id")
     public TimeSlotEntity getTimeSlot() {
         return timeSlot;
@@ -73,32 +46,12 @@ public class SectionEntity {
     }
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "teaches_id")
-    public TeachesEntity getTeaches() {
-        return teaches;
+    @JoinColumn(name = "class_id", nullable = false)
+    public ClassEntity get_class() {
+        return _class;
     }
 
-    public void setTeaches(TeachesEntity teaches) {
-        this.teaches = teaches;
-    }
-
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "course_id")
-    public CourseEntity getCourse() {
-        return course;
-    }
-
-    public void setCourse(CourseEntity course) {
-        this.course = course;
-    }
-
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "takes_id")
-    public TakesEntity getTakes() {
-        return takes;
-    }
-
-    public void setTakes(TakesEntity takes) {
-        this.takes = takes;
+    public void set_class(ClassEntity _class) {
+        this._class = _class;
     }
 }

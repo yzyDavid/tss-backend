@@ -15,7 +15,9 @@ public class CourseEntity {
     private Float credit;
     private Character semester;
     private String intro;
-    private Set<SectionEntity> sections = new HashSet<>();
+    private DepartmentEntity department;
+    private Set<ClassEntity> classes = new HashSet<>();
+    private Set<TeachesEntity> teaches = new HashSet<>();
 
     @Id
     @Column(name = "course_id", length = 10)
@@ -64,12 +66,31 @@ public class CourseEntity {
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
-    public Set<SectionEntity> getSections() {
-        return sections;
+    public Set<ClassEntity> getClasses() {
+        return classes;
     }
 
-    public void setSections(Set<SectionEntity> sections) {
-        this.sections = sections;
+    public void setClasses(Set<ClassEntity> classes) {
+        this.classes = classes;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
+    public Set<TeachesEntity> getTeaches() {
+        return teaches;
+    }
+
+    public void setTeaches(Set<TeachesEntity> teaches) {
+        this.teaches = teaches;
+    }
+
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE}, optional = false)
+    @JoinColumn(name = "department_id")
+    public DepartmentEntity getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(DepartmentEntity department) {
+        this.department = department;
     }
 
     /*public Integer getExamBeginTime() {

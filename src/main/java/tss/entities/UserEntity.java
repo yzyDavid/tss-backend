@@ -1,5 +1,6 @@
 package tss.entities;
 
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,46 +19,24 @@ public class UserEntity {
     public static final int TYPE_STUDENT = 3;
     public static final int TYPE_NUM = 3;
 
-    public static final int MODIFY_OTHERS_PWD = 0;
-    public static final int MODIFY_OTHERS_INFO = 1;
-    public static final int ADD_USER = 2;
-    public static final int DELETE_USER = 3;
-    public static final int ADD_COURSE = 4;
-    public static final int ADD_TEACHER = 5;
-    public static final int ADD_TA = 6;
-    public static final int ADD_STUDENT = 7;
-    // all kinds of operation
-
-    //private static Map<Integer, Set<Integer>> typeRights;
 
     private String uid;
-
     private String name;
-
     private String hashedPassword;
-
     private String salt;
-
     private Integer type;
-
     private String email;
-
     private String telephone;
-
     private String intro;
-
     /**
      * fileName
      */
     private String photo;
-
-    //private Set<Integer> rights = new HashSet<>();
-
-    private Set<TeachesEntity> instructors = new HashSet<>();
-
+    private DepartmentEntity department;
+    private Set<TeachesEntity> teaches = new HashSet<>();
     private Set<TakesEntity> takes = new HashSet<>();
+    private Set<RoleEntity> roles = new HashSet<>();
 
-    //TODO : photo, rights, department etc.
 
     public String getName() {
         return name;
@@ -77,7 +56,7 @@ public class UserEntity {
         this.uid = uid;
     }
 
-
+    @Column(name = "hashed_pwd", length = 256)
     public String getHashedPassword() {
         return hashedPassword;
     }
@@ -86,6 +65,7 @@ public class UserEntity {
         this.hashedPassword = hashedPassword;
     }
 
+    @Column(length = 16)
     public String getSalt() {
         return salt;
     }
@@ -104,6 +84,7 @@ public class UserEntity {
         }
     }
 
+    @Column(length = 16)
     public String getTelephone() {
         return telephone;
     }
@@ -112,6 +93,7 @@ public class UserEntity {
         this.telephone = telephone;
     }
 
+    @Column(length = 31)
     public String getEmail() {
         return email;
     }
@@ -128,6 +110,7 @@ public class UserEntity {
         this.intro = intro;
     }
 
+    @Column(length = 10)
     public String getPhoto() {
         return photo;
     }
@@ -145,20 +128,44 @@ public class UserEntity {
         this.takes = takes;
     }
 
-    public void addTake(TakesEntity take) {
-        takes.add(take);
-    }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher")
-    public Set<TeachesEntity> getInstructors() {
-        return instructors;
+    public Set<TeachesEntity> getTeaches() {
+        return teaches;
     }
 
-    public void setInstructors(Set<TeachesEntity> instructors) {
-        this.instructors = instructors;
+    public void setTeaches(Set<TeachesEntity> teaches) {
+        this.teaches = teaches;
     }
 
-    public void addInstructors(TeachesEntity instructor) {
-        instructors.add(instructor);
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE}, optional = false)
+    @JoinColumn(name = "department_id")
+    public DepartmentEntity getDepartment() {
+        return department;
     }
+
+    public void setDepartment(DepartmentEntity department) {
+        this.department = department;
+    }
+
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    @JoinTable(name = "user_role", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
+    public Set<RoleEntity> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RoleEntity> roles) {
+        this.roles = roles;
+    }
+
+    public boolean haveAuthority(String uri) {
+        for(RoleEntity role : roles) {
+            for(AuthorityEntity authority : role.getAuthorities()) {
+                if(authority.getUri().equals(uri))
+                    return true;
+            }
+        }
+        return false;
+    }
+
 }
