@@ -3,6 +3,7 @@ package tss.repositories;
 import org.springframework.data.repository.CrudRepository;
 import tss.entities.UserEntity;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -10,8 +11,9 @@ import java.util.Optional;
  */
 public interface UserRepository extends CrudRepository<UserEntity, String> {
     /**
-     * @param uid
-     * @return boolean
-     * check exists of a UID
+     * @param name
+     * @return Optional<UserEntity>
+     * description
      */
+    List<UserEntity> findByName(String name);
 }

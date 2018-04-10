@@ -13,6 +13,8 @@ import tss.responses.information.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -129,6 +131,17 @@ public class CourseController {
         CourseEntity course = courseRepository.findById(cid).get();
         return new ResponseEntity<>(new GetCourseResponse("ok", course.getCid(), course.getName(),
                 course.getCredit(), course.getSemester(), course.getIntro()), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/name")
+    @Authorization
+    public ResponseEntity<GetCoursesByNameResponse> getCidsByName(@RequestParam String name) {
+        List<String> cids = new ArrayList<>();
+        List<CourseEntity> ret = courseRepository.findByName(name);
+        for(CourseEntity user : ret) {
+            cids.add(user.getCid());
+        }
+        return new ResponseEntity<>(new GetCoursesByNameResponse("OK", cids), HttpStatus.OK);
     }
 
     //TODO: getClasses

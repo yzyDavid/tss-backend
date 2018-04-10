@@ -2,7 +2,7 @@ package tss.responses.information;
 
 import org.jetbrains.annotations.Nls;
 
-public class GetUserResponse {
+public class GetUserByUidResponse {
     private final @Nls
     String status;
     private final String uid;
@@ -12,8 +12,8 @@ public class GetUserResponse {
     private final String telephone;
     private final String intro;
 
-    public GetUserResponse(String status, String uid, String name, int type, String email,
-                           String telephone, String intro) {
+    public GetUserByUidResponse(String status, String uid, String name, int type, String email,
+                                String telephone, String intro) {
         this.status = status;
         this.uid = uid;
         this.name = name;

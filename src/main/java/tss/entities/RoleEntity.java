@@ -7,7 +7,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "role")
+@Table(name = "role", indexes = {
+        @Index(name = "role_name_index", columnList = "role_name")
+})
 public class RoleEntity {
     private short id;
     private String name;
@@ -24,7 +26,7 @@ public class RoleEntity {
         this.id = id;
     }
 
-    @Column(length = 15, nullable = false)
+    @Column(name = "role_name", length = 15, nullable = false)
     public String getName() {
         return name;
     }
