@@ -6,13 +6,15 @@ import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
-public class CompositeKeys implements Serializable{
+public class CompositeKeys implements Serializable {
     @NonNull
     String uid;
     @NonNull
     String cid;
 
-    CompositeKeys() {}
+    CompositeKeys() {
+    }
+
     CompositeKeys(String uid, String cid) {
         this.uid = uid;
         this.cid = cid;
@@ -36,12 +38,15 @@ public class CompositeKeys implements Serializable{
 
     @Override
     public boolean equals(Object other) {
-        if ((this == other))
+        if ((this == other)) {
             return true;
-        if ((other == null))
+        }
+        if ((other == null)) {
             return false;
-        if (!(other instanceof CompositeKeys))
+        }
+        if (!(other instanceof CompositeKeys)) {
             return false;
+        }
         CompositeKeys tmp = (CompositeKeys) other;
 
         return uid.equals(tmp.uid) & cid.equals(tmp.cid);

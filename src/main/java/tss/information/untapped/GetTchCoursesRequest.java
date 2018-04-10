@@ -17,15 +17,15 @@ public class GetTchCoursesRequest {
         return semester;
     }
 
-    public void setYear(int year) {
-        this.year = year;
+    public void setSemester(char semester) {
+        this.semester = semester;
     }
 
     public int getYear() {
         return year;
     }
 
-    public void setSemester(char semester) {
-        this.semester = semester;
+    public void setYear(int year) {
+        this.year = year;
     }
 }
