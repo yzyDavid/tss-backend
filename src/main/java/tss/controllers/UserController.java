@@ -19,6 +19,8 @@ import tss.utils.SecurityUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static tss.utils.SecurityUtils.getHashedPasswordByPasswordAndSalt;
@@ -136,15 +138,26 @@ public class UserController {
 
     @GetMapping(path = "/info")
     @Authorization
-    public ResponseEntity<GetUserResponse> getInfo(@RequestParam String uid) {
+    public ResponseEntity<GetUserByUidResponse> getInfo(@RequestParam String uid) {
         Optional<UserEntity> ret = userRepository.findById(uid);
         if(!ret.isPresent()) {
-            return new ResponseEntity<>(new GetUserResponse("non-existent uid", "", "", -1,
+            return new ResponseEntity<>(new GetUserByUidResponse("non-existent uid", "", "", -1,
                     "", "", ""), HttpStatus.BAD_REQUEST);
         }
         UserEntity user = ret.get();
-        return new ResponseEntity<>(new GetUserResponse("OK", user.getUid(), user.getName(), user.getType(),
+        return new ResponseEntity<>(new GetUserByUidResponse("OK", user.getUid(), user.getName(), user.getType(),
                 user.getEmail(), user.getTelephone(), user.getIntro()), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/name")
+    @Authorization
+    public ResponseEntity<GetUsersByNameResponse> getUidsByName(@RequestParam String name) {
+        List<String> uids = new ArrayList<>();
+        List<UserEntity> ret = userRepository.findByName(name);
+        for(UserEntity user : ret) {
+            uids.add(user.getUid());
+        }
+        return new ResponseEntity<>(new GetUsersByNameResponse("OK", uids), HttpStatus.OK);
     }
 
     @PostMapping(path = "/photo")
