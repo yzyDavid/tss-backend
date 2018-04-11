@@ -53,7 +53,7 @@ public class TimeSlotEntity {
         this.end = end;
     }
 
-    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "timeSlot")
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "timeSlot")
     public Set<SectionEntity> getSections() {
         return sections;
     }

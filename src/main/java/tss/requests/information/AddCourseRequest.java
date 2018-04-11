@@ -3,9 +3,9 @@ package tss.requests.information;
 public class AddCourseRequest {
     private String cid;
     private String name;
-    private float credit;
-    private char semester;
-    private int capacity;
+    private Float credit;
+    private String semester;
+    private String dept;
 
     public String getCid() {
         return cid;
@@ -23,27 +23,27 @@ public class AddCourseRequest {
         this.name = name;
     }
 
-    public float getCredit() {
+    public Float getCredit() {
         return credit;
     }
 
-    public void setCredit(float credit) {
+    public void setCredit(Float credit) {
         this.credit = credit;
     }
 
-    public char getSemester() {
+    public String getSemester() {
         return semester;
     }
 
-    public void setSemester(char semester) {
+    public void setSemester(String semester) {
         this.semester = semester;
     }
 
-    public int getCapacity() {
-        return capacity;
+    public String getDept() {
+        return dept;
     }
 
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
+    public void setDept(String dept) {
+        this.dept = dept;
     }
 }

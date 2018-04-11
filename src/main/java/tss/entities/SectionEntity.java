@@ -25,7 +25,7 @@ public class SectionEntity {
         this.id = id;
     }
 
-    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     @JoinColumn(name = "classroom_id")
     public ClassroomEntity getClassroom() {
         return classroom;
@@ -35,7 +35,7 @@ public class SectionEntity {
         this.classroom = classroom;
     }
 
-    @ManyToOne(cascade = CascadeType.MERGE, optional = false)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     @JoinColumn(name = "time_slot_id")
     public TimeSlotEntity getTimeSlot() {
         return timeSlot;
@@ -45,7 +45,7 @@ public class SectionEntity {
         this.timeSlot = timeSlot;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     @JoinColumn(name = "class_id", nullable = false)
     public ClassEntity get_class() {
         return _class;

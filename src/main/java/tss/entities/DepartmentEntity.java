@@ -5,7 +5,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "department")
+@Table(name = "department", indexes = {
+        @Index(name = "dept_name_index", columnList = "dept_name", unique = true)
+})
 public class DepartmentEntity {
     private short id;
     private String name;
@@ -22,7 +24,7 @@ public class DepartmentEntity {
         this.id = id;
     }
 
-    @Column(length = 31)
+    @Column(name = "dept_name", length = 31, unique = true)
     public String getName() {
         return name;
     }
@@ -31,7 +33,7 @@ public class DepartmentEntity {
         this.name = name;
     }
 
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE}, mappedBy = "department")
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "department")
     public Set<UserEntity> getUsers() {
         return users;
     }
@@ -40,7 +42,7 @@ public class DepartmentEntity {
         this.users = users;
     }
 
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE}, mappedBy = "department")
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "department")
     public Set<CourseEntity> getCourses() {
         return courses;
     }

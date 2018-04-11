@@ -19,6 +19,7 @@ import tss.utils.SecurityUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import static tss.utils.SecurityUtils.getHashedPasswordByPasswordAndSalt;
 import static tss.utils.SecurityUtils.getSalt;
@@ -46,12 +47,12 @@ public class UserController {
     public ResponseEntity<AddUserResponse> addUser(@CurrentUser UserEntity user,
                                                    @RequestBody AddUserRequest request) {
         String uid = request.getUid();
-        if (userRepository.existsById(uid)) {
-            return new ResponseEntity<>(new AddUserResponse("failed with duplicated uid", "", ""), HttpStatus.BAD_REQUEST);
-        } else if (user.getType() != UserEntity.TYPE_MANAGER) {
+        if (user.getType() != UserEntity.TYPE_MANAGER) {
             return new ResponseEntity<>(new AddUserResponse("permission denied", "", ""), HttpStatus.FORBIDDEN);
         }
-
+        if (userRepository.existsById(uid)) {
+            return new ResponseEntity<>(new AddUserResponse("failed with duplicated uid", null, null), HttpStatus.BAD_REQUEST);
+        }
         UserEntity entity = new UserEntity();
         entity.setUid(uid);
         entity.setName(request.getName());
@@ -59,10 +60,10 @@ public class UserController {
         String hashedPassword = getHashedPasswordByPasswordAndSalt(request.getPassword(), salt);
         entity.setSalt(salt);
         entity.setHashedPassword(hashedPassword);
-        //entity.setType(request.getType());
+        entity.setType(request.getType());
 
         userRepository.save(entity);
-        return new ResponseEntity<>(new AddUserResponse("OK", uid, user.getName()), HttpStatus.CREATED);
+        return new ResponseEntity<>(new AddUserResponse("OK", uid, request.getName()), HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "/delete")
@@ -70,13 +71,15 @@ public class UserController {
     public ResponseEntity<DeleteUserResponse> deleteUser(@CurrentUser UserEntity user,
                                                          @RequestBody DeleteUserRequest request) {
         String uid = request.getUid();
-        if (!userRepository.existsById(uid)) {
-            return new ResponseEntity<>(new DeleteUserResponse("non-existent uid", uid, ""), HttpStatus.BAD_REQUEST);
-        } else if (user.getType() != UserEntity.TYPE_MANAGER) {
+
+        if (user.getType() != UserEntity.TYPE_MANAGER) {
             return new ResponseEntity<>(new DeleteUserResponse("permission denied", "", ""), HttpStatus.FORBIDDEN);
         }
-
-        UserEntity entity = userRepository.findById(uid).get();
+        Optional<UserEntity> ret = userRepository.findById(uid);
+        if(!ret.isPresent()) {
+            return new ResponseEntity<>(new DeleteUserResponse("non-existent uid", null, null), HttpStatus.BAD_REQUEST);
+        }
+        UserEntity entity = ret.get();
         String name = entity.getName();
         userRepository.delete(entity);
 
@@ -87,18 +90,21 @@ public class UserController {
     @Authorization
     public ResponseEntity<ModifyPwdResponse> modifyPwd(@CurrentUser UserEntity user,
                                                        @RequestBody ModifyPwdRequest request) {
-        String uid = user.getUid();
-        String name = user.getName();
-
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            if (user.getUid() != request.getUid()) {
-                return new ResponseEntity<>(new ModifyPwdResponse("permission denied", "", ""), HttpStatus.FORBIDDEN);
-            } else if (!user.getHashedPassword().equals(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getOldPwd(), user.getSalt()))) {
-                return new ResponseEntity<>(new ModifyPwdResponse("incorrect password", uid, name), HttpStatus.UNAUTHORIZED);
-            }
+        String uid = request.getUid();
+        if(user.getType() != UserEntity.TYPE_MANAGER || user.getUid() != request.getUid())
+            return new ResponseEntity<>(new ModifyPwdResponse("permission denied", uid, ""), HttpStatus.FORBIDDEN);
+        Optional<UserEntity> ret = userRepository.findById(uid);
+        if(!ret.isPresent()) {
+            return new ResponseEntity<>(new ModifyPwdResponse("non-existent uid", uid, null), HttpStatus.BAD_REQUEST);
         }
-
-        user.setHashedPassword(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getNewPwd(), user.getSalt()));
+        UserEntity tar = ret.get();
+        String name = tar.getName();
+        if (tar.getType() != UserEntity.TYPE_MANAGER &&
+        !tar.getHashedPassword().equals(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getOldPwd(), tar.getSalt()))) {
+            return new ResponseEntity<>(new ModifyPwdResponse("incorrect password", uid, name), HttpStatus.UNAUTHORIZED);
+        }
+        tar.setHashedPassword(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getNewPwd(), tar.getSalt()));
+        userRepository.save(tar);
 
         return new ResponseEntity<>(new ModifyPwdResponse("OK", uid, name), HttpStatus.OK);
     }
@@ -107,36 +113,36 @@ public class UserController {
     @Authorization
     public ResponseEntity<ModifyUserResponse> modifyInfo(@CurrentUser UserEntity user,
                                                          @RequestBody ModifyUserRequest request) {
-
-        if (!userRepository.existsById(request.getUid())) {
-            return new ResponseEntity<>(new ModifyUserResponse("non-existent uid", "", ""), HttpStatus.BAD_REQUEST);
-        } else if (user.getType() != UserEntity.TYPE_MANAGER && user.getUid() != request.getUid()) {
-            return new ResponseEntity<>(new ModifyUserResponse("permission denied", "", ""), HttpStatus.FORBIDDEN);
+        if (user.getType() != UserEntity.TYPE_MANAGER && user.getUid() != request.getUid()) {
+            return new ResponseEntity<>(new ModifyUserResponse("permission denied", null, null), HttpStatus.FORBIDDEN);
         }
-
-        user = userRepository.findById(user.getUid()).get();
-
+        Optional<UserEntity> ret = userRepository.findById(request.getUid());
+        if(!ret.isPresent()) {
+            return new ResponseEntity<>(new ModifyUserResponse("non-existent uid", request.getUid(), null), HttpStatus.BAD_REQUEST);
+        }
+        UserEntity tar = ret.get();
         if (request.getEmail() != null) {
-            user.setEmail(request.getEmail());
+            tar.setEmail(request.getEmail());
         }
         if (request.getTelephone() != null) {
-            user.setTelephone(request.getTelephone());
+            tar.setTelephone(request.getTelephone());
         }
         if (request.getIntro() != null) {
-            user.setIntro(request.getIntro());
+            tar.setIntro(request.getIntro());
         }
-
-        return new ResponseEntity<>(new ModifyUserResponse("OK", user.getUid(), user.getName()), HttpStatus.OK);
+        userRepository.save(tar);
+        return new ResponseEntity<>(new ModifyUserResponse("OK", tar.getUid(), tar.getName()), HttpStatus.OK);
     }
 
     @GetMapping(path = "/info")
-    public ResponseEntity<GetUserResponse> getInfo(@RequestBody GetUserRequest request) {
-        String uid = request.getUid();
-        if (!userRepository.existsById(uid)) {
+    @Authorization
+    public ResponseEntity<GetUserResponse> getInfo(@RequestParam String uid) {
+        Optional<UserEntity> ret = userRepository.findById(uid);
+        if(!ret.isPresent()) {
             return new ResponseEntity<>(new GetUserResponse("non-existent uid", "", "", -1,
                     "", "", ""), HttpStatus.BAD_REQUEST);
         }
-        UserEntity user = userRepository.findById(uid).get();
+        UserEntity user = ret.get();
         return new ResponseEntity<>(new GetUserResponse("OK", user.getUid(), user.getName(), user.getType(),
                 user.getEmail(), user.getTelephone(), user.getIntro()), HttpStatus.OK);
     }
@@ -170,8 +176,8 @@ public class UserController {
     }
 
     @GetMapping(path = "")
-    public ResponseEntity<GetPhotoResponse> getPhoto(@RequestBody GetPhotoRequest request) {
-        String uid = request.getUid();
+    @Authorization
+    public ResponseEntity<GetPhotoResponse> getPhoto(@RequestParam String uid) {
         if (!userRepository.existsById(uid)) {
             return new ResponseEntity<>(new GetPhotoResponse("non-existent uid", null), HttpStatus.BAD_REQUEST);
         }

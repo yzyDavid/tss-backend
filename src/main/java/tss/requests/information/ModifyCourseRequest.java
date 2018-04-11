@@ -1,17 +1,15 @@
 package tss.requests.information;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public class ModifyCourseRequest {
+    @NotNull
     private String cid;
-    @Nullable
     private String name;
-    @Nullable
     private Float credit;
-    @Nullable
-    private Character semester;
-    @Nullable
+    private String semester;
     private String intro;
+    private String dept;
 
     public String getCid() {
         return cid;
@@ -37,11 +35,11 @@ public class ModifyCourseRequest {
         this.credit = credit;
     }
 
-    public Character getSemester() {
+    public String getSemester() {
         return semester;
     }
 
-    public void setSemester(Character semester) {
+    public void setSemester(String semester) {
         this.semester = semester;
     }
 
@@ -51,5 +49,13 @@ public class ModifyCourseRequest {
 
     public void setIntro(String intro) {
         this.intro = intro;
+    }
+
+    public String getDept() {
+        return dept;
+    }
+
+    public void setDept(String dept) {
+        this.dept = dept;
     }
 }

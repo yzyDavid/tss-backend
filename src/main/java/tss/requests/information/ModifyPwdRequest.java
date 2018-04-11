@@ -5,12 +5,6 @@ public class ModifyPwdRequest {
     private String oldPwd;
     private String newPwd;
 
-    ModifyPwdRequest(String uid, String oldPwd, String newPwd) {
-        this.uid = uid;
-        this.oldPwd = oldPwd;
-        this.newPwd = newPwd;
-    }
-
     public String getUid() {
         return uid;
     }

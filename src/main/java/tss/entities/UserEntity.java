@@ -1,6 +1,5 @@
 package tss.entities;
 
-
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -11,7 +10,9 @@ import java.util.Set;
  * TODO: index
  */
 @Entity
-@Table(name = "user")
+@Table(name = "user", indexes = {
+        @Index(name = "user_name_index", columnList = "user_name")
+})
 public class UserEntity {
     public static final int TYPE_MANAGER = 0;
     public static final int TYPE_TEACHER = 1;
@@ -38,6 +39,7 @@ public class UserEntity {
     private Set<RoleEntity> roles = new HashSet<>();
 
 
+    @Column(name = "user_name")
     public String getName() {
         return name;
     }
@@ -47,7 +49,7 @@ public class UserEntity {
     }
 
     @Id
-    @Column(name = "course_id", length = 10)
+    @Column(name = "user_id", length = 10)
     public String getUid() {
         return uid;
     }
@@ -56,7 +58,7 @@ public class UserEntity {
         this.uid = uid;
     }
 
-    @Column(name = "hashed_pwd", length = 256)
+    @Column(name = "hashed_pwd", length = 44)
     public String getHashedPassword() {
         return hashedPassword;
     }
@@ -65,7 +67,7 @@ public class UserEntity {
         this.hashedPassword = hashedPassword;
     }
 
-    @Column(length = 16)
+    @Column(length = 24)
     public String getSalt() {
         return salt;
     }
@@ -79,7 +81,7 @@ public class UserEntity {
     }
 
     public void setType(Integer type) {
-        if (0 < type && type < TYPE_NUM) {
+        if (0 <= type && type < TYPE_NUM) {
             this.type = type;
         }
     }
@@ -138,7 +140,7 @@ public class UserEntity {
         this.teaches = teaches;
     }
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE}, optional = false)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "department_id")
     public DepartmentEntity getDepartment() {
         return department;
@@ -148,7 +150,7 @@ public class UserEntity {
         this.department = department;
     }
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "user_role", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
     public Set<RoleEntity> getRoles() {
         return roles;

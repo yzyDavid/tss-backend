@@ -30,7 +30,7 @@ public class AuthorityEntity {
         this.uri = uri;
     }
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH}, mappedBy = "authorities")
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "authorities")
     public Set<RoleEntity> getRole() {
         return role;
     }

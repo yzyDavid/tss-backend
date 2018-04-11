@@ -9,9 +9,9 @@ public class ClassEntity {
     private long id;
     private Integer year;
     private Integer capacity;
-    private Integer studentNum;
-    private TeachesEntity teaches;
+    private Integer studentNum = 0;
     private CourseEntity course;
+    private Set<TeachesEntity> teaches;
     private Set<TakesEntity> takes;
     private Set<SectionEntity> sections;
 
@@ -51,17 +51,16 @@ public class ClassEntity {
         this.studentNum = studentNum;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "teaches_id")
-    public TeachesEntity getTeaches() {
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "classes")
+    public Set<TeachesEntity> getTeaches() {
         return teaches;
     }
 
-    public void setTeaches(TeachesEntity teaches) {
+    public void setTeaches(Set<TeachesEntity> teaches) {
         this.teaches = teaches;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     @JoinColumn(name = "course_id")
     public CourseEntity getCourse() {
         return course;
@@ -80,7 +79,7 @@ public class ClassEntity {
         this.sections = sections;
     }
 
-    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH}, mappedBy = "_class")
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "_class")
     public Set<TakesEntity> getTakes() {
         return takes;
     }

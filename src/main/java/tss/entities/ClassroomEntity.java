@@ -50,7 +50,7 @@ public class ClassroomEntity {
         this.capactity = capactity;
     }
 
-    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "classroom")
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "classroom")
     public Set<SectionEntity> getSections() {
         return sections;
     }

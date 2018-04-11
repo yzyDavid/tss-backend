@@ -33,7 +33,7 @@ public class RoleEntity {
         this.name = name;
     }
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "role_authority", joinColumns = {@JoinColumn(name = "role_id")}, inverseJoinColumns = {@JoinColumn(name = "authority_id")})
     public Set<AuthorityEntity> getAuthorities() {
         return authorities;
@@ -43,7 +43,7 @@ public class RoleEntity {
         this.authorities = authorities;
     }
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.DETACH}, mappedBy = "roles")
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "roles")
     public Set<UserEntity> getUsers() {
         return users;
     }

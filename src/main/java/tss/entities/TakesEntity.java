@@ -41,7 +41,7 @@ public class TakesEntity {
         }
     }
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     @JoinColumn(name = "student_id")
     public UserEntity getStudent() {
         return student;
@@ -60,7 +60,7 @@ public class TakesEntity {
         this.year = year;
     }
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.DETACH}, optional = false)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     @JoinColumn(name = "class_id", nullable = false)
     public ClassEntity get_class() {
         return _class;

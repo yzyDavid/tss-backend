@@ -8,12 +8,14 @@ import java.util.Set;
  * @author Mingqi Yi
  */
 @Entity
-@Table(name = "course")
+@Table(name = "course", indexes = {
+        @Index(name = "course_name_index", columnList = "course_name")
+})
 public class CourseEntity {
     private String cid;
     private String name;
     private Float credit;
-    private Character semester;
+    private String semester;
     private String intro;
     private DepartmentEntity department;
     private Set<ClassEntity> classes = new HashSet<>();
@@ -38,7 +40,7 @@ public class CourseEntity {
         this.name = name;
     }
 
-    @Column(name = "course_credit", nullable = false)
+    @Column(name = "course_credit")
     public Float getCredit() {
         return credit;
     }
@@ -47,12 +49,12 @@ public class CourseEntity {
         this.credit = credit;
     }
 
-    @Column(name = "course_semester", nullable = false)
-    public Character getSemester() {
+    @Column(name = "course_semester", length = 8)
+    public String getSemester() {
         return semester;
     }
 
-    public void setSemester(Character semester) {
+    public void setSemester(String semester) {
         this.semester = semester;
     }
 
@@ -83,7 +85,7 @@ public class CourseEntity {
         this.teaches = teaches;
     }
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE}, optional = false)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "department_id")
     public DepartmentEntity getDepartment() {
         return department;

@@ -2,7 +2,6 @@ package tss.requests.information;
 
 public class AddClassRequest {
     private String cid;
-    private long tid;
     private Integer capacity;
     private Integer year;
 
@@ -12,14 +11,6 @@ public class AddClassRequest {
 
     public void setCid(String cid) {
         this.cid = cid;
-    }
-
-    public long getTid() {
-        return tid;
-    }
-
-    public void setTid(long tid) {
-        this.tid = tid;
     }
 
     public Integer getCapacity() {

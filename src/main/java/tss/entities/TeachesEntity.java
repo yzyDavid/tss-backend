@@ -6,16 +6,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "instructor")
+@Table(name = "teaches")
 public class TeachesEntity {
     private long id;
-    private UserEntity teacher;
     private CourseEntity course;
-    private Set<ClassEntity> classes = new HashSet<>();
+    private UserEntity teacher;
+    private Set<ClassEntity> classes;
 
     public TeachesEntity(UserEntity user, CourseEntity course) {
-        this.course = course;
         this.teacher = user;
+        this.course = course;
     }
 
 
@@ -29,17 +29,7 @@ public class TeachesEntity {
         this.id = id;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "course_id", nullable = false)
-    public CourseEntity getCourse() {
-        return course;
-    }
-
-    public void setCourse(CourseEntity course) {
-        this.course = course;
-    }
-
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     @JoinColumn(name = "teacher_id", nullable = false)
     public UserEntity getTeacher() {
         return teacher;
@@ -49,12 +39,23 @@ public class TeachesEntity {
         this.teacher = teacher;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teaches")
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(name = "teaches_class", joinColumns = {@JoinColumn(name = "teaches_id")}, inverseJoinColumns = {@JoinColumn(name = "class_id")})
     public Set<ClassEntity> getClasses() {
         return classes;
     }
 
     public void setClasses(Set<ClassEntity> classes) {
         this.classes = classes;
+    }
+
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
+    @JoinColumn(name = "course_id", nullable = false)
+    public CourseEntity getCourse() {
+        return course;
+    }
+
+    public void setCourse(CourseEntity course) {
+        this.course = course;
     }
 }
