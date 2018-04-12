@@ -9,10 +9,17 @@ import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.*;
 import tss.repositories.*;
-import tss.requests.information.*;
-import tss.responses.information.*;
+import tss.requests.information.AddClassRequest;
+import tss.requests.information.DeleteClassesRequest;
+import tss.requests.information.ModifyClassRequest;
+import tss.responses.information.AddClassResponse;
+import tss.responses.information.DeleteClassesResponse;
+import tss.responses.information.GetInstructorsResponse;
+import tss.responses.information.ModifyClassResponse;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(path = "/class")
@@ -25,8 +32,8 @@ public class ClassController {
 
     @Autowired
     public ClassController(CourseRepository courseRepository, TeachesRepository teachesRepository,
-                     UserRepository userRepository, TakesRepository takesRepository,
-                     ClassRepository classRepository) {
+                           UserRepository userRepository, TakesRepository takesRepository,
+                           ClassRepository classRepository) {
         this.courseRepository = courseRepository;
         this.teachesRepository = teachesRepository;
         this.userRepository = userRepository;
@@ -45,8 +52,9 @@ public class ClassController {
         }
 
         Optional<CourseEntity> ret = courseRepository.findById(cid);
-        if(!ret.isPresent())
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new AddClassResponse("course doesn't exist"), HttpStatus.BAD_REQUEST);
+        }
         CourseEntity course = ret.get();
         ClassEntity newClass = new ClassEntity();
         newClass.setCapacity(request.getCapacity());
@@ -66,14 +74,14 @@ public class ClassController {
             return new ResponseEntity<>(new ModifyClassResponse("permission denied"), HttpStatus.FORBIDDEN);
         }
         Optional<ClassEntity> ret = classRepository.findById(cid);
-        if(!ret.isPresent()) {
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new ModifyClassResponse("can't find the class"), HttpStatus.BAD_REQUEST);
         }
         ClassEntity c = ret.get();
-        if(request.getCapacity() != null) {
+        if (request.getCapacity() != null) {
             c.setCapacity(request.getCapacity());
         }
-        if(request.getYear() != null) {
+        if (request.getYear() != null) {
             c.setYear(request.getYear());
         }
         classRepository.save(c);
@@ -91,15 +99,15 @@ public class ClassController {
         }
 
         List<Long> failIds = new ArrayList<>();
-        for(Long cid : cids) {
-            if(!classRepository.existsById(cid)) {
+        for (Long cid : cids) {
+            if (!classRepository.existsById(cid)) {
                 failIds.add(cid);
             }
         }
-        if(!failIds.isEmpty()) {
+        if (!failIds.isEmpty()) {
             return new ResponseEntity<>(new DeleteClassesResponse("Some Class don't exist", failIds), HttpStatus.BAD_REQUEST);
         }
-        for(Long cid : cids) {
+        for (Long cid : cids) {
             classRepository.deleteById(cid);
         }
         return new ResponseEntity<>(new DeleteClassesResponse("OK", failIds), HttpStatus.OK);
@@ -110,7 +118,7 @@ public class ClassController {
     public ResponseEntity<GetInstructorsResponse> getInstructors(Long cid) {
 
         Optional<ClassEntity> ret = classRepository.findById(cid);
-        if(!ret.isPresent()) {
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetInstructorsResponse("class non-exist", null, null, null, null), HttpStatus.BAD_REQUEST);
         }
         ClassEntity clazz = ret.get();
@@ -118,13 +126,13 @@ public class ClassController {
         List<String> names = new ArrayList<>();
         List<List<String>> times = new ArrayList<>();
         List<List<String>> classrooms = new ArrayList<>();
-        for(TeachesEntity teaches : clazz.getTeaches()) {
+        for (TeachesEntity teaches : clazz.getTeaches()) {
             UserEntity teacher = teaches.getTeacher();
             tids.add(teacher.getUid());
             names.add(teacher.getName());
             List<String> time = new ArrayList<>();
             List<String> location = new ArrayList<>();
-            for(SectionEntity section : clazz.getSections()) {
+            for (SectionEntity section : clazz.getSections()) {
                 TimeSlotEntity timeSlot = section.getTimeSlot();
                 ClassroomEntity classroom = section.getClassroom();
                 time.add(timeSlot.getDay() + " " + timeSlot.getStart() + "-" + timeSlot.getEnd());

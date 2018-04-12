@@ -33,9 +33,9 @@ public class DepartmentController {
     @Authorization
     public ResponseEntity<AddDepartmentResponse> addDepartment(@CurrentUser UserEntity user,
                                                                @RequestBody AddDepartmentRequest request) {
-        if(user.getType() != UserEntity.TYPE_MANAGER) {
+        if (user.getType() != UserEntity.TYPE_MANAGER) {
             return new ResponseEntity<>(new AddDepartmentResponse("permission denied"), HttpStatus.FORBIDDEN);
-        } else if(departmentRepository.existsByName(request.getName())) {
+        } else if (departmentRepository.existsByName(request.getName())) {
             return new ResponseEntity<>(new AddDepartmentResponse("duplicated name"), HttpStatus.BAD_REQUEST);
         }
         DepartmentEntity department = new DepartmentEntity();
@@ -47,10 +47,10 @@ public class DepartmentController {
     @GetMapping(path = "/getAll")
     @Authorization
     public ResponseEntity<GetAllDepartmentsResponse> getAllDepartments() {
-        Iterable<DepartmentEntity> depts = departmentRepository.findAll();
+        Iterable<DepartmentEntity> departments = departmentRepository.findAll();
         List<String> names = new ArrayList<>();
         List<Short> ids = new ArrayList<>();
-        for(DepartmentEntity dept : depts) {
+        for (DepartmentEntity dept : departments) {
             names.add(dept.getName());
             ids.add(dept.getId());
         }
@@ -61,8 +61,9 @@ public class DepartmentController {
     @Authorization
     public ResponseEntity<GetDepartmentResponse> getDepartment(String name) {
         Optional<DepartmentEntity> ret = departmentRepository.findByName(name);
-        if(!ret.isPresent())
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetDepartmentResponse("department doesn't exist", null, null), HttpStatus.BAD_REQUEST);
+        }
         DepartmentEntity dept = ret.get();
         return new ResponseEntity<>(new GetDepartmentResponse("ok", dept.getId(), dept.getName()), HttpStatus.OK);
     }
@@ -71,9 +72,7 @@ public class DepartmentController {
     @Authorization
     public ResponseEntity<DeleteDepartmentResponse> deleteDepartment(@CurrentUser UserEntity user,
                                                                      @RequestBody DeleteDepartmentRequest request) {
-        /*if(user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new AddDepartmentResponse("permission denied"), HttpStatus.FORBIDDEN);
-        } else*/ if(!departmentRepository.existsByName(request.getName())) {
+        if (!departmentRepository.existsByName(request.getName())) {
             return new ResponseEntity<>(new DeleteDepartmentResponse("department doesn't exist"), HttpStatus.BAD_REQUEST);
         }
         departmentRepository.deleteByName(request.getName());
@@ -84,11 +83,8 @@ public class DepartmentController {
     @Authorization
     public ResponseEntity<ModifyDepartmentResponse> modifyDepartment(@CurrentUser UserEntity user,
                                                                      @RequestBody ModifyDepartmentRequest request) {
-        /*if(user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new AddDepartmentResponse("permission denied"), HttpStatus.FORBIDDEN);
-        }*/
         Optional<DepartmentEntity> ret = departmentRepository.findByName(request.getName());
-        if(!ret.isPresent()) {
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new ModifyDepartmentResponse("department doesn't exist"), HttpStatus.BAD_REQUEST);
         }
         DepartmentEntity department = ret.get();
@@ -96,5 +92,4 @@ public class DepartmentController {
         departmentRepository.save(department);
         return new ResponseEntity<>(new ModifyDepartmentResponse("ok"), HttpStatus.OK);
     }
-
 }

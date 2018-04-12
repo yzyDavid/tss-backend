@@ -93,8 +93,9 @@ public class UserController {
     public ResponseEntity<ModifyPwdResponse> modifyPwd(@CurrentUser UserEntity user,
                                                        @RequestBody ModifyPwdRequest request) {
         String uid = request.getUid();
-        if(user.getType() != UserEntity.TYPE_MANAGER || user.getUid() != request.getUid())
+        if(user.getType() != UserEntity.TYPE_MANAGER || user.getUid() != request.getUid()) {
             return new ResponseEntity<>(new ModifyPwdResponse("permission denied", uid, ""), HttpStatus.FORBIDDEN);
+        }
         Optional<UserEntity> ret = userRepository.findById(uid);
         if(!ret.isPresent()) {
             return new ResponseEntity<>(new ModifyPwdResponse("non-existent uid", uid, null), HttpStatus.BAD_REQUEST);

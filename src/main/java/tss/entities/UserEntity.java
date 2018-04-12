@@ -163,8 +163,9 @@ public class UserEntity {
     public boolean haveAuthority(String uri) {
         for(RoleEntity role : roles) {
             for(AuthorityEntity authority : role.getAuthorities()) {
-                if(authority.getUri().equals(uri))
+                if(authority.getUri().equals(uri)) {
                     return true;
+                }
             }
         }
         return false;

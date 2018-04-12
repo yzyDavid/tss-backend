@@ -7,6 +7,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * @author yzy
+ *
+ * TODO: ensure it works
  */
 @Configuration
 public class CorsConfiguration {
