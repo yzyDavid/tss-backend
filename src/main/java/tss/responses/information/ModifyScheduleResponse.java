@@ -5,12 +5,12 @@ import org.jetbrains.annotations.Nls;
 /**
  * Created by apple on 2018/4/13.
  */
-public class AdjustScheduleResponse {
+public class ModifyScheduleResponse {
 
     @Nls
     private final String status;
 
-    public AdjustScheduleResponse(String status) {
+    public ModifyScheduleResponse(String status) {
         this.status = status;
     }
 

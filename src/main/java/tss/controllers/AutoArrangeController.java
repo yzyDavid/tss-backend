@@ -3,19 +3,14 @@ package tss.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.UserEntity;
-import tss.requests.information.AddClassRequest;
-import tss.requests.information.AdjustScheduleRequest;
+import tss.requests.information.ModifyScheduleRequest;
 import tss.requests.information.AutoArrangeRequest;
 import tss.requests.information.QueryScheduleRequest;
-import tss.responses.information.AddClassResponse;
-import tss.responses.information.AdjustScheduleResponse;
+import tss.responses.information.ModifyScheduleResponse;
 import tss.responses.information.AutoArrangeResponse;
 import tss.responses.information.QueryScheduleResponse;
 
@@ -39,22 +34,14 @@ public class AutoArrangeController {
         return new ResponseEntity<>(new AutoArrangeResponse("OK"), HttpStatus.OK);
     }
 
-    @PutMapping(path = "/adjust")
+
+
+    @PostMapping(path = "/modify")
     @Authorization
-    public ResponseEntity<AdjustScheduleResponse> adjustClass(@CurrentUser UserEntity user,@RequestBody AdjustScheduleRequest request){
+    public ResponseEntity<ModifyScheduleResponse> modifySchedule(@CurrentUser UserEntity user, @RequestBody ModifyScheduleRequest request){
 
 
-        return new ResponseEntity<>(new AdjustScheduleResponse("OK"), HttpStatus.OK);
+        return new ResponseEntity<>(new ModifyScheduleResponse("OK"), HttpStatus.OK);
     }
-
-    @GetMapping(path = "/query")
-    @Authorization
-    public ResponseEntity<QueryScheduleResponse> printClass(@CurrentUser UserEntity user, @RequestBody QueryScheduleRequest request){
-
-
-        return new ResponseEntity<>(new QueryScheduleResponse("OK"), HttpStatus.OK);
-    }
-
-
 
 }
