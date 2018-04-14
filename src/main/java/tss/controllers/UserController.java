@@ -45,13 +45,13 @@ public class UserController {
     }
 
     @PutMapping(path = "/add")
-    @Authorization
-    public ResponseEntity<AddUserResponse> addUser(@CurrentUser UserEntity user,
+//    @Authorization
+    public ResponseEntity<AddUserResponse> addUser(//@CurrentUser UserEntity user,
                                                    @RequestBody AddUserRequest request) {
         String uid = request.getUid();
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new AddUserResponse("permission denied", "", ""), HttpStatus.FORBIDDEN);
-        }
+//        if (user.getType() != UserEntity.TYPE_MANAGER) {
+//            return new ResponseEntity<>(new AddUserResponse("permission denied", "", ""), HttpStatus.FORBIDDEN);
+//        }
         if (userRepository.existsById(uid)) {
             return new ResponseEntity<>(new AddUserResponse("failed with duplicated uid", null, null), HttpStatus.BAD_REQUEST);
         }
