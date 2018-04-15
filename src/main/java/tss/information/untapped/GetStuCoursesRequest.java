@@ -1,4 +1,4 @@
-package tss.information;
+package tss.information.untapped;
 
 public class GetStuCoursesRequest {
     private String uid;

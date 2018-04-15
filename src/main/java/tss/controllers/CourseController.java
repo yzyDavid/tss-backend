@@ -97,7 +97,7 @@ public class CourseController {
         DepartmentEntity dept = null;
         if(request.getDept() != null) {
             Optional<DepartmentEntity> retd = departmentRepository.findByName(request.getDept());
-            if(!ret.isPresent()) {
+            if(!retd.isPresent()) {
                 return new ResponseEntity<>(new ModifyCourseResponse("department doesn't exist", null, null), HttpStatus.BAD_REQUEST);
             }
             course.setDepartment(retd.get());

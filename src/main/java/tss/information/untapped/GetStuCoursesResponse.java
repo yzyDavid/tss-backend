@@ -1,4 +1,4 @@
-package tss.information;
+package tss.information.untapped;
 
 import org.jetbrains.annotations.Nls;
 
