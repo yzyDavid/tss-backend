@@ -7,22 +7,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
-import tss.entities.ClassroomEntity;
-import tss.entities.CourseEntity;
-import tss.entities.TeachesEntity;
-import tss.entities.UserEntity;
+import tss.entities.*;
 import tss.repositories.ClassRepository;
 import tss.repositories.ClassroomRepository;
 import tss.repositories.TeachesRepository;
+import tss.repositories.UserRepository;
 import tss.requests.information.*;
 import tss.responses.information.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by apple on 2018/4/13.
+ * @author cbq
  */
 @Controller
 @RequestMapping(path = "/classroom")
@@ -31,12 +31,14 @@ public class ClassroomController {
     private final ClassRepository classRepository;
     private final ClassroomRepository classroomRepository;
     private final TeachesRepository teachesRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public ClassroomController(ClassRepository classRepository, ClassroomRepository classroomRepository, TeachesRepository teachesRepository){
+    public ClassroomController(ClassRepository classRepository, ClassroomRepository classroomRepository, TeachesRepository teachesRepository, UserRepository userRepository){
         this.classRepository = classRepository;
         this.classroomRepository = classroomRepository;
         this.teachesRepository = teachesRepository;
+        this.userRepository = userRepository;
     }
 
     @PutMapping(path = "/add")
@@ -126,8 +128,43 @@ public class ClassroomController {
 //            return new ResponseEntity<>(new PrintClassroomResponse("permission denied."), HttpStatus.FORBIDDEN);
 //        }
 
+            String building;
+            Integer room;
+            List<String> courseName = new ArrayList<String>();
+            List<String> day = new ArrayList<String>();
+            List<Integer> start = new ArrayList<Integer>();
+            List<Integer> end = new ArrayList<Integer>();
+            List<String> teacherName = new ArrayList<String>();
 
-        return new ResponseEntity<>(new PrintClassroomResponse("OK"), HttpStatus.OK);
+            Optional<ClassroomEntity> ret = classroomRepository.findById(request.getCrid());
+            if( !ret.isPresent()){
+                return new ResponseEntity<>(new PrintClassroomResponse("No classroom find!",null, null,null, null, null, null, null), HttpStatus.BAD_REQUEST);
+            }
+
+            ClassroomEntity classroom = ret.get();
+            building = classroom.getBuilding();
+            room = classroom.getRoom();
+
+            Set<SectionEntity> sectionEntities = classroom.getSections();
+            for(SectionEntity sectionEntity: sectionEntities){
+                TimeSlotEntity time = sectionEntity.getTimeSlot();
+                day.add(time.getDay());
+                start.add(time.getStart());
+                end.add(time.getEnd());
+
+                ClassEntity classEntity = sectionEntity.get_class();
+                courseName.add(classEntity.getCourse().getName());
+
+                StringBuffer teachers = new StringBuffer();
+                Set<TeachesEntity>teachesEntities = classEntity.getTeaches();
+                for(TeachesEntity teachesEntity: teachesEntities){
+                    teachers.append("/");
+                    teachers.append(teachesEntity.getTeacher().getName());
+                }
+                teacherName.add(teachers.toString());
+            }
+
+            return new ResponseEntity<>(new PrintClassroomResponse("OK",building, room, courseName, day, start, end, teacherName), HttpStatus.OK);
     }
 
 
@@ -140,23 +177,49 @@ public class ClassroomController {
 //            return new ResponseEntity<>(new QueryScheduleResponse("permission denied."), HttpStatus.FORBIDDEN);
 //        }
 
-
-        //for test only
         List<String> courseName = new ArrayList<String>();
         List<String> day = new ArrayList<String>();
         List<Integer> start = new ArrayList<Integer>();
-        List<Integer> end = new ArrayList<Integer>();;
+        List<Integer> end = new ArrayList<Integer>();
         List<String> building = new ArrayList<String>();
-        List<Integer> room = new ArrayList<Integer>();;
+        List<Integer> room = new ArrayList<Integer>();
 
-        courseName.add("SE");
-        day.add("Thursday");
-        start.add(13);
-        end.add(15);
-        building.add("CaoGuangBiaoXi");
-        room.add(201);
+        Optional<UserEntity> retu = userRepository.findById(request.getUid());
+        if(!retu.isPresent()){
+            return new ResponseEntity<>(new QueryScheduleResponse("User doesn't exist.",null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
+        }
+        UserEntity teacher = retu.get();
+        if(teacher.getType() != UserEntity.TYPE_TEACHER){
+            return new ResponseEntity<>(new QueryScheduleResponse("User is not a teacher!",null, null , null, null, null, null, null), HttpStatus.BAD_REQUEST);
+        }
+        String teacherName = teacher.getName();
+        Set<TeachesEntity> teachesEntities = teacher.getTeaches();
 
-        return new ResponseEntity<>(new QueryScheduleResponse("OK",courseName , day, start, end, building, room), HttpStatus.OK);
+        for(TeachesEntity teach: teachesEntities){
+            CourseEntity course = teach.getCourse();
+            courseName.add(course.getName());
+
+            Set<ClassEntity> classEntities = teach.getClasses();
+            for(ClassEntity classEntity: classEntities){
+
+                Set<SectionEntity>sectionEntities = classEntity.getSections();
+                for(SectionEntity sectionEntity: sectionEntities){
+
+                    TimeSlotEntity time = sectionEntity.getTimeSlot();
+                    day.add(time.getDay());
+                    start.add(time.getStart());
+                    end.add(time.getEnd());
+
+                    ClassroomEntity classroom = sectionEntity.getClassroom();
+                    building.add(classroom.getBuilding());
+                    room.add(classroom.getRoom());
+                }
+
+            }
+
+        }
+
+        return new ResponseEntity<>(new QueryScheduleResponse("OK",teacherName, courseName , day, start, end, building, room), HttpStatus.OK);
     }
 
 
