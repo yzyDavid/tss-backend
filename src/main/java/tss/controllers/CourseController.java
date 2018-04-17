@@ -55,6 +55,7 @@ public class CourseController {
         course.setCid(request.getCid());
         course.setName(request.getName());
         course.setCredit(request.getCredit());
+        course.setWeeklyNum(request.getWeeklyNum());
         course.setSemester(request.getSemester());
         course.setDepartment(dept);
         courseRepository.save(course);
@@ -109,6 +110,9 @@ public class CourseController {
         if(request.getCredit() != null) {
             course.setCredit(request.getCredit());
         }
+        if(request.getWeeklyNum() != null) {
+            course.setWeeklyNum(request.getWeeklyNum());
+        }
         if(request.getSemester() != null) {
             course.setSemester(request.getSemester());
         }
@@ -124,13 +128,13 @@ public class CourseController {
     @Authorization
     public ResponseEntity<GetCourseResponse> getInfo(String cid) {
         if (!courseRepository.existsById(cid)) {
-            return new ResponseEntity<>(new GetCourseResponse("course non-exist", "", "", 0.0f,
-                    null, ""), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new GetCourseResponse("course non-exist", "", "", null,
+                    null, null, ""), HttpStatus.BAD_REQUEST);
         }
 
         CourseEntity course = courseRepository.findById(cid).get();
         return new ResponseEntity<>(new GetCourseResponse("ok", course.getCid(), course.getName(),
-                course.getCredit(), course.getSemester(), course.getIntro()), HttpStatus.OK);
+                course.getCredit(), course.getWeeklyNum(), course.getSemester(), course.getIntro()), HttpStatus.OK);
     }
 
     @GetMapping(path = "/name")

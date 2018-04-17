@@ -15,6 +15,7 @@ public class CourseEntity {
     private String cid;
     private String name;
     private Float credit;
+    private Integer weeklyNum;
     private String semester;
     private String intro;
     private DepartmentEntity department;
@@ -47,6 +48,15 @@ public class CourseEntity {
 
     public void setCredit(Float credit) {
         this.credit = credit;
+    }
+
+    @Column(name = "weekly_number")
+    public Integer getWeeklyNum() {
+        return weeklyNum;
+    }
+
+    public void setWeeklyNum(Integer weeklyNum) {
+        this.weeklyNum = weeklyNum;
     }
 
     @Column(name = "course_semester", length = 8)
