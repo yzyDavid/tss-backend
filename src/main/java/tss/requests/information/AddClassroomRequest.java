@@ -1,31 +1,31 @@
 package tss.requests.information;
 
-/**
- * Created by apple on 2018/4/13.
- */
 public class AddClassroomRequest {
-    private short cid;
     private String building;
     private Integer room;
     private Integer capacity;
 
-    public short getCid() {
-        return cid;
+    public String getBuilding() {
+        return building;
     }
 
-    public void setCid(short cid) {
-        this.cid = cid;
+    public void setBuilding(String building) {
+        this.building = building;
     }
 
-    public String getBuilding(){ return building; }
+    public void setRoom(Integer room) {
+        this.room = room;
+    }
 
-    public void setBuilding(String building) { this.building = building; }
+    public Integer getRoom() {
+        return room;
+    }
 
-    public void setRoom(Integer room) {this.room = room;}
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
 
-    public Integer getRoom() {return room;}
-
-    public void setCapacity(Integer capacity) {this.capacity = capacity;}
-
-    public Integer getCapacity() {return capacity;}
+    public Integer getCapacity() {
+        return capacity;
+    }
 }

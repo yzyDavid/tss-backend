@@ -1,29 +1,26 @@
 package tss.entities;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "classroom")
 public class ClassroomEntity {
-    short id;
+    private Integer id;
     private String building;
     private Integer room;
     private Integer capactity;
-    private Set<SectionEntity> sections = new HashSet<>();
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public short getId() {
+    @GeneratedValue
+    public Integer getId() {
         return id;
     }
 
-    public void setId(short id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    @Column(length = 31)
+    @Column(length = 31, nullable = false)
     public String getBuilding() {
         return building;
     }
@@ -48,14 +45,5 @@ public class ClassroomEntity {
 
     public void setCapactity(Integer capactity) {
         this.capactity = capactity;
-    }
-
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "classroom")
-    public Set<SectionEntity> getSections() {
-        return sections;
-    }
-
-    public void setSections(Set<SectionEntity> sections) {
-        this.sections = sections;
     }
 }
