@@ -81,7 +81,7 @@ public class CourseController {
     }
 
 
-    @PostMapping(path = "/info")
+    @PostMapping(path = "/modify")
     @Authorization
     public ResponseEntity<ModifyCourseResponse> modifyInfo(@CurrentUser UserEntity user,
                                                            @RequestBody ModifyCourseRequest request) {
@@ -97,7 +97,7 @@ public class CourseController {
         DepartmentEntity dept = null;
         if(request.getDept() != null) {
             Optional<DepartmentEntity> retd = departmentRepository.findByName(request.getDept());
-            if(!ret.isPresent()) {
+            if(!retd.isPresent()) {
                 return new ResponseEntity<>(new ModifyCourseResponse("department doesn't exist", null, null), HttpStatus.BAD_REQUEST);
             }
             course.setDepartment(retd.get());
@@ -120,24 +120,24 @@ public class CourseController {
         return new ResponseEntity<>(new ModifyCourseResponse("ok", "", ""), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/info")
+    @PostMapping(path = "/get")
     @Authorization
-    public ResponseEntity<GetCourseResponse> getInfo(String cid) {
-        if (!courseRepository.existsById(cid)) {
+    public ResponseEntity<GetCourseResponse> getInfo(@RequestBody GetCourseRequest request) {
+        Optional<CourseEntity> ret = courseRepository.findById(request.getCid());
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetCourseResponse("course non-exist", "", "", 0.0f,
                     null, ""), HttpStatus.BAD_REQUEST);
         }
-
-        CourseEntity course = courseRepository.findById(cid).get();
+        CourseEntity course = ret.get();
         return new ResponseEntity<>(new GetCourseResponse("ok", course.getCid(), course.getName(),
                 course.getCredit(), course.getSemester(), course.getIntro()), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/name")
+    @PostMapping(path = "/name")
     @Authorization
-    public ResponseEntity<GetCoursesByNameResponse> getCidsByName(@RequestParam String name) {
+    public ResponseEntity<GetCoursesByNameResponse> getCidsByName(@RequestBody GetCoursesByNameRequest request) {
         List<String> cids = new ArrayList<>();
-        List<CourseEntity> ret = courseRepository.findByName(name);
+        List<CourseEntity> ret = courseRepository.findByName(request.getName());
         for(CourseEntity user : ret) {
             cids.add(user.getCid());
         }

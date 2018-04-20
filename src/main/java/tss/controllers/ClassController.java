@@ -11,6 +11,7 @@ import tss.entities.*;
 import tss.repositories.*;
 import tss.requests.information.AddClassRequest;
 import tss.requests.information.DeleteClassesRequest;
+import tss.requests.information.GetInstructorsRequest;
 import tss.requests.information.ModifyClassRequest;
 import tss.responses.information.AddClassResponse;
 import tss.responses.information.DeleteClassesResponse;
@@ -113,11 +114,11 @@ public class ClassController {
         return new ResponseEntity<>(new DeleteClassesResponse("OK", failIds), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/instructor")
+    @PostMapping(path = "/getInstructors")
     @Authorization
-    public ResponseEntity<GetInstructorsResponse> getInstructors(Long cid) {
+    public ResponseEntity<GetInstructorsResponse> getInstructors(@RequestBody GetInstructorsRequest request) {
 
-        Optional<ClassEntity> ret = classRepository.findById(cid);
+        Optional<ClassEntity> ret = classRepository.findById(request.getCid());
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetInstructorsResponse("class non-exist", null, null, null, null), HttpStatus.BAD_REQUEST);
         }
