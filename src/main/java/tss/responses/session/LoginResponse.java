@@ -8,12 +8,14 @@ import org.jetbrains.annotations.Nls;
 public class LoginResponse {
     private final String uid;
     private final String token;
+    private final Integer type;
     private final @Nls
     String info;
 
-    public LoginResponse(String uid, String token, String info) {
+    public LoginResponse(String uid, String token, Integer type, String info) {
         this.uid = uid;
         this.token = token;
+        this.type = type;
         this.info = info;
     }
 
@@ -23,6 +25,10 @@ public class LoginResponse {
 
     public String getToken() {
         return token;
+    }
+
+    public Integer getType() {
+        return type;
     }
 
     public String getInfo() {

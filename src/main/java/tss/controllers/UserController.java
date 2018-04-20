@@ -92,7 +92,7 @@ public class UserController {
     @Authorization
     public ResponseEntity<ModifyPwdResponse> modifyPwd(@CurrentUser UserEntity user,
                                                        @RequestBody ModifyPwdRequest request) {
-        String uid = request.getUid();
+        String uid = (request.getUid() == null) ? user.getUid() : request.getUid();
         if(user.getType() != UserEntity.TYPE_MANAGER || user.getUid() != request.getUid()) {
             return new ResponseEntity<>(new ModifyPwdResponse("permission denied", uid, ""), HttpStatus.FORBIDDEN);
         }
@@ -102,7 +102,7 @@ public class UserController {
         }
         UserEntity tar = ret.get();
         String name = tar.getName();
-        if (tar.getType() != UserEntity.TYPE_MANAGER &&
+        if ((tar.getType() != UserEntity.TYPE_MANAGER || uid.equals(user.getUid())) &&
         !tar.getHashedPassword().equals(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getOldPwd(), tar.getSalt()))) {
             return new ResponseEntity<>(new ModifyPwdResponse("incorrect password", uid, name), HttpStatus.UNAUTHORIZED);
         }
@@ -112,16 +112,17 @@ public class UserController {
         return new ResponseEntity<>(new ModifyPwdResponse("OK", uid, name), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/info")
+    @PostMapping(path = "/modify")
     @Authorization
     public ResponseEntity<ModifyUserResponse> modifyInfo(@CurrentUser UserEntity user,
                                                          @RequestBody ModifyUserRequest request) {
         if (user.getType() != UserEntity.TYPE_MANAGER && user.getUid() != request.getUid()) {
             return new ResponseEntity<>(new ModifyUserResponse("permission denied", null, null), HttpStatus.FORBIDDEN);
         }
-        Optional<UserEntity> ret = userRepository.findById(request.getUid());
+        String uid = (request.getUid() == null) ? user.getUid() : request.getUid();
+        Optional<UserEntity> ret = userRepository.findById(uid);
         if(!ret.isPresent()) {
-            return new ResponseEntity<>(new ModifyUserResponse("non-existent uid", request.getUid(), null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ModifyUserResponse("non-existent uid", uid, null), HttpStatus.BAD_REQUEST);
         }
         UserEntity tar = ret.get();
         if (request.getEmail() != null) {
@@ -137,9 +138,11 @@ public class UserController {
         return new ResponseEntity<>(new ModifyUserResponse("OK", tar.getUid(), tar.getName()), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/info")
+    @PostMapping(path = "/get")
     @Authorization
-    public ResponseEntity<GetUserByUidResponse> getInfo(@RequestParam String uid) {
+    public ResponseEntity<GetUserByUidResponse> getInfo(@CurrentUser UserEntity curUser,
+                                                        @RequestBody GetUserByUidRequest request) {
+        String uid = (request.getUid() == null) ? curUser.getUid() : request.getUid();
         Optional<UserEntity> ret = userRepository.findById(uid);
         if(!ret.isPresent()) {
             return new ResponseEntity<>(new GetUserByUidResponse("non-existent uid", "", "", -1,
@@ -150,18 +153,18 @@ public class UserController {
                 user.getEmail(), user.getTelephone(), user.getIntro()), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/name")
+    @PostMapping(path = "/name")
     @Authorization
-    public ResponseEntity<GetUsersByNameResponse> getUidsByName(@RequestParam String name) {
+    public ResponseEntity<GetUsersByNameResponse> getUidsByName(@RequestBody GetUsersByNameRequest request) {
         List<String> uids = new ArrayList<>();
-        List<UserEntity> ret = userRepository.findByName(name);
+        List<UserEntity> ret = userRepository.findByName(request.getName());
         for(UserEntity user : ret) {
             uids.add(user.getUid());
         }
         return new ResponseEntity<>(new GetUsersByNameResponse("OK", uids), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/photo")
+    @PostMapping(path = "/modifyPhoto")
     @Authorization
     public ResponseEntity<ModifyPhotoResponse> modifyPhoto(@CurrentUser UserEntity user,
                                                            @RequestBody ModifyPhotoRequest request) {
@@ -189,16 +192,19 @@ public class UserController {
         return new ResponseEntity<>(new ModifyPhotoResponse("OK"), HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "")
+    @PostMapping(path = "/getPhoto")
     @Authorization
-    public ResponseEntity<GetPhotoResponse> getPhoto(@RequestParam String uid) {
-        if (!userRepository.existsById(uid)) {
+    public ResponseEntity<GetPhotoResponse> getPhoto(@CurrentUser UserEntity user,
+                                                     @RequestBody GetPhotoRequest request) {
+        String uid = (request.getUid() == null) ? user.getUid() : request.getUid();
+        Optional<UserEntity> ret = userRepository.findById(uid);
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetPhotoResponse("non-existent uid", null), HttpStatus.BAD_REQUEST);
         }
-        UserEntity user = userRepository.findById(uid).get();
+        UserEntity tar = ret.get();
         try {
             return new ResponseEntity<>(new GetPhotoResponse("OK",
-                    resourceLoader.getResource("file:" + Paths.get(Config.PHOTO_ROOT_DIR, user.getPhoto()))), HttpStatus.OK);
+                    resourceLoader.getResource("file:" + Paths.get(Config.PHOTO_ROOT_DIR, tar.getPhoto()))), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(new GetPhotoResponse(e.getMessage(), null), HttpStatus.BAD_REQUEST);
