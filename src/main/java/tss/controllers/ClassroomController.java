@@ -41,14 +41,14 @@ public class ClassroomController {
     }
 
     @PostMapping(path = "/classrooms")
-    @Authorization
-    public ResponseEntity<ClassroomResponse> addClassroom(@CurrentUser UserEntity user,
+//    @Authorization
+    public ResponseEntity<ClassroomResponse> addClassroom(// @CurrentUser UserEntity user,
                                                           @RequestBody AddClassroomRequest request) {
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(
-                    new ClassroomResponse("permission denied", null, null, null),
-                    HttpStatus.FORBIDDEN);
-        }
+//        if (user.getType() != UserEntity.TYPE_MANAGER) {
+//            return new ResponseEntity<>(
+//                    new ClassroomResponse("permission denied", null, null, null),
+//                    HttpStatus.FORBIDDEN);
+//        }
 
         ClassroomEntity classroom = new ClassroomEntity();
         classroom.setBuilding(request.getBuilding());
@@ -63,15 +63,15 @@ public class ClassroomController {
     }
 
     @PutMapping(path = "/classrooms/{classroomId}")
-    @Authorization
-    public ResponseEntity<ClassroomResponse> addClassroom(@CurrentUser UserEntity user,
+//    @Authorization
+    public ResponseEntity<ClassroomResponse> addClassroom(// @CurrentUser UserEntity user,
                                                           @PathVariable int classroomId,
                                                           @RequestBody AddClassroomRequest request) {
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(
-                    new ClassroomResponse("permission denied", null, null, null),
-                    HttpStatus.FORBIDDEN);
-        }
+//        if (user.getType() != UserEntity.TYPE_MANAGER) {
+//            return new ResponseEntity<>(
+//                    new ClassroomResponse("permission denied", null, null, null),
+//                    HttpStatus.FORBIDDEN);
+//        }
 
         ClassroomEntity classroom = new ClassroomEntity();
         classroom.setId(classroomId);
@@ -86,7 +86,7 @@ public class ClassroomController {
     }
 
     @GetMapping(path = "classrooms/{classroomId}")
-    @Authorization
+//    @Authorization
     public ResponseEntity<ClassroomResponse> getClassroom(@PathVariable int classroomId) {
         Optional<ClassroomEntity> ret = classroomRepository.findById(classroomId);
         if (!ret.isPresent()) {
@@ -103,14 +103,14 @@ public class ClassroomController {
     }
 
     @DeleteMapping(path = "/classrooms/{classroomId}")
-    @Authorization
-    public ResponseEntity<ClassroomResponse> deleteClassroom(@CurrentUser UserEntity user,
+//    @Authorization
+    public ResponseEntity<ClassroomResponse> deleteClassroom(// @CurrentUser UserEntity user,
                                                              @PathVariable int classroomId) {
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(
-                    new ClassroomResponse("permission denied", null, null, null),
-                    HttpStatus.FORBIDDEN);
-        }
+//        if (user.getType() != UserEntity.TYPE_MANAGER) {
+//            return new ResponseEntity<>(
+//                    new ClassroomResponse("permission denied", null, null, null),
+//                    HttpStatus.FORBIDDEN);
+//        }
 
         Optional<ClassroomEntity> ret = classroomRepository.findById(classroomId);
         if (!ret.isPresent()) {
@@ -128,15 +128,15 @@ public class ClassroomController {
     }
 
     @PatchMapping(path = "/classrooms/{classroomId}")
-    @Authorization
-    public ResponseEntity<ClassroomResponse> modifyClassroom(@CurrentUser UserEntity user,
+//    @Authorization
+    public ResponseEntity<ClassroomResponse> modifyClassroom(// @CurrentUser UserEntity user,
                                                              @PathVariable int classroomId,
                                                              @RequestBody ModifyClassroomRequest request) {
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(
-                    new ClassroomResponse("permission denied", null, null, null),
-                    HttpStatus.FORBIDDEN);
-        }
+//        if (user.getType() != UserEntity.TYPE_MANAGER) {
+//            return new ResponseEntity<>(
+//                    new ClassroomResponse("permission denied", null, null, null),
+//                    HttpStatus.FORBIDDEN);
+//        }
 
         Optional<ClassroomEntity> ret = classroomRepository.findById(classroomId);
         if (!ret.isPresent()) {
