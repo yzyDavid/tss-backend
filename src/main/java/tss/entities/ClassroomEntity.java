@@ -2,13 +2,16 @@ package tss.entities;
 
 import javax.persistence.*;
 
+/**
+ * @author reeve
+ */
 @Entity
 @Table(name = "classroom")
 public class ClassroomEntity {
     private Integer id;
-    private String building;
-    private Integer room;
-    private Integer capactity;
+    private String name;
+    private Integer capacity;
+    private BuildingEntity building;
 
     @Id
     @GeneratedValue
@@ -20,30 +23,31 @@ public class ClassroomEntity {
         this.id = id;
     }
 
-    @Column(length = 31, nullable = false)
-    public String getBuilding() {
+    @Column(length = 32, nullable = false)
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Column(nullable = false)
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "building_id")
+    public BuildingEntity getBuilding() {
         return building;
     }
 
-    public void setBuilding(String building) {
+    public void setBuilding(BuildingEntity building) {
         this.building = building;
-    }
-
-    @Column(nullable = false)
-    public Integer getRoom() {
-        return room;
-    }
-
-    public void setRoom(Integer room) {
-        this.room = room;
-    }
-
-    @Column(nullable = false)
-    public Integer getCapactity() {
-        return capactity;
-    }
-
-    public void setCapactity(Integer capactity) {
-        this.capactity = capactity;
     }
 }
