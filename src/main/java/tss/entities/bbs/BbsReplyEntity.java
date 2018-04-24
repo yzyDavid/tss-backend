@@ -1,6 +1,5 @@
-package tss.entities.bbs;
+package tss.entities;
 
-import tss.entities.UserEntity;
 
 import javax.persistence.*;
 import java.util.Date;

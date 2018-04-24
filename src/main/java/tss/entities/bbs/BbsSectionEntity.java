@@ -1,6 +1,4 @@
-package tss.entities.bbs;
-
-import tss.entities.*;
+package tss.entities;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -44,6 +42,7 @@ public class BbsSectionEntity {
     }
 
     @Column(name = "section_teaches")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher")
     public Set<TeachesEntity> getTeaches() {
         return teaches;
     }
@@ -53,6 +52,7 @@ public class BbsSectionEntity {
     }
 
     @Column(name = "section_topic")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "belongedSection")
     public Set<BbsTopicEntity> getTopics() {
         return topics;
     }

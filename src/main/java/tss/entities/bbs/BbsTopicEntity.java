@@ -1,6 +1,4 @@
-package tss.entities.bbs;
-
-import tss.entities.*;
+package tss.entities;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -84,6 +82,7 @@ public class BbsTopicEntity {
     }
 
     @Column(name = "topic_reply")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "belongedTopic")
     public Set<BbsReplyEntity> getReplies() {
         return replies;
     }
