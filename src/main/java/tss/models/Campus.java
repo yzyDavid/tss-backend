@@ -1,4 +1,4 @@
-package tss.responses.information;
+package tss.models;
 
 import tss.entities.CampusEntity;
 
