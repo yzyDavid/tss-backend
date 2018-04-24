@@ -2,18 +2,18 @@ package tss.responses.information.bbs;
 
 import org.jetbrains.annotations.Nls;
 
-public class AddBbsSectionResponce {
+public class AddBbsSectionResponse {
     @Nls
     private final String status;
     private final long id;
     private final String name;
-    private final String tid;
+    private final String tname;
 
-    public AddBbsSectionResponce(String status, long id, String name, String tid){
+    public AddBbsSectionResponse(String status, long id, String name, String tname){
         this.status = status;
         this.id = id;
         this.name = name;
-        this.tid = tid;
+        this.tname = tname;
     }
 
     public String getStatus() {
@@ -28,7 +28,7 @@ public class AddBbsSectionResponce {
         return name;
     }
 
-    public String getTid() {
-        return tid;
+    public String getTname() {
+        return tname;
     }
 }

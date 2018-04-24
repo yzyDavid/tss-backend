@@ -138,7 +138,6 @@ public class UserController {
     }
 
     @GetMapping(path = "/info")
-    @Authorization
     public ResponseEntity<GetUserByUidResponse> getInfo(@RequestParam String uid) {
         Optional<UserEntity> ret = userRepository.findById(uid);
         if(!ret.isPresent()) {

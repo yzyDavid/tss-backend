@@ -1,17 +1,24 @@
-package tss.entities;
+package tss.entities.bbs;
 
+
+import tss.entities.UserEntity;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "bbs_reply")
+@Table(name = "bbsreply")
 public class BbsReplyEntity {
     private long id;
     private UserEntity author;
     private BbsTopicEntity belongedTopic;
     private Date time;
     private String content;
+
+    public BbsReplyEntity(UserEntity author, BbsTopicEntity belongedTopic){
+        this.author = author;
+        this.belongedTopic = belongedTopic;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,7 +30,8 @@ public class BbsReplyEntity {
         this.id = id;
     }
 
-    @Column(name = "reply_author")
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
+    @JoinColumn(name = "user_id")
     public UserEntity getAuthor() {
         return author;
     }
@@ -32,7 +40,8 @@ public class BbsReplyEntity {
         this.author = author;
     }
 
-    @Column(name = "topic_belonged")
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
+    @JoinColumn(name = "bbstopic_id")
     public BbsTopicEntity getBelongedTopic() {
         return belongedTopic;
     }

@@ -1,17 +1,23 @@
-package tss.entities;
+package tss.entities.bbs;
+
+import tss.entities.TeachesEntity;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "bbs_section")
+@Table(name = "bbssection")
 public class BbsSectionEntity {
     private long id;
     private String name;
-    private Integer usrNum = 0;
-    private Set<TeachesEntity> teaches = new HashSet<>();
-    private Set<BbsTopicEntity> topics = new HashSet<>();
+    public static int usrNum = 0;
+    private TeachesEntity teaches;
+    private Set<BbsTopicEntity> topics;
+
+    public BbsSectionEntity(TeachesEntity teaches){
+        this.teaches = teaches;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -41,13 +47,13 @@ public class BbsSectionEntity {
         this.usrNum = usrNum;
     }
 
-    @Column(name = "section_teaches")
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher")
-    public Set<TeachesEntity> getTeaches() {
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE}, optional = false)
+    @JoinColumn(name = "section_teaches")
+    public TeachesEntity getTeaches() {
         return teaches;
     }
 
-    public void setTeaches(Set<TeachesEntity> teaches) {
+    public void setTeaches(TeachesEntity teaches) {
         this.teaches = teaches;
     }
 

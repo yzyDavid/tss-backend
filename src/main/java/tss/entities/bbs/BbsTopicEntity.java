@@ -1,11 +1,13 @@
-package tss.entities;
+package tss.entities.bbs;
+
+import tss.entities.UserEntity;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
 
 @Entity
-@Table(name = "bbs_topic")
+@Table(name = "bbstopic")
 public class BbsTopicEntity {
     private long id;
     private String name;
@@ -16,6 +18,11 @@ public class BbsTopicEntity {
 
     private int replyNum = 0;
     private Set<BbsReplyEntity> replies;
+
+    public BbsTopicEntity(UserEntity author, BbsSectionEntity belongedSection){
+        this.author = author;
+        this.belongedSection = belongedSection;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -36,7 +43,8 @@ public class BbsTopicEntity {
         this.name = name;
     }
 
-    @Column(name = "topic_author")
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "user_id")
     public UserEntity getAuthor() {
         return author;
     }
@@ -45,7 +53,8 @@ public class BbsTopicEntity {
         this.author = author;
     }
 
-    @Column(name = "section_belonged")
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
+    @JoinColumn(name = "bbssection_id")
     public BbsSectionEntity getBelongedSection() {
         return belongedSection;
     }
@@ -81,7 +90,6 @@ public class BbsTopicEntity {
         this.replyNum = replyNum;
     }
 
-    @Column(name = "topic_reply")
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "belongedTopic")
     public Set<BbsReplyEntity> getReplies() {
         return replies;
