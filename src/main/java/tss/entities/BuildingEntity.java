@@ -15,6 +15,16 @@ public class BuildingEntity {
     private CampusEntity campus;
     private List<ClassroomEntity> classrooms = new ArrayList<>();
 
+    public BuildingEntity() {
+    }
+
+    public BuildingEntity(Integer id, String name, CampusEntity campus, List<ClassroomEntity> classrooms) {
+        this.id = id;
+        this.name = name;
+        this.campus = campus;
+        this.classrooms = classrooms;
+    }
+
     @Id
     @GeneratedValue
     public Integer getId() {
