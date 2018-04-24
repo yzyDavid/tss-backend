@@ -122,7 +122,7 @@ public class CourseController {
 
     @GetMapping(path = "/info")
     @Authorization
-    public ResponseEntity<GetCourseResponse> getInfo(String cid) {
+    public ResponseEntity<GetCourseResponse> getInfo(@RequestParam String cid) {
         if (!courseRepository.existsById(cid)) {
             return new ResponseEntity<>(new GetCourseResponse("course non-exist", "", "", 0.0f,
                     null, ""), HttpStatus.BAD_REQUEST);
