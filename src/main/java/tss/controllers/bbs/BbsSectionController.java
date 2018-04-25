@@ -15,9 +15,7 @@ import tss.repositories.TeachesRepository;
 import tss.repositories.bbs.BbsSectionRepository;
 import tss.requests.information.bbs.AddBbsSectionRequest;
 import tss.requests.information.bbs.DeleteBbsSectionRequest;
-import tss.responses.information.bbs.AddBbsSectionResponse;
-import tss.responses.information.bbs.DeleteBbsSectionResponse;
-import tss.responses.information.bbs.GetInfoBbsSectionResponse;
+import tss.responses.information.bbs.*;
 
 import java.util.*;
 
@@ -112,4 +110,28 @@ public class BbsSectionController {
         return new ResponseEntity<>(new GetInfoBbsSectionResponse("ok", ids, names), HttpStatus.OK);
     }
 
+    /* find by section id */
+    @GetMapping(path = "/id")
+    public ResponseEntity<GetSectionInfoByIdResponse> getSectionInfoById(@RequestParam Long id){
+        Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(id);
+        if(!ret.isPresent())
+            return new ResponseEntity<>(new GetSectionInfoByIdResponse("no such section", -1, null, -1, null), HttpStatus.BAD_REQUEST);
+
+        BbsSectionEntity section = ret.get();
+        return new ResponseEntity<>(new GetSectionInfoByIdResponse("ok", section.getId(), section.getName(), section.getUsrNum(), section.getTopics()), HttpStatus.OK);
+    }
+
+
+    /* find by section name */
+    @GetMapping(path = "/name")
+    public ResponseEntity<GetSectionInfoByNameResponse> getSectionInfoById(@RequestParam String name){
+        Optional<BbsSectionEntity> ret = bbsSectionRepository.findByName(name);
+        if(!ret.isPresent())
+            return new ResponseEntity<>(new GetSectionInfoByNameResponse("no such section", -1, null, -1, null), HttpStatus.BAD_REQUEST);
+
+        BbsSectionEntity section = ret.get();
+        return new ResponseEntity<>(new GetSectionInfoByNameResponse("ok", section.getId(), section.getName(), section.getUsrNum(), section.getTopics()), HttpStatus.OK);
+    }
+
+    /*  */
 }
