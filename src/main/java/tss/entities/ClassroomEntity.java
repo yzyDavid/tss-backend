@@ -13,6 +13,16 @@ public class ClassroomEntity {
     private Integer capacity;
     private BuildingEntity building;
 
+    public ClassroomEntity() {
+    }
+
+    public ClassroomEntity(Integer id, String name, Integer capacity, BuildingEntity building) {
+        this.id = id;
+        this.name = name;
+        this.capacity = capacity;
+        this.building = building;
+    }
+
     @Id
     @GeneratedValue
     public Integer getId() {
