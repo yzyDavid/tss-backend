@@ -133,5 +133,6 @@ public class BbsSectionController {
         return new ResponseEntity<>(new GetSectionInfoByNameResponse("ok", section.getId(), section.getName(), section.getUsrNum(), section.getTopics()), HttpStatus.OK);
     }
 
-    /*  */
+    /* to do: modify, many add section introduction part */
+
 }
