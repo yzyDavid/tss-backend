@@ -1,6 +1,8 @@
 package tss.entities;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author reeve
@@ -8,23 +10,36 @@ import javax.persistence.*;
 @Entity
 @Table(name = "classroom")
 public class ClassroomEntity {
+
+    @Id
+    @GeneratedValue
     private Integer id;
+
+    @Column(length = 32, nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private Integer capacity;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "building_id")
     private BuildingEntity building;
+
+    @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ArrangementEntity> arrangements = new ArrayList<>();
 
     public ClassroomEntity() {
     }
 
-    public ClassroomEntity(Integer id, String name, Integer capacity, BuildingEntity building) {
-        this.id = id;
+    public ClassroomEntity(String name, Integer capacity, BuildingEntity building) {
         this.name = name;
         this.capacity = capacity;
         this.building = building;
     }
 
-    @Id
-    @GeneratedValue
+
+    // Getter and setter.
+
     public Integer getId() {
         return id;
     }
@@ -33,7 +48,6 @@ public class ClassroomEntity {
         this.id = id;
     }
 
-    @Column(length = 32, nullable = false)
     public String getName() {
         return name;
     }
@@ -42,7 +56,6 @@ public class ClassroomEntity {
         this.name = name;
     }
 
-    @Column(nullable = false)
     public Integer getCapacity() {
         return capacity;
     }
@@ -51,13 +64,23 @@ public class ClassroomEntity {
         this.capacity = capacity;
     }
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "building_id")
     public BuildingEntity getBuilding() {
         return building;
     }
 
     public void setBuilding(BuildingEntity building) {
         this.building = building;
+    }
+
+    public List<ArrangementEntity> getArrangements() {
+        return arrangements;
+    }
+
+
+    // Utility methods.
+
+    public void addArrangement(ArrangementEntity arrangementEntity) {
+        arrangements.add(arrangementEntity);
+        arrangementEntity.setClassroom(this);
     }
 }

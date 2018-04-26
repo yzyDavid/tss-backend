@@ -33,9 +33,8 @@ public class CampusController {
     @PostMapping()
     @ResponseStatus(value = HttpStatus.CREATED)
     public Campus insertCampus(@RequestBody Campus campus) {
-        CampusEntity campusEntity = new CampusEntity(null, campus.getName(), null);
-        campusEntity = campusRepository.save(campusEntity);
-        return new Campus(campusEntity);
+        CampusEntity campusEntity = new CampusEntity(campus.getName());
+        return new Campus(campusRepository.save(campusEntity));
     }
 
     @GetMapping()
@@ -47,68 +46,47 @@ public class CampusController {
                 campusEntities) {
             campuses.add(new Campus(campusEntity));
         }
-
         return campuses;
     }
 
     @GetMapping("/{campusId}")
     @ResponseStatus(value = HttpStatus.OK)
     public Campus getCampus(@PathVariable int campusId) {
-        Optional<CampusEntity> optional = campusRepository.findById(campusId);
-        if (!optional.isPresent()) {
-            throw new CampusNotFoundException();
-        }
-        return new Campus(optional.get());
+        CampusEntity campusEntity = campusRepository.findById(campusId).orElseThrow(CampusNotFoundException::new);
+        return new Campus(campusEntity);
     }
 
     @DeleteMapping("/{campusId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeCampus(@PathVariable int campusId) {
-        Optional<CampusEntity> optional = campusRepository.findById(campusId);
-        if (!optional.isPresent()) {
-            throw new CampusNotFoundException();
-        }
-        campusRepository.delete(optional.get());
+        CampusEntity campusEntity = campusRepository.findById(campusId).orElseThrow(CampusNotFoundException::new);
+        campusRepository.delete(campusEntity);
     }
 
     @PatchMapping("/{campusId}")
     @ResponseStatus(value = HttpStatus.OK)
     public Campus updateCampus(@PathVariable int campusId, @RequestBody Campus campus) {
-        Optional<CampusEntity> optional = campusRepository.findById(campusId);
-        if (!optional.isPresent()) {
-            throw new CampusNotFoundException();
-        }
-        CampusEntity campusEntity = optional.get();
-
+        CampusEntity campusEntity = campusRepository.findById(campusId).orElseThrow(CampusNotFoundException::new);
         if (campus.getName() != null) {
             campusEntity.setName(campus.getName());
         }
-        campusEntity = campusRepository.save(campusEntity);
-        return new Campus(campusEntity);
+        return new Campus(campusRepository.save(campusEntity));
     }
 
     @PostMapping("/{campusId}/buildings")
     @ResponseStatus(value = HttpStatus.CREATED)
     public Building insertBuilding(@PathVariable int campusId, @RequestBody Building building) {
-        Optional<CampusEntity> optional = campusRepository.findById(campusId);
-        if (!optional.isPresent()) {
-            throw new CampusNotFoundException();
-        }
-        CampusEntity campusEntity = optional.get();
+        CampusEntity campusEntity = campusRepository.findById(campusId).orElseThrow(CampusNotFoundException::new);
 
-        BuildingEntity buildingEntity = new BuildingEntity(null, building.getName(), campusEntity, null);
-        buildingEntity = buildingRepository.save(buildingEntity);
-        return new Building(buildingEntity);
+        BuildingEntity buildingEntity = new BuildingEntity(building.getName(), null);
+        campusEntity.addBuilding(buildingEntity);
+        return new Building(buildingRepository.save(buildingEntity));
     }
 
     @GetMapping("/{campusId}/buildings")
     @ResponseStatus(value = HttpStatus.OK)
     public List<Building> listBuildings(@PathVariable int campusId) {
-        Optional<CampusEntity> optional = campusRepository.findById(campusId);
-        if (!optional.isPresent()) {
-            throw new CampusNotFoundException();
-        }
-        CampusEntity campusEntity = optional.get();
+        CampusEntity campusEntity = campusRepository.findById(campusId).orElseThrow(CampusNotFoundException::new);
 
         List<BuildingEntity> buildingEntities = campusEntity.getBuildings();
         List<Building> buildings = new ArrayList<>();

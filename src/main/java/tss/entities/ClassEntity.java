@@ -1,23 +1,58 @@
 package tss.entities;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * @author ymq
+ */
 @Entity
 @Table(name = "class")
 public class ClassEntity {
-    private long id;
-    private Integer year;
-    private Integer capacity;
-    private Integer studentNum = 0;
-    private CourseEntity course;
-    private Set<TeachesEntity> teaches;
-    private Set<TakesEntity> takes;
-    private Set<SectionEntity> sections;
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+
+    private Integer year;
+
+    private String semester;
+
+    private Integer capacity;
+
+    @Column(name = "num_student")
+    private Integer numStudent = 0;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "course_id")
+    private CourseEntity course;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "teacher_id")
+    private UserEntity teacher;
+
+    @OneToMany(mappedBy = "clazz", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ArrangementEntity> arrangements = new ArrayList<>();
+
+    @OneToMany(mappedBy = "clazz", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClassRegistrationEntity> classRegistrations = new ArrayList<>();
+
+    public ClassEntity() {
+    }
+
+    public ClassEntity(Integer year, String semester, Integer capacity, Integer numStudent, CourseEntity course, UserEntity teacher) {
+        this.year = year;
+        this.semester = semester;
+        this.capacity = capacity;
+        this.numStudent = numStudent;
+        this.course = course;
+        this.teacher = teacher;
+    }
+
+
+    // Getter and setter.
+
     public long getId() {
         return id;
     }
@@ -34,6 +69,14 @@ public class ClassEntity {
         this.year = year;
     }
 
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
+    }
+
     public Integer getCapacity() {
         return capacity;
     }
@@ -42,26 +85,14 @@ public class ClassEntity {
         this.capacity = capacity;
     }
 
-    @Column(name = "student_number")
-    public Integer getStudentNum() {
-        return studentNum;
+    public Integer getNumStudent() {
+        return numStudent;
     }
 
-    public void setStudentNum(Integer studentNum) {
-        this.studentNum = studentNum;
+    public void setNumStudent(Integer numStudent) {
+        this.numStudent = numStudent;
     }
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "classes")
-    public Set<TeachesEntity> getTeaches() {
-        return teaches;
-    }
-
-    public void setTeaches(Set<TeachesEntity> teaches) {
-        this.teaches = teaches;
-    }
-
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
-    @JoinColumn(name = "course_id")
     public CourseEntity getCourse() {
         return course;
     }
@@ -70,21 +101,32 @@ public class ClassEntity {
         this.course = course;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "_class")
-    public Set<SectionEntity> getSections() {
-        return sections;
+    public UserEntity getTeacher() {
+        return teacher;
     }
 
-    public void setSections(Set<SectionEntity> sections) {
-        this.sections = sections;
+    public void setTeacher(UserEntity teacher) {
+        this.teacher = teacher;
     }
 
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "_class")
-    public Set<TakesEntity> getTakes() {
-        return takes;
+    public List<ArrangementEntity> getArrangements() {
+        return arrangements;
     }
 
-    public void setTakes(Set<TakesEntity> takes) {
-        this.takes = takes;
+    public List<ClassRegistrationEntity> getClassRegistrations() {
+        return classRegistrations;
+    }
+
+
+    // Utility methods.
+
+    public void addArrangements(ArrangementEntity arrangementEntity) {
+        arrangements.add(arrangementEntity);
+        arrangementEntity.setClazz(this);
+    }
+
+    public void addClassRegistration(ClassRegistrationEntity classRegistrationEntity) {
+        classRegistrations.add(classRegistrationEntity);
+        classRegistrationEntity.setClazz(this);
     }
 }

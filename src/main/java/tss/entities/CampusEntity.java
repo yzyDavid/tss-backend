@@ -10,21 +10,26 @@ import java.util.List;
 @Entity
 @Table(name = "campus")
 public class CampusEntity {
+
+    @Id
+    @GeneratedValue
     private Integer id;
+
+    @Column(length = 32, unique = true, nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "campus", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BuildingEntity> buildings = new ArrayList<>();
 
     public CampusEntity() {
     }
 
-    public CampusEntity(Integer id, String name, List<BuildingEntity> buildings) {
-        this.id = id;
+    public CampusEntity(String name) {
         this.name = name;
-        this.buildings = buildings;
     }
 
-    @Id
-    @GeneratedValue
+    // Getter and setter.
+
     public Integer getId() {
         return id;
     }
@@ -33,7 +38,6 @@ public class CampusEntity {
         this.id = id;
     }
 
-    @Column(length = 32, unique = true, nullable = false)
     public String getName() {
         return name;
     }
@@ -42,12 +46,15 @@ public class CampusEntity {
         this.name = name;
     }
 
-    @OneToMany(mappedBy = "campus", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<BuildingEntity> getBuildings() {
         return buildings;
     }
 
-    public void setBuildings(List<BuildingEntity> buildings) {
-        this.buildings = buildings;
+
+    // Utility methods.
+
+    public void addBuilding(BuildingEntity buildingEntity) {
+        buildings.add(buildingEntity);
+        buildingEntity.setCampus(this);
     }
 }

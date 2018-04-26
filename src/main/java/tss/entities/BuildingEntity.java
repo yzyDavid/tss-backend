@@ -10,23 +10,29 @@ import java.util.List;
 @Entity
 @Table(name = "building")
 public class BuildingEntity {
+
+    @Id
+    @GeneratedValue
     private Integer id;
+
+    @Column(length = 32, nullable = false)
     private String name;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "campus_id")
     private CampusEntity campus;
+
+    @OneToMany(mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClassroomEntity> classrooms = new ArrayList<>();
 
     public BuildingEntity() {
     }
 
-    public BuildingEntity(Integer id, String name, CampusEntity campus, List<ClassroomEntity> classrooms) {
-        this.id = id;
+    public BuildingEntity(String name, CampusEntity campus) {
         this.name = name;
         this.campus = campus;
-        this.classrooms = classrooms;
     }
 
-    @Id
-    @GeneratedValue
     public Integer getId() {
         return id;
     }
@@ -35,7 +41,6 @@ public class BuildingEntity {
         this.id = id;
     }
 
-    @Column(length = 32, nullable = false)
     public String getName() {
         return name;
     }
@@ -44,8 +49,6 @@ public class BuildingEntity {
         this.name = name;
     }
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "campus_id")
     public CampusEntity getCampus() {
         return campus;
     }
@@ -54,12 +57,12 @@ public class BuildingEntity {
         this.campus = campus;
     }
 
-    @OneToMany(mappedBy = "building", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<ClassroomEntity> getClassrooms() {
         return classrooms;
     }
 
-    public void setClassrooms(List<ClassroomEntity> classrooms) {
-        this.classrooms = classrooms;
+    public void addClassroom(ClassroomEntity classroomEntity) {
+        classrooms.add(classroomEntity);
+        classroomEntity.setBuilding(this);
     }
 }

@@ -1,7 +1,11 @@
 package tss.entities;
 
+import sun.misc.Cleaner;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -10,9 +14,12 @@ import java.util.Set;
  * TODO: index
  */
 @Entity
-@Table(name = "user", indexes = {
-        @Index(name = "user_name_index", columnList = "user_name")
-})
+@Table(
+        name = "user",
+        indexes = {
+                @Index(name = "user_name_index", columnList = "user_name")
+        }
+)
 public class UserEntity {
     public static final int TYPE_MANAGER = 0;
     public static final int TYPE_TEACHER = 1;
@@ -20,36 +27,72 @@ public class UserEntity {
     public static final int TYPE_STUDENT = 3;
     public static final int TYPE_NUM = 3;
 
-
+    @Id
+    @Column(name = "user_id", length = 10)
     private String uid;
+
+    @Column(name = "user_name")
     private String name;
+
+    @Column(name = "hashed_pwd", length = 44)
     private String hashedPassword;
+
+    @Column(length = 24)
     private String salt;
+
     private Integer type;
+
+    @Column(length = 31)
     private String email;
+
+    @Column(length = 16)
     private String telephone;
+
     private String intro;
+
     /**
      * fileName
      */
+    @Column(length = 10)
     private String photo;
+
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "department_id")
     private DepartmentEntity department;
-    private Set<TeachesEntity> teaches = new HashSet<>();
-    private Set<TakesEntity> takes = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher")
+    private List<ClassEntity> classesTeaching = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", orphanRemoval = true)
+    private List<ClassRegistrationEntity> classRegistrations = new ArrayList<>();
+
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(name = "user_role", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
     private Set<RoleEntity> roles = new HashSet<>();
 
 
-    @Column(name = "user_name")
-    public String getName() {
-        return name;
+    // Getter and setter.
+
+    public static int getTypeManager() {
+        return TYPE_MANAGER;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public static int getTypeTeacher() {
+        return TYPE_TEACHER;
     }
 
-    @Id
-    @Column(name = "user_id", length = 10)
+    public static int getTypeTa() {
+        return TYPE_TA;
+    }
+
+    public static int getTypeStudent() {
+        return TYPE_STUDENT;
+    }
+
+    public static int getTypeNum() {
+        return TYPE_NUM;
+    }
+
     public String getUid() {
         return uid;
     }
@@ -58,7 +101,14 @@ public class UserEntity {
         this.uid = uid;
     }
 
-    @Column(name = "hashed_pwd", length = 44)
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getHashedPassword() {
         return hashedPassword;
     }
@@ -67,7 +117,6 @@ public class UserEntity {
         this.hashedPassword = hashedPassword;
     }
 
-    @Column(length = 24)
     public String getSalt() {
         return salt;
     }
@@ -81,27 +130,23 @@ public class UserEntity {
     }
 
     public void setType(Integer type) {
-        if (0 <= type && type < TYPE_NUM) {
-            this.type = type;
-        }
+        this.type = type;
     }
 
-    @Column(length = 16)
-    public String getTelephone() {
-        return telephone;
-    }
-
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
-    }
-
-    @Column(length = 31)
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
     }
 
     public String getIntro() {
@@ -112,7 +157,6 @@ public class UserEntity {
         this.intro = intro;
     }
 
-    @Column(length = 10)
     public String getPhoto() {
         return photo;
     }
@@ -121,27 +165,6 @@ public class UserEntity {
         this.photo = photo;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "student")
-    public Set<TakesEntity> getTakes() {
-        return takes;
-    }
-
-    public void setTakes(Set<TakesEntity> takes) {
-        this.takes = takes;
-    }
-
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher")
-    public Set<TeachesEntity> getTeaches() {
-        return teaches;
-    }
-
-    public void setTeaches(Set<TeachesEntity> teaches) {
-        this.teaches = teaches;
-    }
-
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "department_id")
     public DepartmentEntity getDepartment() {
         return department;
     }
@@ -150,8 +173,14 @@ public class UserEntity {
         this.department = department;
     }
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinTable(name = "user_role", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
+    public List<ClassEntity> getClassesTeaching() {
+        return classesTeaching;
+    }
+
+    public List<ClassRegistrationEntity> getClassRegistrations() {
+        return classRegistrations;
+    }
+
     public Set<RoleEntity> getRoles() {
         return roles;
     }
@@ -160,10 +189,13 @@ public class UserEntity {
         this.roles = roles;
     }
 
+
+    // Utility methods.
+
     public boolean haveAuthority(String uri) {
-        for(RoleEntity role : roles) {
-            for(AuthorityEntity authority : role.getAuthorities()) {
-                if(authority.getUri().equals(uri)) {
+        for (RoleEntity role : roles) {
+            for (AuthorityEntity authority : role.getAuthorities()) {
+                if (authority.getUri().equals(uri)) {
                     return true;
                 }
             }
@@ -171,4 +203,13 @@ public class UserEntity {
         return false;
     }
 
+    public void addClassTeaching(ClassEntity classEntity) {
+        classesTeaching.add(classEntity);
+        classEntity.setTeacher(this);
+    }
+
+    public void addClassRegistration(ClassRegistrationEntity classRegistrationEntity) {
+        classRegistrations.add(classRegistrationEntity);
+        classRegistrationEntity.setStudent(this);
+    }
 }

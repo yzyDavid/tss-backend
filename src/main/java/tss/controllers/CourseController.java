@@ -52,15 +52,14 @@ public class CourseController {
             dept = ret.get();
         }
         CourseEntity course = new CourseEntity();
-        course.setCid(request.getCid());
+        course.setId(request.getCid());
         course.setName(request.getName());
         course.setCredit(request.getCredit());
-        course.setWeeklyNum(request.getWeeklyNum());
-        course.setSemester(request.getSemester());
+        course.setNumLessonsEachWeek(request.getWeeklyNum());
         course.setDepartment(dept);
         courseRepository.save(course);
 
-        return new ResponseEntity<>(new AddCourseResponse("ok", course.getCid(), course.getName()), HttpStatus.CREATED);
+        return new ResponseEntity<>(new AddCourseResponse("ok", course.getId(), course.getName()), HttpStatus.CREATED);
 
     }
 
@@ -111,10 +110,7 @@ public class CourseController {
             course.setCredit(request.getCredit());
         }
         if(request.getWeeklyNum() != null) {
-            course.setWeeklyNum(request.getWeeklyNum());
-        }
-        if(request.getSemester() != null) {
-            course.setSemester(request.getSemester());
+            course.setNumLessonsEachWeek(request.getWeeklyNum());
         }
         if(request.getIntro() != null) {
             course.setIntro(request.getIntro());
@@ -129,12 +125,12 @@ public class CourseController {
     public ResponseEntity<GetCourseResponse> getInfo(String cid) {
         if (!courseRepository.existsById(cid)) {
             return new ResponseEntity<>(new GetCourseResponse("course non-exist", "", "", null,
-                    null, null, ""), HttpStatus.BAD_REQUEST);
+                    null, null), HttpStatus.BAD_REQUEST);
         }
 
         CourseEntity course = courseRepository.findById(cid).get();
-        return new ResponseEntity<>(new GetCourseResponse("ok", course.getCid(), course.getName(),
-                course.getCredit(), course.getWeeklyNum(), course.getSemester(), course.getIntro()), HttpStatus.OK);
+        return new ResponseEntity<>(new GetCourseResponse("ok", course.getId(), course.getName(),
+                course.getCredit(), course.getNumLessonsEachWeek(), course.getIntro()), HttpStatus.OK);
     }
 
     @GetMapping(path = "/name")
@@ -143,7 +139,7 @@ public class CourseController {
         List<String> cids = new ArrayList<>();
         List<CourseEntity> ret = courseRepository.findByName(name);
         for(CourseEntity user : ret) {
-            cids.add(user.getCid());
+            cids.add(user.getId());
         }
         return new ResponseEntity<>(new GetCoursesByNameResponse("OK", cids), HttpStatus.OK);
     }

@@ -7,14 +7,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
-import tss.entities.*;
-import tss.repositories.*;
+import tss.entities.ClassEntity;
+import tss.entities.CourseEntity;
+import tss.entities.UserEntity;
+import tss.repositories.ClassRepository;
+import tss.repositories.CourseRepository;
 import tss.requests.information.AddClassRequest;
 import tss.requests.information.DeleteClassesRequest;
 import tss.requests.information.ModifyClassRequest;
 import tss.responses.information.AddClassResponse;
 import tss.responses.information.DeleteClassesResponse;
-import tss.responses.information.GetInstructorsResponse;
 import tss.responses.information.ModifyClassResponse;
 
 import java.util.ArrayList;
@@ -25,19 +27,11 @@ import java.util.Optional;
 @RequestMapping(path = "/class")
 public class ClassController {
     private final CourseRepository courseRepository;
-    private final TeachesRepository teachesRepository;
-    private final UserRepository userRepository;
-    private final TakesRepository takesRepository;
     private final ClassRepository classRepository;
 
     @Autowired
-    public ClassController(CourseRepository courseRepository, TeachesRepository teachesRepository,
-                           UserRepository userRepository, TakesRepository takesRepository,
-                           ClassRepository classRepository) {
+    public ClassController(CourseRepository courseRepository, ClassRepository classRepository) {
         this.courseRepository = courseRepository;
-        this.teachesRepository = teachesRepository;
-        this.userRepository = userRepository;
-        this.takesRepository = takesRepository;
         this.classRepository = classRepository;
     }
 
@@ -112,98 +106,4 @@ public class ClassController {
         }
         return new ResponseEntity<>(new DeleteClassesResponse("OK", failIds), HttpStatus.OK);
     }
-
-    @GetMapping(path = "/instructor")
-    @Authorization
-    public ResponseEntity<GetInstructorsResponse> getInstructors(Long cid) {
-
-        Optional<ClassEntity> ret = classRepository.findById(cid);
-        if (!ret.isPresent()) {
-            return new ResponseEntity<>(new GetInstructorsResponse("class non-exist", null, null, null, null), HttpStatus.BAD_REQUEST);
-        }
-        ClassEntity clazz = ret.get();
-        List<String> tids = new ArrayList<>();
-        List<String> names = new ArrayList<>();
-        List<List<String>> times = new ArrayList<>();
-        List<List<String>> classrooms = new ArrayList<>();
-        for (TeachesEntity teaches : clazz.getTeaches()) {
-            UserEntity teacher = teaches.getTeacher();
-            tids.add(teacher.getUid());
-            names.add(teacher.getName());
-            List<String> time = new ArrayList<>();
-            List<String> location = new ArrayList<>();
-            for (SectionEntity section : clazz.getSections()) {
-                TimeSlotEntity timeSlot = section.getTimeSlot();
-                ClassroomEntity classroom = section.getClassroom();
-                time.add(timeSlot.getDay() + " " + timeSlot.getStart() + "-" + timeSlot.getEnd());
-                times.add(time);
-                location.add(classroom.getBuilding() + " " + classroom.getName());
-                classrooms.add(location);
-            }
-        }
-        return new ResponseEntity<>(new GetInstructorsResponse("ok", tids, names, times, classrooms), HttpStatus.OK);
-    }
-
-    /*@PutMapping(path = "/instructor")
-    @Authorization
-    public ResponseEntity<AddInstructorsResponse> addInstructors(@CurrentUser UserEntity user,
-                                                                 @RequestBody AddInstructorsRequest request) {
-        String cid = request.getCid();
-        Set<String> uids = request.getUids();
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new AddInstructorsResponse("permission denied", uids), HttpStatus.FORBIDDEN);
-        }
-        Optional<CourseEntity> ret = courseRepository.findById(cid);
-
-        if (!courseRepository.existsById(cid)) {
-            return new ResponseEntity<>(new AddInstructorsResponse("course doesn't exist", uids), HttpStatus.BAD_REQUEST);
-        }
-
-        Set<String> fail = new HashSet<>();
-        for (String uid : uids) {
-            if (!userRepository.existsById(uid)) {
-                fail.add(uid);
-            }
-        }
-        if (!fail.isEmpty()) {
-            return new ResponseEntity<>(new AddInstructorsResponse("uids don't exist", fail), HttpStatus.BAD_REQUEST);
-        }
-
-        for (String uid : uids) {
-            if (userRepository.findById(uid).get().getType() != UserEntity.TYPE_TEACHER) {
-                fail.add(uid);
-            }
-        }
-        if (!fail.isEmpty()) {
-            return new ResponseEntity<>(new AddInstructorsResponse("users are not teachers", fail), HttpStatus.BAD_REQUEST);
-        }
-
-        CourseEntity course = courseRepository.findById(cid).get();
-        for (String uid : uids) {
-            TeachesEntity teaches = new TeachesEntity(userRepository.findById(uid).get());
-            teaches
-            teachesRepository.save(teaches);
-        }
-        return new ResponseEntity<>(new AddInstructorsResponse("OK", null), HttpStatus.OK);
-    }
-
-    @DeleteMapping(path = "/instructor")
-    @Authorization
-    public ResponseEntity<DeleteInstructorsResponse> deleteInstructors(@CurrentUser UserEntity user,
-                                                                       @RequestBody DeleteInstructorsRequest request) {
-        String cid = request.getCid();
-        Set<String> uids = request.getUids();
-        if (!courseRepository.existsById(cid)) {
-            return new ResponseEntity<>(new DeleteInstructorsResponse("course doesn't exist"), HttpStatus.BAD_REQUEST);
-        } else if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new DeleteInstructorsResponse("permission denied"), HttpStatus.FORBIDDEN);
-        }
-
-        CourseEntity course = courseRepository.findById(cid).get();
-        for(TeachesEntity teaches: course.getTeaches()) {
-            if(uids.contains(teaches.getTeacher().getUid()))
-                teachesRepository.delete(teaches);
-        }
-        return new ResponseEntity<>(new DeleteInstructorsResponse("OK"), HttpStatus.OK);
-    }*/
 }

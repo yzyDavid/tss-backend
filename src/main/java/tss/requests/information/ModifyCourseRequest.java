@@ -8,7 +8,6 @@ public class ModifyCourseRequest {
     private String name;
     private Float credit;
     private Integer weeklyNum;
-    private String semester;
     private String intro;
     private String dept;
 
@@ -42,14 +41,6 @@ public class ModifyCourseRequest {
 
     public void setWeeklyNum(Integer weeklyNum) {
         this.weeklyNum = weeklyNum;
-    }
-
-    public String getSemester() {
-        return semester;
-    }
-
-    public void setSemester(String semester) {
-        this.semester = semester;
     }
 
     public String getIntro() {

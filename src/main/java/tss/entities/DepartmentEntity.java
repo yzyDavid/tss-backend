@@ -5,9 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "department", indexes = {
-        @Index(name = "dept_name_index", columnList = "dept_name", unique = true)
-})
+@Table(
+        name = "department",
+        indexes = {
+                @Index(name = "dept_name_index", columnList = "dept_name", unique = true)
+        }
+)
 public class DepartmentEntity {
     private short id;
     private String name;

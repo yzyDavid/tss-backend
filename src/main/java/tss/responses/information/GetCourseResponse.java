@@ -9,17 +9,15 @@ public class GetCourseResponse {
     private final String name;
     private final Float credit;
     private final Integer weeklyNum;
-    private final String semester;
     private final String intro;
 
     public GetCourseResponse(String status, String cid, String name, Float credit,
-                             Integer weeklyNum, String semester, String intro) {
+                             Integer weeklyNum, String intro) {
         this.status = status;
         this.cid = cid;
         this.name = name;
         this.credit = credit;
         this.weeklyNum = weeklyNum;
-        this.semester = semester;
         this.intro = intro;
     }
 
@@ -41,10 +39,6 @@ public class GetCourseResponse {
 
     public Integer getWeeklyNum() {
         return weeklyNum;
-    }
-
-    public String getSemester() {
-        return semester;
     }
 
     public String getIntro() {

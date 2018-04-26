@@ -15,7 +15,7 @@ import java.util.Optional;
  * @author reeve
  */
 @RestController
-@RequestMapping("/classrooms/{classroomId}")
+@RequestMapping("/classrooms")
 public class ClassroomController {
     private final ClassroomRepository classroomRepository;
 
@@ -24,43 +24,34 @@ public class ClassroomController {
         this.classroomRepository = classroomRepository;
     }
 
-    @GetMapping()
+    @GetMapping("/{classroomId}")
     @ResponseStatus(HttpStatus.OK)
     public Classroom getClassroom(@PathVariable int classroomId) {
-        Optional<ClassroomEntity> optional = classroomRepository.findById(classroomId);
-        if (!optional.isPresent()) {
-            throw new ClassroomNotFoundException();
-        }
-        return new Classroom(optional.get());
+        ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
+                (ClassroomNotFoundException::new);
+        return new Classroom(classroomEntity);
     }
 
-    @DeleteMapping()
+    @DeleteMapping("/{classroomId}")
     @ResponseStatus(HttpStatus.OK)
     public void removeClassroom(@PathVariable int classroomId) {
-        Optional<ClassroomEntity> optional = classroomRepository.findById(classroomId);
-        if (!optional.isPresent()) {
-            throw new ClassroomNotFoundException();
-        }
-        classroomRepository.delete(optional.get());
+        ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
+                (ClassroomNotFoundException::new);
+        classroomRepository.delete(classroomEntity);
     }
 
-    @PatchMapping()
+    @PatchMapping("/{classroomId}")
     @ResponseStatus(HttpStatus.OK)
     public Classroom updateClassroom(@PathVariable int classroomId, @RequestBody Classroom classroom) {
-        Optional<ClassroomEntity> optional = classroomRepository.findById(classroomId);
-        if (!optional.isPresent()) {
-            throw new ClassroomNotFoundException();
-        }
-        ClassroomEntity classroomEntity = optional.get();
-
+        ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
+                (ClassroomNotFoundException::new);
         if (classroom.getName() != null) {
             classroomEntity.setName(classroom.getName());
         }
         if (classroom.getCapacity() != null) {
             classroomEntity.setCapacity(classroom.getCapacity());
         }
-        classroomEntity = classroomRepository.save(classroomEntity);
-        return new Classroom(classroomEntity);
+        return new Classroom(classroomRepository.save(classroomEntity));
     }
 
 //    @GetMapping(path = "/classrooms/{classroomId}/schedule")
