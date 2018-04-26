@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.UserEntity;
@@ -21,6 +18,7 @@ import tss.requests.information.bbs.DeleteBbsTopicRequest;
 import tss.requests.information.bbs.ModifyTopicContentRequest;
 import tss.responses.information.bbs.AddBbsTopicResponse;
 import tss.responses.information.bbs.DeleteBbsTopicResponse;
+import tss.responses.information.bbs.GetTopicInfoByIdResponse;
 import tss.responses.information.bbs.ModifyTopicContentResponse;
 
 import java.text.DateFormat;
@@ -143,5 +141,30 @@ public class BbsTopicController {
         return new ResponseEntity<>(new ModifyTopicContentResponse("ok", topic.getId(), topic.getName(), topic.getContent(), topic.getTime()), HttpStatus.OK);
     }
 
+    /* Look for topic by id
+     * get par: id
+     * permission: anyone
+     * return: id, name, content, time, author_name, section_name, reply number
+     */
+    @GetMapping(path = "id")
+    public ResponseEntity<GetTopicInfoByIdResponse> getTopicInfoById(@RequestParam long id){
+        /* invalid topic id error */
+        Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(id);
+        if(!ret.isPresent())
+            return new ResponseEntity<>(new GetTopicInfoByIdResponse("no such topic", -1, null, null, null,
+                    null, null, 0), HttpStatus.BAD_REQUEST);
 
+        BbsTopicEntity topic = ret.get();
+        String name = topic.getName();
+        String content = topic.getContent();
+        String authorName = topic.getAuthor().getName();
+        String sectionName = topic.getBelongedSection().getName();
+        Date time = topic.getTime();
+        DateFormat mediumDateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+        mediumDateFormat.format(time);
+        int replyNum = topic.getReplyNum();
+
+        return new ResponseEntity<>(new GetTopicInfoByIdResponse("ok", topic.getId(), name, content,
+                                    time, authorName, sectionName, replyNum), HttpStatus.OK);
+    }
 }
