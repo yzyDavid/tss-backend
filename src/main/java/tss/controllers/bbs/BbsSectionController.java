@@ -11,6 +11,7 @@ import tss.entities.ClassEntity;
 import tss.entities.TeachesEntity;
 import tss.entities.UserEntity;
 import tss.entities.bbs.BbsSectionEntity;
+import tss.entities.bbs.BbsTopicEntity;
 import tss.repositories.TeachesRepository;
 import tss.repositories.bbs.BbsSectionRepository;
 import tss.requests.information.bbs.AddBbsSectionRequest;
@@ -32,6 +33,11 @@ public class BbsSectionController {
         this.teachesRepository = teachesRepository;
     }
 
+    /* create a section
+     * request: id, name, teacher id
+     * permission : manager
+     * return : id, name, teacher name
+     */
     @PutMapping(path = "/add")
     @Authorization
     public ResponseEntity<AddBbsSectionResponse> addBbsSection(@CurrentUser UserEntity user,
@@ -69,6 +75,11 @@ public class BbsSectionController {
         return new ResponseEntity<>(new AddBbsSectionResponse("add ok", id, name, teaches.getTeacher().getName()), HttpStatus.OK);
     }
 
+    /* delete a section with id
+     * request: id
+     * permission: manager
+     * return: id, name
+     */
     @DeleteMapping(path = "/delete")
     @Authorization
     public ResponseEntity<DeleteBbsSectionResponse> deleteBbsSection(@CurrentUser UserEntity user,
@@ -89,7 +100,10 @@ public class BbsSectionController {
         return new ResponseEntity<>(new DeleteBbsSectionResponse("ok", section.getId(), section.getName()), HttpStatus.OK);
     }
 
-    /* show all sections information, no need permission */
+    /* show all sections information, no need permission
+     * permission: anyone
+     * return: List ids , List names
+     */
     @GetMapping(path = "/info")
     public ResponseEntity<GetInfoBbsSectionResponse> infoBbsSection(){
         List<Long> ids = new ArrayList<>();
@@ -110,7 +124,11 @@ public class BbsSectionController {
         return new ResponseEntity<>(new GetInfoBbsSectionResponse("ok", ids, names), HttpStatus.OK);
     }
 
-    /* find by section id */
+    /* find by section id
+     * get par: id
+     * permission: anyone
+     * return: id, name, userNum, Set<topic name>
+     */
     @GetMapping(path = "/id")
     public ResponseEntity<GetSectionInfoByIdResponse> getSectionInfoById(@RequestParam Long id){
         Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(id);
@@ -118,11 +136,19 @@ public class BbsSectionController {
             return new ResponseEntity<>(new GetSectionInfoByIdResponse("no such section", -1, null, -1, null), HttpStatus.BAD_REQUEST);
 
         BbsSectionEntity section = ret.get();
-        return new ResponseEntity<>(new GetSectionInfoByIdResponse("ok", section.getId(), section.getName(), section.getUsrNum(), section.getTopics()), HttpStatus.OK);
+        Set<String> names = new HashSet<>();
+        for(BbsTopicEntity e : section.getTopics())
+            names.add(e.getName());
+
+        return new ResponseEntity<>(new GetSectionInfoByIdResponse("ok", section.getId(), section.getName(), section.getUsrNum(), names), HttpStatus.OK);
     }
 
 
-    /* find by section name */
+    /* find by section name
+     * get par: name
+     * permission: anyone
+     * return: id, name , userNum, Set<topic-name>
+     */
     @GetMapping(path = "/name")
     public ResponseEntity<GetSectionInfoByNameResponse> getSectionInfoById(@RequestParam String name){
         Optional<BbsSectionEntity> ret = bbsSectionRepository.findByName(name);
@@ -130,7 +156,10 @@ public class BbsSectionController {
             return new ResponseEntity<>(new GetSectionInfoByNameResponse("no such section", -1, null, -1, null), HttpStatus.BAD_REQUEST);
 
         BbsSectionEntity section = ret.get();
-        return new ResponseEntity<>(new GetSectionInfoByNameResponse("ok", section.getId(), section.getName(), section.getUsrNum(), section.getTopics()), HttpStatus.OK);
+        Set<String> names = new HashSet<>();
+        for(BbsTopicEntity e : section.getTopics())
+            names.add(e.getName());
+        return new ResponseEntity<>(new GetSectionInfoByNameResponse("ok", section.getId(), section.getName(), section.getUsrNum(), names), HttpStatus.OK);
     }
 
     /* to do: modify, many add section introduction part */

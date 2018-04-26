@@ -1,6 +1,5 @@
 package tss.controllers.bbs;
 
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +18,10 @@ import tss.repositories.bbs.BbsSectionRepository;
 import tss.repositories.bbs.BbsTopicRepository;
 import tss.requests.information.bbs.AddBbsTopicRequest;
 import tss.requests.information.bbs.DeleteBbsTopicRequest;
+import tss.requests.information.bbs.ModifyTopicContentRequest;
 import tss.responses.information.bbs.AddBbsTopicResponse;
 import tss.responses.information.bbs.DeleteBbsTopicResponse;
+import tss.responses.information.bbs.ModifyTopicContentResponse;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -43,8 +44,9 @@ public class BbsTopicController {
     }
 
     /* create a topic
-     * author : the current user
-     * time : init
+     * request: id, name, section id, content
+     * permission: anyone login
+     * return: id, name, content, time
      */
     @PostMapping(path = "/add")
     @Authorization
@@ -82,7 +84,7 @@ public class BbsTopicController {
         return new ResponseEntity<>(new AddBbsTopicResponse("ok", topicId, name, content, date), HttpStatus.OK);
     }
 
-    /*  delete by id
+    /* delete by id
      * request: id
      * permission : manager, author
      * response: id, name, author name;
@@ -109,4 +111,37 @@ public class BbsTopicController {
 
         return new ResponseEntity<>(new DeleteBbsTopicResponse("ok", request.getId(), topicName, authorName), HttpStatus.OK);
     }
+
+    /* modify the topic content
+     * request: id, new content
+     * permission: author only
+     * return: id, name, content, time
+     */
+    @PostMapping(path = "modify")
+    @Authorization
+    public ResponseEntity<ModifyTopicContentResponse> modifyTopicContent(@CurrentUser UserEntity user,
+                                                                         @RequestBody ModifyTopicContentRequest request){
+        /* invalid topic id error */
+        Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(request.getId());
+        if(!ret.isPresent())
+            return new ResponseEntity<>(new ModifyTopicContentResponse("no such topic", -1, null, null, null), HttpStatus.BAD_REQUEST);
+        BbsTopicEntity topic = ret.get();
+
+        /* not author, error */
+        if(!user.getUid().equals(topic.getAuthor().getUid()))
+            return new ResponseEntity<>(new ModifyTopicContentResponse("permission denied", -1, null, null, null), HttpStatus.FORBIDDEN);
+
+        /* modify content by new content */
+        topic.setContent(request.getNewContent());
+
+        Date date = new Date();
+        DateFormat mediumDateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+        mediumDateFormat.format(date);
+        topic.setTime(date);
+
+        bbsTopicRepository.save(topic);
+        return new ResponseEntity<>(new ModifyTopicContentResponse("ok", topic.getId(), topic.getName(), topic.getContent(), topic.getTime()), HttpStatus.OK);
+    }
+
+
 }

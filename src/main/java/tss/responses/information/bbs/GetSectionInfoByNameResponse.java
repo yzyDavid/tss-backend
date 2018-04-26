@@ -11,9 +11,9 @@ public class GetSectionInfoByNameResponse {
     private final long id;
     private final String name;
     private final int userNum;
-    private final Set<BbsTopicEntity> topics;
+    private final Set<String> topics;
 
-    public GetSectionInfoByNameResponse(String status, long id, String name, int userNum, Set<BbsTopicEntity> topics){
+    public GetSectionInfoByNameResponse(String status, long id, String name, int userNum, Set<String> topics){
         this.status = status;
         this.id = id;
         this.name = name;
@@ -37,7 +37,7 @@ public class GetSectionInfoByNameResponse {
         return userNum;
     }
 
-    public Set<BbsTopicEntity> getTopics() {
+    public Set<String> getTopics() {
         return topics;
     }
 }
