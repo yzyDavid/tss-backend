@@ -137,7 +137,7 @@ public class ClassController {
                 ClassroomEntity classroom = section.getClassroom();
                 time.add(timeSlot.getDay() + " " + timeSlot.getStart() + "-" + timeSlot.getEnd());
                 times.add(time);
-                location.add(classroom.getBuilding() + " " + classroom.getRoom());
+                location.add(classroom.getBuilding() + " " + classroom.getName());
                 classrooms.add(location);
             }
         }
