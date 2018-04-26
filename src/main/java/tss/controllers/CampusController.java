@@ -63,16 +63,12 @@ public class CampusController {
 
     @DeleteMapping("/{campusId}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public Campus removeCampus(@PathVariable int campusId) {
+    public void removeCampus(@PathVariable int campusId) {
         Optional<CampusEntity> optional = campusRepository.findById(campusId);
         if (!optional.isPresent()) {
             throw new CampusNotFoundException();
         }
-        CampusEntity campusEntity = optional.get();
-
-        Campus campus = new Campus(campusEntity);
-        campusRepository.delete(campusEntity);
-        return campus;
+        campusRepository.delete(optional.get());
     }
 
     @PatchMapping("/{campusId}")

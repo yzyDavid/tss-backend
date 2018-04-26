@@ -41,17 +41,13 @@ public class BuildingController {
     }
 
     @DeleteMapping()
-    @ResponseStatus(value = HttpStatus.OK)
-    public Building removeBuilding(@PathVariable int buildingId) {
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void removeBuilding(@PathVariable int buildingId) {
         Optional<BuildingEntity> optional = buildingRepository.findById(buildingId);
         if (!optional.isPresent()) {
             throw new BuildingNotFoundException();
         }
-        BuildingEntity buildingEntity = optional.get();
-
-        Building building = new Building(buildingEntity);
-        buildingRepository.delete(buildingEntity);
-        return building;
+        buildingRepository.delete(optional.get());
     }
 
     @PatchMapping()

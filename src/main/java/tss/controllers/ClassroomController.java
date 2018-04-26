@@ -36,16 +36,12 @@ public class ClassroomController {
 
     @DeleteMapping()
     @ResponseStatus(HttpStatus.OK)
-    public Classroom removeClassroom(@PathVariable int classroomId) {
+    public void removeClassroom(@PathVariable int classroomId) {
         Optional<ClassroomEntity> optional = classroomRepository.findById(classroomId);
         if (!optional.isPresent()) {
             throw new ClassroomNotFoundException();
         }
-        ClassroomEntity classroomEntity = optional.get();
-
-        Classroom classroom = new Classroom(classroomEntity);
-        classroomRepository.delete(classroomEntity);
-        return classroom;
+        classroomRepository.delete(optional.get());
     }
 
     @PatchMapping()
