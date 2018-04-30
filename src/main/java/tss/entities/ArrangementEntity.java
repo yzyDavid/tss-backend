@@ -1,13 +1,11 @@
 package tss.entities;
 
-import com.sun.tools.corba.se.idl.constExpr.Times;
 import tss.models.TimeSlotEnum;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
-import java.sql.Time;
 
 /**
  * @author reeve
