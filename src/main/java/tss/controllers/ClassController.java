@@ -10,13 +10,16 @@ import tss.annotations.session.CurrentUser;
 import tss.entities.ClassEntity;
 import tss.entities.CourseEntity;
 import tss.entities.UserEntity;
+import tss.exceptions.ClazzNotFoundException;
 import tss.repositories.ClassRepository;
 import tss.repositories.CourseRepository;
 import tss.requests.information.AddClassRequest;
 import tss.requests.information.DeleteClassesRequest;
+import tss.requests.information.GetInstructorsRequest;
 import tss.requests.information.ModifyClassRequest;
 import tss.responses.information.AddClassResponse;
 import tss.responses.information.DeleteClassesResponse;
+import tss.responses.information.GetInstructorResponse;
 import tss.responses.information.ModifyClassResponse;
 
 import java.util.ArrayList;
@@ -106,4 +109,77 @@ public class ClassController {
         }
         return new ResponseEntity<>(new DeleteClassesResponse("OK", failIds), HttpStatus.OK);
     }
+
+    @PostMapping(path = "/getInstructor")
+    @Authorization
+    public ResponseEntity<GetInstructorResponse> getInstructor(@RequestBody GetInstructorsRequest request) {
+        ClassEntity classEntity = classRepository.findById(request.getCid()).orElseThrow(ClazzNotFoundException::new);
+        UserEntity teacherEntity = classEntity.getTeacher();
+
+        return new ResponseEntity<>(new GetInstructorResponse("ok", teacherEntity.getUid(), teacherEntity.getName()),
+                HttpStatus.OK);
+    }
+
+    /*@PutMapping(path = "/instructor")
+    @Authorization
+    public ResponseEntity<AddInstructorsResponse> addInstructors(@CurrentUser UserEntity user,
+                                                                 @RequestBody AddInstructorsRequest request) {
+        String cid = request.getCid();
+        Set<String> uids = request.getUids();
+        if (user.getType() != UserEntity.TYPE_MANAGER) {
+            return new ResponseEntity<>(new AddInstructorsResponse("permission denied", uids), HttpStatus.FORBIDDEN);
+        }
+        Optional<CourseEntity> ret = courseRepository.findById(cid);
+
+        if (!courseRepository.existsById(cid)) {
+            return new ResponseEntity<>(new AddInstructorsResponse("course doesn't exist", uids), HttpStatus.BAD_REQUEST);
+        }
+
+        Set<String> fail = new HashSet<>();
+        for (String uid : uids) {
+            if (!userRepository.existsById(uid)) {
+                fail.add(uid);
+            }
+        }
+        if (!fail.isEmpty()) {
+            return new ResponseEntity<>(new AddInstructorsResponse("uids don't exist", fail), HttpStatus.BAD_REQUEST);
+        }
+
+        for (String uid : uids) {
+            if (userRepository.findById(uid).get().getType() != UserEntity.TYPE_TEACHER) {
+                fail.add(uid);
+            }
+        }
+        if (!fail.isEmpty()) {
+            return new ResponseEntity<>(new AddInstructorsResponse("users are not teachers", fail), HttpStatus.BAD_REQUEST);
+        }
+
+        CourseEntity course = courseRepository.findById(cid).get();
+        for (String uid : uids) {
+            TeachesEntity teaches = new TeachesEntity(userRepository.findById(uid).get());
+            teaches
+            teachesRepository.save(teaches);
+        }
+        return new ResponseEntity<>(new AddInstructorsResponse("OK", null), HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/instructor")
+    @Authorization
+    public ResponseEntity<DeleteInstructorsResponse> deleteInstructors(@CurrentUser UserEntity user,
+                                                                       @RequestBody DeleteInstructorsRequest request) {
+        String cid = request.getCid();
+        Set<String> uids = request.getUids();
+        if (!courseRepository.existsById(cid)) {
+            return new ResponseEntity<>(new DeleteInstructorsResponse("course doesn't exist"), HttpStatus.BAD_REQUEST);
+        } else if (user.getType() != UserEntity.TYPE_MANAGER) {
+            return new ResponseEntity<>(new DeleteInstructorsResponse("permission denied"), HttpStatus.FORBIDDEN);
+        }
+
+        CourseEntity course = courseRepository.findById(cid).get();
+        for(TeachesEntity teaches: course.getTeaches()) {
+            if(uids.contains(teaches.getTeacher().getUid()))
+                teachesRepository.delete(teaches);
+        }
+        return new ResponseEntity<>(new DeleteInstructorsResponse("OK"), HttpStatus.OK);
+    }*/
 }
