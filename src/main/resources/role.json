@@ -11,7 +11,7 @@
   },
   "department_administrator" : {
     "prefix" : "dept",
-    "paths" : ["add", "getAll", "get", "delete", "modify"],
+    "paths" : ["add", "delete", "modify"],
     "belong2" : [0]
   }
 }

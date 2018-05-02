@@ -7,7 +7,7 @@ import java.util.Set;
 @Entity
 @Table(name = "classroom")
 public class ClassroomEntity {
-    short id;
+    Short id;
     private String building;
     private Integer room;
     private Integer capactity;
@@ -15,11 +15,11 @@ public class ClassroomEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public short getId() {
+    public Short getId() {
         return id;
     }
 
-    public void setId(short id) {
+    public void setId(Short id) {
         this.id = id;
     }
 
@@ -57,5 +57,23 @@ public class ClassroomEntity {
 
     public void setSections(Set<SectionEntity> sections) {
         this.sections = sections;
+    }
+
+    @Override
+    public int hashCode() {
+        if(id == null) {
+            return super.hashCode();
+        } else {
+            return id.hashCode();
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!obj.getClass().equals(this.getClass()) || id == null) {
+            return false;
+        } else {
+            return (id.equals(((ClassroomEntity)obj).id));
+        }
     }
 }

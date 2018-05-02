@@ -105,20 +105,18 @@ public class CourseEntity {
         this.department = department;
     }
 
-    /*public Integer getExamBeginTime() {
-        return examBeginTime;
+    @Override
+    public int hashCode() {
+        return cid.hashCode();
     }
 
-    public void setExamBeginTime(Integer examBeginTime) {
-        this.examBeginTime = examBeginTime;
+    @Override
+    public boolean equals(Object obj) {
+        if(!obj.getClass().equals(this.getClass())) {
+            return false;
+        } else {
+            return (cid.equals(((CourseEntity)obj).cid));
+        }
     }
-
-    public Integer getExamduration() {
-        return examDuration;
-    }
-
-    public void setExamduration(Integer examDuration) {
-        this.examDuration = examDuration;
-    }*/
 }
 

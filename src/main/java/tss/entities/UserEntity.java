@@ -88,9 +88,7 @@ public class UserEntity {
     }
 
     public void setType(Integer type) {
-        if (0 <= type && type < TYPE_NUM) {
-            this.type = type;
-        }
+        this.type = type;
     }
 
     @Column(length = 16)
@@ -171,5 +169,22 @@ public class UserEntity {
         roles.add(role);
     }
 
+    @Override
+    public int hashCode() {
+        if(uid == null) {
+            return super.hashCode();
+        } else {
+            return uid.hashCode();
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!obj.getClass().equals(this.getClass()) || uid == null) {
+            return false;
+        } else {
+            return (uid.equals(((UserEntity)obj).uid));
+        }
+    }
 
 }

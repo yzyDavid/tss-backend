@@ -87,4 +87,18 @@ public class TakesEntity {
     public void setCid(String cid) {
         this.cid = cid;
     }
+
+    @Override
+    public int hashCode() {
+        return (int)id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!obj.getClass().equals(this.getClass())) {
+            return false;
+        } else {
+            return (id == ((TakesEntity)obj).id);
+        }
+    }
 }

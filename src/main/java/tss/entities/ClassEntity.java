@@ -6,7 +6,7 @@ import java.util.Set;
 @Entity
 @Table(name = "class")
 public class ClassEntity {
-    private long id;
+    private Long id;
     private Integer year;
     private Integer capacity;
     private Integer studentNum = 0;
@@ -18,11 +18,11 @@ public class ClassEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -86,5 +86,23 @@ public class ClassEntity {
 
     public void setTakes(Set<TakesEntity> takes) {
         this.takes = takes;
+    }
+
+    @Override
+    public int hashCode() {
+        if(id == null) {
+            return super.hashCode();
+        } else {
+            return id.hashCode();
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!obj.getClass().equals(this.getClass()) || id == null) {
+            return false;
+        } else {
+            return (id.equals(((ClassEntity)obj).id));
+        }
     }
 }
