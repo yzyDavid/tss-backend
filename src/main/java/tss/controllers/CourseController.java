@@ -38,9 +38,9 @@ public class CourseController {
     public ResponseEntity<AddCourseResponse> addCourse(@CurrentUser UserEntity user,
                                                        @RequestBody AddCourseRequest request) {
         String cid = request.getCid();
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
+        /*if (user.getType() != UserEntity.TYPE_MANAGER) {
             return new ResponseEntity<>(new AddCourseResponse("permission denied", "", ""), HttpStatus.FORBIDDEN);
-        } else if (courseRepository.existsById(cid)) {
+        } else */if (courseRepository.existsById(cid)) {
             return new ResponseEntity<>(new AddCourseResponse("failed with duplicated cid", null, null), HttpStatus.BAD_REQUEST);
         }
         DepartmentEntity dept = null;
@@ -71,9 +71,9 @@ public class CourseController {
         String cid = request.getCid();
         if (!courseRepository.existsById(cid)) {
             return new ResponseEntity<>(new DeleteCourseResponse("course non-exist"), HttpStatus.BAD_REQUEST);
-        } else if (user.getType() != UserEntity.TYPE_MANAGER) {
+        }/* else if (user.getType() != UserEntity.TYPE_MANAGER) {
             return new ResponseEntity<>(new DeleteCourseResponse("permission denied"), HttpStatus.FORBIDDEN);
-        }
+        }*/
 
         courseRepository.deleteById(cid);
 
@@ -87,9 +87,9 @@ public class CourseController {
     public ResponseEntity<ModifyCourseResponse> modifyInfo(@CurrentUser UserEntity user,
                                                            @RequestBody ModifyCourseRequest request) {
         String cid = request.getCid();
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
+        /*if (user.getType() != UserEntity.TYPE_MANAGER) {
             return new ResponseEntity<>(new ModifyCourseResponse("permission denied", "", ""), HttpStatus.FORBIDDEN);
-        }
+        }*/
         Optional<CourseEntity> ret = courseRepository.findById(cid);
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new ModifyCourseResponse("course doesn't exist", null, null), HttpStatus.BAD_REQUEST);

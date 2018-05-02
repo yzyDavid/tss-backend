@@ -34,9 +34,9 @@ public class DepartmentController {
     @Authorization
     public ResponseEntity<AddDepartmentResponse> addDepartment(@CurrentUser UserEntity user,
                                                                @RequestBody AddDepartmentRequest request) {
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
+        /*if (user.getType() != UserEntity.TYPE_MANAGER) {
             return new ResponseEntity<>(new AddDepartmentResponse("permission denied"), HttpStatus.FORBIDDEN);
-        } else if (departmentRepository.existsByName(request.getName())) {
+        } else */if (departmentRepository.existsByName(request.getName())) {
             return new ResponseEntity<>(new AddDepartmentResponse("duplicated name"), HttpStatus.BAD_REQUEST);
         }
         DepartmentEntity department = new DepartmentEntity();

@@ -40,4 +40,18 @@ public class AuthorityEntity {
     public void setRole(Set<RoleEntity> role) {
         this.role = role;
     }
+
+    @Override
+    public int hashCode() {
+        return uri.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!obj.getClass().equals(this.getClass())) {
+            return false;
+        } else {
+            return (uri.equals(((AuthorityEntity)obj).uri));
+        }
+    }
 }

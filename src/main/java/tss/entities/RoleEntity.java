@@ -2,6 +2,7 @@ package tss.entities;
 
 import tss.entities.UserEntity;
 
+import javax.management.relation.Role;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +36,7 @@ public class RoleEntity {
         this.name = name;
     }
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinTable(name = "role_authority", joinColumns = {@JoinColumn(name = "role_id")}, inverseJoinColumns = {@JoinColumn(name = "authority_id")})
     public Set<AuthorityEntity> getAuthorities() {
         return authorities;
@@ -56,5 +57,19 @@ public class RoleEntity {
 
     public void setUsers(Set<UserEntity> users) {
         this.users = users;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!obj.getClass().equals(this.getClass())) {
+            return false;
+        } else {
+            return (name.equals(((RoleEntity)obj).name));
+        }
     }
 }

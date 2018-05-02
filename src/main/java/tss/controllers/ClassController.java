@@ -48,9 +48,9 @@ public class ClassController {
                                                      @RequestBody AddClassRequest request) {
         String cid = request.getCid();
 
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
+        /*if (user.getType() != UserEntity.TYPE_MANAGER) {
             return new ResponseEntity<>(new AddClassResponse("permission denied"), HttpStatus.FORBIDDEN);
-        }
+        }*/
 
         Optional<CourseEntity> ret = courseRepository.findById(cid);
         if (!ret.isPresent()) {
@@ -71,9 +71,9 @@ public class ClassController {
                                                            @RequestBody ModifyClassRequest request) {
         Long cid = request.getCid();
 
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
+        /*if (user.getType() != UserEntity.TYPE_MANAGER) {
             return new ResponseEntity<>(new ModifyClassResponse("permission denied"), HttpStatus.FORBIDDEN);
-        }
+        }*/
         Optional<ClassEntity> ret = classRepository.findById(cid);
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new ModifyClassResponse("can't find the class"), HttpStatus.BAD_REQUEST);
@@ -95,9 +95,9 @@ public class ClassController {
                                                                @RequestBody DeleteClassesRequest request) {
         List<Long> cids = request.getIds();
 
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
+        /*if (user.getType() != UserEntity.TYPE_MANAGER) {
             return new ResponseEntity<>(new DeleteClassesResponse("permission denied", null), HttpStatus.FORBIDDEN);
-        }
+        }*/
 
         List<Long> failIds = new ArrayList<>();
         for (Long cid : cids) {

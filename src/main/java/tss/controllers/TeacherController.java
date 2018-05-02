@@ -40,9 +40,9 @@ public class TeacherController {
                                                          @RequestBody AddTeachesRequest request) {
         String cid = request.getCid();
         List<String> uids = request.getUids();
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
+        /*if (user.getType() != UserEntity.TYPE_MANAGER) {
             return new ResponseEntity<>(new AddTeachesResponse("permission denied", null), HttpStatus.FORBIDDEN);
-        }
+        }*/
         Optional<CourseEntity> ret = courseRepository.findById(cid);
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new AddTeachesResponse("course doesn't exist", null), HttpStatus.BAD_REQUEST);

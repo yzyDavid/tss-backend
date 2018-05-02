@@ -20,7 +20,6 @@ import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.utils.SecurityUtils;
 
-import javax.management.relation.Role;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -56,37 +55,30 @@ public class UserController {
 
     @PutMapping(path = "/add")
     @Authorization
-    public ResponseEntity<AddUserResponse> addUser(//@CurrentUser UserEntity user,
-                                                   @RequestBody AddUserRequest request) {
+    public ResponseEntity<AddUserResponse> addUser(@RequestBody AddUserRequest request) {
         String uid = request.getUid();
-        /*if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new AddUserResponse("permission denied", "", ""), HttpStatus.FORBIDDEN);
-        }*/
         if (userRepository.existsById(uid)) {
             return new ResponseEntity<>(new AddUserResponse("failed with duplicated uid", null, null), HttpStatus.BAD_REQUEST);
         }
-        UserEntity entity = new UserEntity();
-        entity.setUid(uid);
-        entity.setName(request.getName());
+        UserEntity user = new UserEntity();
+        user.setUid(uid);
+        user.setName(request.getName());
         String salt = getSalt();
         String hashedPassword = getHashedPasswordByPasswordAndSalt(request.getPassword(), salt);
-        entity.setSalt(salt);
-        entity.setHashedPassword(hashedPassword);
-        entity.setType(request.getType());
-
-        userRepository.save(entity);
+        user.setSalt(salt);
+        user.setHashedPassword(hashedPassword);
+        if(!setUserType(user, request.getType())) {
+            return new ResponseEntity<>(new AddUserResponse("No such user type", uid, request.getName()), HttpStatus.BAD_REQUEST);
+        }
+        userRepository.save(user);
         return new ResponseEntity<>(new AddUserResponse("OK", uid, request.getName()), HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "/delete")
     @Authorization
-    public ResponseEntity<DeleteUserResponse> deleteUser(//@CurrentUser UserEntity user,
-                                                         @RequestBody DeleteUserRequest request) {
+    public ResponseEntity<DeleteUserResponse> deleteUser(@RequestBody DeleteUserRequest request) {
         String uid = request.getUid();
 
-        /*if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new DeleteUserResponse("permission denied", "", ""), HttpStatus.FORBIDDEN);
-        }*/
         Optional<UserEntity> ret = userRepository.findById(uid);
         if(!ret.isPresent()) {
             return new ResponseEntity<>(new DeleteUserResponse("non-existent uid", null, null), HttpStatus.BAD_REQUEST);
@@ -115,44 +107,16 @@ public class UserController {
     @PostMapping(path = "/reset-pwd")
     @Authorization
     public ResponseEntity<BasicResponse> resetPwd(@RequestBody BasicUserRequest request) {
-        final String initPwd = "123456";
         String uid = request.getUid();
         Optional<UserEntity> ret = userRepository.findById(uid);
         if(!ret.isPresent()) {
             return new ResponseEntity<>(new BasicResponse("non-existent uid"), HttpStatus.BAD_REQUEST);
         }
         UserEntity tar = ret.get();
-        String name = tar.getName();
-        tar.setHashedPassword(SecurityUtils.getHashedPasswordByPasswordAndSalt(initPwd, tar.getSalt()));
+        tar.setHashedPassword(SecurityUtils.getHashedPasswordByPasswordAndSalt(Config.INIT_PWD, tar.getSalt()));
         userRepository.save(tar);
 
         return new ResponseEntity<>(new BasicResponse("OK"), HttpStatus.OK);
-    }
-
-    @PostMapping(path = "/modify")
-    @Authorization
-    public ResponseEntity<ModifyUserResponse> modifyInfo(@CurrentUser UserEntity user,
-                                                         @RequestBody ModifyUserRequest request) {
-        if (user.getType() != UserEntity.TYPE_MANAGER && user.getUid() != request.getUid()) {
-            return new ResponseEntity<>(new ModifyUserResponse("permission denied", null, null), HttpStatus.FORBIDDEN);
-        }
-        String uid = (request.getUid() == null) ? user.getUid() : request.getUid();
-        Optional<UserEntity> ret = userRepository.findById(uid);
-        if(!ret.isPresent()) {
-            return new ResponseEntity<>(new ModifyUserResponse("non-existent uid", uid, null), HttpStatus.BAD_REQUEST);
-        }
-        UserEntity tar = ret.get();
-        if (request.getEmail() != null) {
-            tar.setEmail(request.getEmail());
-        }
-        if (request.getTelephone() != null) {
-            tar.setTelephone(request.getTelephone());
-        }
-        if (request.getIntro() != null) {
-            tar.setIntro(request.getIntro());
-        }
-        userRepository.save(tar);
-        return new ResponseEntity<>(new ModifyUserResponse("OK", tar.getUid(), tar.getName()), HttpStatus.OK);
     }
 
     @PostMapping(path = "/modify-own")
@@ -191,18 +155,19 @@ public class UserController {
             user.setIntro(request.getIntro());
         }
 
-        Optional<DepartmentEntity> dept = departmentRepository.findByName(request.getDeptName());
-        if(dept.isPresent()) {
-            user.setDepartment(dept.get());
-        } else {
-            return new ResponseEntity<>(new ModifyUserResponse("No such department", user.getUid(), user.getName()), HttpStatus.OK);
+        if(request.getDeptName() != null) {
+            Optional<DepartmentEntity> dept = departmentRepository.findByName(request.getDeptName());
+            if(dept.isPresent()) {
+                user.setDepartment(dept.get());
+            } else {
+                return new ResponseEntity<>(new ModifyUserResponse("No such department", user.getUid(), user.getName()), HttpStatus.BAD_REQUEST);
+            }
         }
 
-        Optional<RoleEntity> role = roleRepository.findByName(request.getRole());
-        if(role.isPresent()) {
-            user.getRoles().add(role.get());
-        } else {
-            return new ResponseEntity<>(new ModifyUserResponse("No such role", user.getUid(), user.getName()), HttpStatus.OK);
+        if(request.getType() != null) {
+            if(!setUserType(user, request.getType())) {
+                return new ResponseEntity<>(new ModifyUserResponse("No such user type", user.getUid(), user.getName()), HttpStatus.BAD_REQUEST);
+            }
         }
 
         userRepository.save(user);
@@ -239,12 +204,6 @@ public class UserController {
     @Authorization
     public ResponseEntity<ModifyPhotoResponse> modifyPhoto(@CurrentUser UserEntity user,
                                                            @RequestBody ModifyPhotoRequest request) {
-        /*if (!userRepository.existsById(request.getUid())) {
-            return new ResponseEntity<>(new ModifyPhotoResponse("non-existent uid"), HttpStatus.BAD_REQUEST);
-        } else if (user.getType() != UserEntity.TYPE_MANAGER && user.getUid() != request.getUid()) {
-            return new ResponseEntity<>(new ModifyPhotoResponse("permission denied"), HttpStatus.FORBIDDEN);
-        }
-        user = userRepository.findById(user.getUid()).get();*/
         MultipartFile file = request.getFile();
         if (!file.isEmpty()) {
             try {
@@ -282,4 +241,19 @@ public class UserController {
         }
 
     }
+
+    private boolean setUserType(UserEntity user, int newType) {
+        if(newType != user.getType() && newType >= 0 && newType <= UserEntity.TYPE_NUM) {
+            user.setType(newType);
+            for (String name : UserEntity.ROLE_ALLOC.get(user.getType())) {
+                Optional<RoleEntity> role = roleRepository.findByName(name);
+                if (role.isPresent()) {
+                    user.addRole(role.get());
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
 }
