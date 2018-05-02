@@ -8,25 +8,25 @@ import java.util.Set;
 
 @Entity
 @Table(name = "role", indexes = {
-        @Index(name = "role_name_index", columnList = "role_name")
+        @Index(name = "role_name_index", columnList = "role_name", unique = true)
 })
 public class RoleEntity {
-    private short id;
+    private Short id;
     private String name;
     private Set<AuthorityEntity> authorities = new HashSet<>();
     private Set<UserEntity> users = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public short getId() {
+    public Short getId() {
         return id;
     }
 
-    public void setId(short id) {
+    public void setId(Short id) {
         this.id = id;
     }
 
-    @Column(name = "role_name", length = 15, nullable = false)
+    @Column(name = "role_name", length = 31, nullable = false)
     public String getName() {
         return name;
     }
@@ -43,6 +43,10 @@ public class RoleEntity {
 
     public void setAuthorities(Set<AuthorityEntity> authorities) {
         this.authorities = authorities;
+    }
+
+    public void addAuthority(AuthorityEntity authority) {
+        authorities.add(authority);
     }
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "roles")

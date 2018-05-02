@@ -1,0 +1,10 @@
+{
+  "user_administrator" : {
+    "prefix" : "user",
+    "paths" : ["add", "delete", "reset-pwd", "modify-all", "name"]
+  },
+  "course_administrator" : {
+    "prefix" : "course",
+    "paths" : ["add", "delete", "modify", "name"]
+  }
+}
