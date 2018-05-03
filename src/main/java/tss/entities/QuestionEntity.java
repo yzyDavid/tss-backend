@@ -10,73 +10,73 @@ import java.util.Set;
 })
 public class QuestionEntity{
     private String qid;
-    private String content;
-    private String answer;
-    private String type;
-    private String unit;
+    private String question;
+    private String qanswer;
+    private String qtype;
+    private String qunit;
 
-    private Integar answerednum;
-    private Float correct;
+    private int answerednum;
+    private double correct;
 
-    @id
+    @Id
     @Column(name = "question_qid", length = 10)
     public String getId() {
-        return id;
+        return  qid;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setId(String qid) {
+        this.qid = qid;
     }
 
-    @Column(name = "question_content", length = 300)
-    public String getContent() {
-        return content;
+    @Column(name = "question_question", length = 300)
+    public String getQuestion() {
+        return question;
     }
 
-    public void setContent(String content) { this.content = content; }
+    public void setQuestion(String question) { this.question = question; }
 
-    @Column(name = "question_answer", length = 200)
-    public String getAnswer() {
-        return answer;
+    @Column(name = "question_qanswer", length = 200)
+    public String getQanswer() {
+        return qanswer;
     }
 
-    public void setAnswer(String answer) {
-        this.answer = answer;
+    public void setQAanswer(String qanswer) {
+        this.qanswer = qanswer;
     }
 
-    @Column(name = "question_type")
-    public String getType() {
-        return type;
+    @Column(name = "question_qtype")
+    public String getQtype() {
+        return qtype;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setQtype(String qtype) {
+        this.qtype = qtype;
     }
 
-    @Column(name = "question_unit")
-    public String getUnit() {
-        return unit;
+    @Column(name = "question_qunit")
+    public String getQunit() {
+        return qunit;
     }
 
-    public void setUnit(String unit) {
-        this.unit = unit;
+    public void setQunit(String qunit) {
+        this.qunit = qunit;
     }
 
     @Column(name = "question_answerednum")
-    public Integar getAnswerednum() {
+    public int getAnswerednum() {
         return answerednum;
     }
 
-    public void setAnswerednum(Integar answerednum) {
+    public void setAnswerednum(int answerednum) {
         this.answerednum = answerednum;
     }
 
     @Column(name = "question_correct")
-    public Float getCorrect() {
+    public double getCorrect() {
         return correct;
     }
 
-    public void setCorrect(Float correct) {
+    public void setCorrect(double correct) {
         this.correct = correct;
     }
 

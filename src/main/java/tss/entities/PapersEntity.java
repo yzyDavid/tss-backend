@@ -10,14 +10,14 @@ import java.util.Set;
 })
 public class PapersEntity{
     private String pid;
-    private Integar answerednum;
-    private Float average;
     private String begin;
     private String end;
 
     private Set<String> questionnum = new HashSet<>();
-    private Set<Float> questionscore = new HashSet<>();
+    private Set<String> questionscore = new HashSet<>();
 
+    private long answerednum;
+    private Float average;
     @Id
     @Column(name = "paper_id", length = 10)
     public String getPid() {
@@ -29,11 +29,11 @@ public class PapersEntity{
     }
 
     @Column(name = "paper_answerednum")
-    public Integar getAnswerednum() {
+    public long getAnswerednum() {
         return answerednum;
     }
 
-    public void setAnswerednum(Integar answerednum) {
+    public void setAnswerednum(long answerednum) {
         this.answerednum = answerednum;
     }
 
@@ -73,11 +73,11 @@ public class PapersEntity{
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paper")
-    public Set<Float> getQuestionscore() {
+    public Set<String> getQuestionscore() {
         return questionscore;
     }
 
-    public void setQuestionscore(Set<Float> questionscore) {
+    public void setQuestionscore(Set<String> questionscore) {
         this.questionscore = questionscore;
     }
 
