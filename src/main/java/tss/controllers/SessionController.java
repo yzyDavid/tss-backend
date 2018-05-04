@@ -61,6 +61,6 @@ public class SessionController {
 
         sqlSessionRepository.save(session);
 
-        return new ResponseEntity<>(new LoginResponse(login.getUid(), session.getToken(), user.getType(), "OK"), HttpStatus.OK);
+        return new ResponseEntity<>(new LoginResponse(login.getUid(), session.getToken(), user.readTypeName(), "OK"), HttpStatus.OK);
     }
 }

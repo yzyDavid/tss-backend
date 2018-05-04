@@ -13,26 +13,11 @@ import java.util.*;
         @Index(name = "user_name_index", columnList = "user_name")
 })
 public class UserEntity {
-    public static final int TYPE_SYS_ADMIN = 0;
-    public static final int TYPE_TCH_ADMIN = 1;
-    public static final int TYPE_TEACHER = 2;
-    public static final int TYPE_STUDENT = 3;
-    public static final int TYPE_NUM = 4;
-    public static final String[] TYPES = {"System Administrator", "Teaching Administrator", "Teacher", "Student"};
-    public static Map<Integer, List<String>> ROLE_ALLOC = new HashMap<Integer, List<String>>(){{
-        put(0, new ArrayList<>());
-        put(1, new ArrayList<>());
-        put(2, new ArrayList<>());
-        put(3, new ArrayList<>());
-    }};
-
-
 
     private String uid;
     private String name;
     private String hashedPassword;
     private String salt;
-    private Integer type = TYPE_STUDENT;
     private String email;
     private String telephone;
     private String intro;
@@ -41,9 +26,10 @@ public class UserEntity {
      */
     private String photo;
     private DepartmentEntity department;
+    private TypeGroupEntity typeGroup;
     private Set<TeachesEntity> teaches = new HashSet<>();
     private Set<TakesEntity> takes = new HashSet<>();
-    private Set<RoleEntity> roles = new HashSet<>();
+    //private Set<RoleEntity> roles = new HashSet<>();
 
 
     @Column(name = "user_name")
@@ -81,14 +67,6 @@ public class UserEntity {
 
     public void setSalt(String salt) {
         this.salt = salt;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
     }
 
     @Column(length = 16)
@@ -155,7 +133,7 @@ public class UserEntity {
         this.department = department;
     }
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    /*@ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
     public Set<RoleEntity> getRoles() {
         return roles;
@@ -167,6 +145,24 @@ public class UserEntity {
 
     public void addRole(RoleEntity role) {
         roles.add(role);
+    }*/
+
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "group_id")
+    public TypeGroupEntity getTypeGroup() {
+        return typeGroup;
+    }
+
+    public void setTypeGroup(TypeGroupEntity typeGroup) {
+        this.typeGroup = typeGroup;
+    }
+
+    public String readTypeName() {
+        if(typeGroup != null) {
+            return typeGroup.getName();
+        } else {
+            return null;
+        }
     }
 
     @Override

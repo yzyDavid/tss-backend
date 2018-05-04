@@ -52,7 +52,7 @@ public class TeacherController {
                 return new ResponseEntity<>(new AddTeachesResponse("uid does't exist", uid), HttpStatus.BAD_REQUEST);
             }
             UserEntity teacher = retu.get();
-            if(teacher.getType() != UserEntity.TYPE_TEACHER) {
+            if(!teacher.readTypeName().equals("Teacher")) {
                 return new ResponseEntity<>(new AddTeachesResponse("user is not a teacher", uid), HttpStatus.BAD_REQUEST);
             }
             //TODO: check duplication

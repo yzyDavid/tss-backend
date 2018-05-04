@@ -6,7 +6,7 @@ public class ModifyUserRequest {
     private String telephone;
     private String intro;
     private String deptName;
-    private Integer type;
+    private String type;
 
     public String getUid() {
         return uid;
@@ -48,11 +48,11 @@ public class ModifyUserRequest {
         this.deptName = deptName;
     }
 
-    public Integer getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(String type) {
         this.type = type;
     }
 };

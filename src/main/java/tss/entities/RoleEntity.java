@@ -15,7 +15,8 @@ public class RoleEntity {
     private Short id;
     private String name;
     private Set<AuthorityEntity> authorities = new HashSet<>();
-    private Set<UserEntity> users = new HashSet<>();
+    //private Set<UserEntity> users = new HashSet<>();
+    private TypeGroupEntity typeGroup;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -50,13 +51,23 @@ public class RoleEntity {
         authorities.add(authority);
     }
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "roles")
+    /*@ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "roles")
     public Set<UserEntity> getUsers() {
         return users;
     }
 
     public void setUsers(Set<UserEntity> users) {
         this.users = users;
+    }*/
+
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "group_id")
+    public TypeGroupEntity getTypeGroup() {
+        return typeGroup;
+    }
+
+    public void setTypeGroup(TypeGroupEntity typeGroup) {
+        this.typeGroup = typeGroup;
     }
 
     @Override

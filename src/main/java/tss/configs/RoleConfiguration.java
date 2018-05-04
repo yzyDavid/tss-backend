@@ -1,4 +1,4 @@
-package tss.interceptors;
+package tss.configs;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -8,9 +8,11 @@ import org.springframework.stereotype.Component;
 
 import tss.entities.AuthorityEntity;
 import tss.entities.RoleEntity;
+import tss.entities.TypeGroupEntity;
 import tss.entities.UserEntity;
 import tss.repositories.AuthorityRepository;
 import tss.repositories.RoleRepository;
+import tss.repositories.TypeGroupRepository;
 import tss.repositories.UserRepository;
 
 import java.io.IOException;
@@ -22,19 +24,23 @@ import static tss.utils.SecurityUtils.getHashedPasswordByPasswordAndSalt;
 import static tss.utils.SecurityUtils.getSalt;
 
 @Component
-public class StartupRunner implements CommandLineRunner {
+public class RoleConfiguration implements CommandLineRunner {
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
     private AuthorityRepository authorityRepository;
+    @Autowired
+    private TypeGroupRepository typeGroupRepository;
 
     @Override
     public void run(String... args) throws Exception {
         ResourceBundle bundle = ResourceBundle.getBundle("application");
         String ddl_auto = bundle.getString("spring.jpa.hibernate.ddl-auto");
-        initRole(ddl_auto.equals("create"));
+        if(ddl_auto.equals("create")) {
+            initRole();
+        }
 
         String uid = bundle.getString("spring.datasource.username");
         String pwd = bundle.getString("spring.datasource.password");
@@ -46,33 +52,34 @@ public class StartupRunner implements CommandLineRunner {
             String hashedPassword = getHashedPasswordByPasswordAndSalt(pwd, salt);
             user.setSalt(salt);
             user.setHashedPassword(hashedPassword);
-            user.setType(UserEntity.TYPE_SYS_ADMIN);
-            for (String name : UserEntity.ROLE_ALLOC.get(user.getType())) {
-                Optional<RoleEntity> role = roleRepository.findByName(name);
-                if (role.isPresent()) {
-                    user.addRole(role.get());
-                }
+            Optional<TypeGroupEntity> typeGroup = typeGroupRepository.findByName(Config.TYPES[0]);
+            if(typeGroup.isPresent()) {
+                user.setTypeGroup(typeGroup.get());
             }
             userRepository.save(user);
         }
     }
 
-    private void initRole(boolean isCreate) {
+    private void initRole() {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         InputStream inputStream = classloader.getResourceAsStream("role.json");
-        String json = "{}";
         try {
             byte[] buffer = new byte[inputStream.available()];
             inputStream.read(buffer);
-            json = new String(buffer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        String uriFormat = "/%s/%s";
-        JSONObject roleList = new JSONObject(json);
-        for(String roleName : roleList.keySet()) {
-            JSONObject role = (JSONObject)roleList.get(roleName);
-            if(isCreate) {
+            String json = new String(buffer);
+            String uriFormat = "/%s/%s";
+            JSONObject roleList = new JSONObject(json);
+
+            String[] types = Config.TYPES;
+            TypeGroupEntity[] typeGroups = new TypeGroupEntity[types.length];
+            for(int i = 0; i < types.length; i++) {
+                typeGroups[i] = new TypeGroupEntity();
+                typeGroups[i].setName(types[i]);
+                typeGroupRepository.save(typeGroups[i]);
+            }
+
+            for(String roleName : roleList.keySet()) {
+                JSONObject role = (JSONObject)roleList.get(roleName);
                 RoleEntity roleEntity = new RoleEntity();
                 roleEntity.setName(roleName);
                 roleRepository.save(roleEntity);
@@ -85,12 +92,19 @@ public class StartupRunner implements CommandLineRunner {
                     roleEntity.addAuthority(authority);
                     authorityRepository.save(authority);
                 }
+                JSONArray belongs = role.getJSONArray("belong2");
+                for(int i = 0 ; i < belongs.length(); i++) {
+                    roleEntity.setTypeGroup(typeGroups[belongs.getInt(i)]);
+                }
                 roleRepository.save(roleEntity);
             }
-            JSONArray belongs = role.getJSONArray("belong2");
-            for(int i = 0 ; i < belongs.length(); i++) {
-                int type = belongs.getInt(i);
-                UserEntity.ROLE_ALLOC.get(type).add(roleName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try{
+                inputStream.close();
+            } catch (Exception e1){
+
             }
         }
     }

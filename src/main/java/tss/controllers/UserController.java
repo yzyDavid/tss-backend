@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tss.configs.Config;
 import tss.entities.DepartmentEntity;
-import tss.entities.RoleEntity;
+import tss.entities.TypeGroupEntity;
 import tss.entities.UserEntity;
 import tss.repositories.DepartmentRepository;
-import tss.repositories.RoleRepository;
+import tss.repositories.TypeGroupRepository;
 import tss.repositories.UserRepository;
 import tss.requests.information.*;
 import tss.responses.information.*;
@@ -42,15 +42,15 @@ public class UserController {
     private final UserRepository userRepository;
     private final ResourceLoader resourceLoader;
     private final DepartmentRepository departmentRepository;
-    private final RoleRepository roleRepository;
+    private final TypeGroupRepository typeGroupRepository;
 
     @Autowired
     public UserController(UserRepository userRepository, ResourceLoader resourceLoader,
-                          DepartmentRepository departmentRepository, RoleRepository roleRepository) {
+                          DepartmentRepository departmentRepository, TypeGroupRepository typeGroupRepository) {
         this.userRepository = userRepository;
         this.resourceLoader = resourceLoader;
         this.departmentRepository = departmentRepository;
-        this.roleRepository = roleRepository;
+        this.typeGroupRepository = typeGroupRepository;
     }
 
     @PutMapping(path = "/add")
@@ -67,8 +67,12 @@ public class UserController {
         String hashedPassword = getHashedPasswordByPasswordAndSalt(request.getPassword(), salt);
         user.setSalt(salt);
         user.setHashedPassword(hashedPassword);
-        if(!setUserType(user, request.getType())) {
-            return new ResponseEntity<>(new AddUserResponse("No such user type", uid, request.getName()), HttpStatus.BAD_REQUEST);
+        if(request.getType() != null) {
+            Optional<TypeGroupEntity> typeGroup = typeGroupRepository.findByName(request.getType());
+            if(!typeGroup.isPresent()) {
+                return new ResponseEntity<>(new AddUserResponse("No such user type", uid, request.getName()), HttpStatus.BAD_REQUEST);
+            }
+            user.setTypeGroup(typeGroup.get());
         }
         userRepository.save(user);
         return new ResponseEntity<>(new AddUserResponse("OK", uid, request.getName()), HttpStatus.CREATED);
@@ -165,9 +169,11 @@ public class UserController {
         }
 
         if(request.getType() != null) {
-            if(!setUserType(user, request.getType())) {
+            Optional<TypeGroupEntity> typeGroup = typeGroupRepository.findByName(request.getType());
+            if(!typeGroup.isPresent()) {
                 return new ResponseEntity<>(new ModifyUserResponse("No such user type", user.getUid(), user.getName()), HttpStatus.BAD_REQUEST);
             }
+            user.setTypeGroup(typeGroup.get());
         }
 
         userRepository.save(user);
@@ -181,11 +187,11 @@ public class UserController {
         String uid = (request.getUid() == null) ? curUser.getUid() : request.getUid();
         Optional<UserEntity> ret = userRepository.findById(uid);
         if(!ret.isPresent()) {
-            return new ResponseEntity<>(new GetUserByUidResponse("non-existent uid", "", "", -1,
+            return new ResponseEntity<>(new GetUserByUidResponse("non-existent uid", "", "", "",
                     "", "", ""), HttpStatus.BAD_REQUEST);
         }
         UserEntity user = ret.get();
-        return new ResponseEntity<>(new GetUserByUidResponse("OK", user.getUid(), user.getName(), user.getType(),
+        return new ResponseEntity<>(new GetUserByUidResponse("OK", user.getUid(), user.getName(), user.readTypeName(),
                 user.getEmail(), user.getTelephone(), user.getIntro()), HttpStatus.OK);
     }
 
@@ -242,18 +248,5 @@ public class UserController {
 
     }
 
-    private boolean setUserType(UserEntity user, int newType) {
-        if(newType != user.getType() && newType >= 0 && newType <= UserEntity.TYPE_NUM) {
-            user.setType(newType);
-            for (String name : UserEntity.ROLE_ALLOC.get(user.getType())) {
-                Optional<RoleEntity> role = roleRepository.findByName(name);
-                if (role.isPresent()) {
-                    user.addRole(role.get());
-                }
-            }
-            return true;
-        }
-        return false;
-    }
 
 }

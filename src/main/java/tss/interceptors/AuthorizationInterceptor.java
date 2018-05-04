@@ -1,21 +1,22 @@
 package tss.interceptors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import tss.annotations.session.DataAccessControl;
 import tss.configs.Config;
-import tss.entities.AuthorityEntity;
-import tss.entities.RoleEntity;
-import tss.entities.SessionEntity;
+import tss.entities.*;
 import tss.annotations.session.Authorization;
-import tss.entities.UserEntity;
 import tss.repositories.AuthorityRepository;
 import tss.repositories.SqlSessionRepository;
 import tss.repositories.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
@@ -43,6 +44,18 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         }
         Method method = ((HandlerMethod) handler).getMethod();
         String auth = request.getHeader(Config.AUTH_HEADER);
+
+        /*MethodParameter[] parameters = ((HandlerMethod) handler).getMethodParameters();
+        for(MethodParameter parameter : parameters) {
+            Field[] fields = parameter.getParameterType().getDeclaredFields();
+            for(Field field : fields) {
+                DataAccessControl dataAccessControl = field.getAnnotation(DataAccessControl.class);
+                if(dataAccessControl != null) {
+                    System.out.println(dataAccessControl.entityName());
+                    System.out.println(dataAccessControl.fieldName());
+                }
+            }
+        }*/
 
         if (auth == null && method.getAnnotation(Authorization.class) != null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -77,9 +90,17 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         Optional<AuthorityEntity> auth = authorityRepository.findByUri(uri);
         if(!auth.isPresent())
             return true; // no need to check
-        for(RoleEntity role : curUser.getRoles()) {
+        /*for(RoleEntity role : curUser.getRoles()) {
             if(role.getAuthorities().contains(auth.get())) {
                 return true;
+            }
+        }*/
+        TypeGroupEntity typeGroup = curUser.getTypeGroup();
+        if(typeGroup != null) {
+            for(RoleEntity role : typeGroup.getRoles()) {
+                if(role.getAuthorities().contains(auth.get())) {
+                    return true;
+                }
             }
         }
         return false;
