@@ -5,11 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tss.entities.BuildingEntity;
 import tss.entities.ClassroomEntity;
+import tss.entities.TimeSlotEntity;
 import tss.exceptions.BuildingNotFoundException;
 import tss.models.Building;
 import tss.models.Classroom;
+import tss.models.TimeSlotTypeEnum;
 import tss.repositories.BuildingRepository;
 import tss.repositories.ClassroomRepository;
+import tss.repositories.TimeSlotRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +25,14 @@ import java.util.List;
 public class BuildingController {
     private final BuildingRepository buildingRepository;
     private final ClassroomRepository classroomRepository;
+    private final TimeSlotRepository timeSlotRepository;
 
     @Autowired
-    public BuildingController(BuildingRepository buildingRepository, ClassroomRepository classroomRepository) {
+    public BuildingController(BuildingRepository buildingRepository, ClassroomRepository classroomRepository,
+                              TimeSlotRepository timeSlotRepository) {
         this.buildingRepository = buildingRepository;
         this.classroomRepository = classroomRepository;
+        this.timeSlotRepository = timeSlotRepository;
     }
 
     @GetMapping("/{buildingId}")
@@ -64,6 +70,9 @@ public class BuildingController {
 
         ClassroomEntity classroomEntity = new ClassroomEntity(classroom.getName(), classroom.getCapacity(), null);
         buildingEntity.addClassroom(classroomEntity);
+        for (TimeSlotTypeEnum timeSlotType : TimeSlotTypeEnum.values()) {
+            classroomEntity.addTimeSlot(new TimeSlotEntity(timeSlotType.name(), null, null));
+        }
         return new Classroom(classroomRepository.save(classroomEntity));
     }
 

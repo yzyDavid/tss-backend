@@ -1,5 +1,6 @@
 package tss.models;
 
+import org.jetbrains.annotations.NotNull;
 import tss.entities.CampusEntity;
 
 /**
@@ -17,7 +18,7 @@ public class Campus {
         this.name = name;
     }
 
-    public Campus(CampusEntity campusEntity) {
+    public Campus(@NotNull CampusEntity campusEntity) {
         this(campusEntity.getId(), campusEntity.getName());
     }
 

@@ -1,5 +1,6 @@
 package tss.models;
 
+import org.jetbrains.annotations.NotNull;
 import tss.entities.BuildingEntity;
 
 /**
@@ -17,7 +18,7 @@ public class Building {
         this.name = name;
     }
 
-    public Building(BuildingEntity buildingEntity) {
+    public Building(@NotNull BuildingEntity buildingEntity) {
         this(buildingEntity.getId(), buildingEntity.getName());
     }
 

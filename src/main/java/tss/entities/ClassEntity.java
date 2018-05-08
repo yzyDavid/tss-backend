@@ -10,7 +10,6 @@ import java.util.List;
 @Entity
 @Table(name = "class")
 public class ClassEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -32,8 +31,8 @@ public class ClassEntity {
     @JoinColumn(name = "teacher_id")
     private UserEntity teacher;
 
-    @OneToMany(mappedBy = "clazz", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ArrangementEntity> arrangements = new ArrayList<>();
+    @OneToMany(mappedBy = "clazz", cascade = CascadeType.ALL)
+    private List<TimeSlotEntity> timeSlots = new ArrayList<>();
 
     @OneToMany(mappedBy = "clazz", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClassRegistrationEntity> classRegistrations = new ArrayList<>();
@@ -41,7 +40,8 @@ public class ClassEntity {
     public ClassEntity() {
     }
 
-    public ClassEntity(Integer year, String semester, Integer capacity, Integer numStudent, CourseEntity course, UserEntity teacher) {
+    public ClassEntity(Integer year, String semester, Integer capacity, Integer numStudent, CourseEntity course,
+                       UserEntity teacher) {
         this.year = year;
         this.semester = semester;
         this.capacity = capacity;
@@ -109,8 +109,8 @@ public class ClassEntity {
         this.teacher = teacher;
     }
 
-    public List<ArrangementEntity> getArrangements() {
-        return arrangements;
+    public List<TimeSlotEntity> getTimeSlots() {
+        return timeSlots;
     }
 
     public List<ClassRegistrationEntity> getClassRegistrations() {
@@ -120,9 +120,9 @@ public class ClassEntity {
 
     // Utility methods.
 
-    public void addArrangements(ArrangementEntity arrangementEntity) {
-        arrangements.add(arrangementEntity);
-        arrangementEntity.setClazz(this);
+    public void addTimeSlot(TimeSlotEntity timeSlotEntity) {
+        timeSlotEntity.setClazz(this);
+        timeSlots.add(timeSlotEntity);
     }
 
     public void addClassRegistration(ClassRegistrationEntity classRegistrationEntity) {

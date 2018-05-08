@@ -1,9 +1,12 @@
 package tss.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 /**
  * @author reeve
  */
-public enum TimeSlotEnum {
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+public enum TimeSlotTypeEnum {
     MON_1_2(1, 1, 2),
     MON_3_5(1, 3, 5),
     MON_6_8(1, 6, 8),
@@ -50,7 +53,7 @@ public enum TimeSlotEnum {
     private int start;
     private int end;
 
-    TimeSlotEnum(int dayOfWeek, int start, int end) {
+    TimeSlotTypeEnum(int dayOfWeek, int start, int end) {
         this.dayOfWeek = dayOfWeek;
         this.start = start;
         this.end = end;

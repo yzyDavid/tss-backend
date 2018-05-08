@@ -6,6 +6,7 @@ import javax.persistence.*;
  * @author reeve
  */
 @Entity
+@Table(name = "class_registration")
 public class ClassRegistrationEntity {
 
     @EmbeddedId

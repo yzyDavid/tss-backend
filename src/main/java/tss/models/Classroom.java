@@ -1,5 +1,6 @@
 package tss.models;
 
+import org.jetbrains.annotations.NotNull;
 import tss.entities.ClassroomEntity;
 
 /**
@@ -19,7 +20,7 @@ public class Classroom {
         this.capacity = capacity;
     }
 
-    public Classroom(ClassroomEntity classroomEntity) {
+    public Classroom(@NotNull ClassroomEntity classroomEntity) {
         this(classroomEntity.getId(), classroomEntity.getName(), classroomEntity.getCapacity());
     }
 

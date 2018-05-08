@@ -2,7 +2,9 @@ package tss.entities;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author reeve
@@ -10,7 +12,6 @@ import java.util.List;
 @Entity
 @Table(name = "classroom")
 public class ClassroomEntity {
-
     @Id
     @GeneratedValue
     private Integer id;
@@ -26,7 +27,10 @@ public class ClassroomEntity {
     private BuildingEntity building;
 
     @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ArrangementEntity> arrangements = new ArrayList<>();
+    private List<TimeSlotEntity> timeSlots = new ArrayList<>();
+
+    @Transient
+    private Map<String, TimeSlotEntity> timeSlotDirectory;
 
     public ClassroomEntity() {
     }
@@ -72,15 +76,25 @@ public class ClassroomEntity {
         this.building = building;
     }
 
-    public List<ArrangementEntity> getArrangements() {
-        return arrangements;
+    public List<TimeSlotEntity> getTimeSlots() {
+        return timeSlots;
     }
 
+    public Map<String, TimeSlotEntity> getTimeSlotDirectory() {
+        if (timeSlotDirectory == null) {
+            timeSlotDirectory = new HashMap<>(timeSlots.size());
+            for (TimeSlotEntity timeSlotEntity : timeSlots) {
+                timeSlotDirectory.put(timeSlotEntity.getTypeName(), timeSlotEntity);
+            }
+        }
+        return timeSlotDirectory;
+    }
 
     // Utility methods.
 
-    public void addArrangement(ArrangementEntity arrangementEntity) {
-        arrangements.add(arrangementEntity);
-        arrangementEntity.setClassroom(this);
+    public void addTimeSlot(TimeSlotEntity timeSlotEntity) {
+        timeSlotEntity.setClassroom(this);
+        timeSlots.add(timeSlotEntity);
+        getTimeSlotDirectory().put(timeSlotEntity.getTypeName(), timeSlotEntity);
     }
 }
