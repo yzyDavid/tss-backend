@@ -7,12 +7,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
-import tss.entities.ClassEntity;
-import tss.entities.CourseEntity;
-import tss.entities.UserEntity;
+import tss.entities.*;
 import tss.exceptions.ClazzNotFoundException;
+import tss.models.TimeSlotTypeEnum;
 import tss.repositories.ClassRepository;
+import tss.repositories.ClassroomRepository;
 import tss.repositories.CourseRepository;
+import tss.repositories.TimeSlotRepository;
 import tss.requests.information.AddClassRequest;
 import tss.requests.information.DeleteClassesRequest;
 import tss.requests.information.GetInstructorsRequest;
@@ -23,19 +24,28 @@ import tss.responses.information.GetInstructorResponse;
 import tss.responses.information.ModifyClassResponse;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * @author Mingqi Yi
+ * @author reeve
+ */
 @Controller
 @RequestMapping(path = "/class")
 public class ClassController {
     private final CourseRepository courseRepository;
     private final ClassRepository classRepository;
+    private final ClassroomRepository classroomRepository;
+    private final TimeSlotRepository timeSlotRepository;
 
     @Autowired
-    public ClassController(CourseRepository courseRepository, ClassRepository classRepository) {
+    public ClassController(CourseRepository courseRepository, ClassRepository classRepository, ClassroomRepository classroomRepository, TimeSlotRepository timeSlotRepository) {
         this.courseRepository = courseRepository;
         this.classRepository = classRepository;
+        this.classroomRepository = classroomRepository;
+        this.timeSlotRepository = timeSlotRepository;
     }
 
     @PutMapping(path = "/add")
@@ -120,6 +130,46 @@ public class ClassController {
                 HttpStatus.OK);
     }
 
+    /**
+     * @author reeve
+     */
+    @PutMapping(path = "/auto-arrangement")
+    @ResponseStatus(HttpStatus.OK)
+    public void autoArrangement() {
+        List<ClassItem> classItems = new ArrayList<>();
+        for (ClassEntity classEntity : classRepository.findAll()) {
+            ClassItem classItem = new ClassItem(classEntity);
+            if (!classItem.hasNoLeftSection()) {
+                classItems.add(classItem);
+            }
+        }
+
+        for (ClassroomEntity classroomEntity : classroomRepository.findAll()) {
+            if (classItems.size() == 0) {
+                break;
+            }
+            for (TimeSlotEntity timeSlotEntity : classroomEntity.getTimeSlots()) {
+                if (classItems.size() == 0) {
+                    break;
+                }
+                final int timeSlotSize = TimeSlotTypeEnum.valueOf(timeSlotEntity.getTypeName()).getSize();
+                for (int i = 0; i < classItems.size(); i++) {
+                    ClassItem classItem = classItems.get(i);
+                    if (classItem.getNumLeftSectionsOfSize(timeSlotSize) > 0) {
+                        classItem.getClassEntity().addTimeSlot(timeSlotEntity);
+                        timeSlotRepository.save(timeSlotEntity);
+                        classItem.setNumLeftSectionsOfSize(timeSlotSize, classItem.getNumLeftSectionsOfSize(timeSlotSize) - 1);
+                        if (classItem.hasNoLeftSection()) {
+                            Collections.swap(classItems, i, classItems.size());
+                            classItems.remove(classItems.size());
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     /*@PutMapping(path = "/instructor")
     @Authorization
     public ResponseEntity<AddInstructorsResponse> addInstructors(@CurrentUser UserEntity user,
@@ -182,4 +232,77 @@ public class ClassController {
         }
         return new ResponseEntity<>(new DeleteInstructorsResponse("OK"), HttpStatus.OK);
     }*/
+}
+
+class ClassItem {
+    private long classId;
+    private int numLeftSectionsOfSizeTwo = 0;
+    private int numLeftSectionsOfSizeThree = 0;
+    private ClassEntity classEntity;
+
+    ClassItem(ClassEntity classEntity) {
+        switch (classEntity.getCourse().getNumLessonsEachWeek()) {
+            case 2:
+                numLeftSectionsOfSizeTwo = 1;
+                break;
+            case 3:
+                numLeftSectionsOfSizeThree = 1;
+                break;
+            case 4:
+                numLeftSectionsOfSizeTwo = 2;
+                break;
+            case 5:
+                numLeftSectionsOfSizeTwo = 1;
+                numLeftSectionsOfSizeThree = 1;
+                break;
+            case 6:
+                numLeftSectionsOfSizeThree = 2;
+            default:
+        }
+        classId = classEntity.getId();
+        this.classEntity = classEntity;
+    }
+
+    int getNumLeftSectionsOfSize(int size) {
+        switch (size) {
+            case 2:
+                return numLeftSectionsOfSizeTwo;
+            case 3:
+                return numLeftSectionsOfSizeThree;
+            default:
+                return 0;
+        }
+    }
+
+    void setNumLeftSectionsOfSize(int size, int value) {
+        switch (size) {
+            case 2:
+                numLeftSectionsOfSizeTwo = value;
+                break;
+            case 3:
+                numLeftSectionsOfSizeThree = value;
+                break;
+            default:
+        }
+    }
+
+    boolean hasNoLeftSection() {
+        return numLeftSectionsOfSizeTwo + numLeftSectionsOfSizeThree == 0;
+    }
+
+    long getClassId() {
+        return classId;
+    }
+
+    void setClassId(long classId) {
+        this.classId = classId;
+    }
+
+    ClassEntity getClassEntity() {
+        return classEntity;
+    }
+
+    void setClassEntity(ClassEntity classEntity) {
+        this.classEntity = classEntity;
+    }
 }

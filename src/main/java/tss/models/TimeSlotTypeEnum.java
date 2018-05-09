@@ -83,7 +83,7 @@ public enum TimeSlotTypeEnum {
         this.end = end;
     }
 
-    public int getLength() {
+    public int getSize() {
         return end - start + 1;
     }
 }

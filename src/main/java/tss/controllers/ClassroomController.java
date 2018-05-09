@@ -16,9 +16,7 @@ import tss.repositories.ClassRepository;
 import tss.repositories.ClassroomRepository;
 import tss.repositories.TimeSlotRepository;
 
-import javax.transaction.Transactional;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,7 +71,7 @@ public class ClassroomController {
     @PutMapping("/{classroomId}/time-slots/{timeSlotTypeName}/clazz")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void insertArrangement(@PathVariable int classroomId, @PathVariable String timeSlotTypeName,
-                                @RequestParam long classId) {
+                                  @RequestParam long classId) {
         ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
                 (ClassroomNotFoundException::new);
         TimeSlotEntity timeSlotEntity = classroomEntity.getTimeSlotDirectory().get(timeSlotTypeName);
@@ -88,8 +86,7 @@ public class ClassroomController {
 
     @DeleteMapping("/{classroomId}/time-slots/{timeSlotTypeName}/clazz")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeArrangement(@PathVariable int classroomId, @PathVariable String timeSlotTypeName,
-                   @RequestParam long classId) {
+    public void removeArrangement(@PathVariable int classroomId, @PathVariable String timeSlotTypeName) {
         ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
                 (ClassroomNotFoundException::new);
         TimeSlotEntity timeSlotEntity = classroomEntity.getTimeSlotDirectory().get(timeSlotTypeName);
