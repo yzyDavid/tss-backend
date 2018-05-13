@@ -30,7 +30,7 @@ public class AddPaperRequest {
 
     public void setCount(String count) {this.count = count;}
 
-    public boolean isIsauto() {return isauto;}
+    public boolean getIsauto() {return isauto;}
 
     public void setIsauto(boolean isauto) {this.isauto = isauto;}
 

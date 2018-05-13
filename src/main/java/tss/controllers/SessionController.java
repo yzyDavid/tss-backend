@@ -19,6 +19,9 @@ import tss.utils.SessionUtils;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+import static tss.utils.SecurityUtils.getHashedPasswordByPasswordAndSalt;
+import static tss.utils.SecurityUtils.getSalt;
+
 /**
  * @author yzy
  * <p>
@@ -39,6 +42,21 @@ public class SessionController {
 
     @PostMapping(path = "/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest login) {
+
+        String uid = login.getUid();
+
+        UserEntity entity = new UserEntity();
+        entity.setUid(uid);
+        System.out.println(uid);
+        entity.setName("wen");
+        String salt = getSalt();
+        String hashedPassword = getHashedPasswordByPasswordAndSalt("123456", salt);
+        entity.setSalt(salt);
+        entity.setHashedPassword(hashedPassword);
+        entity.setType(0);
+
+        userRepository.save(entity);
+
         if (!userRepository.existsById(login.getUid())) {
             return new ResponseEntity<>(new LoginResponse("", "", null, "User not exists"), HttpStatus.BAD_REQUEST);
         }

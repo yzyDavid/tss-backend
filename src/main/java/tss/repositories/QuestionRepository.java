@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface QuestionRepository extends CrudRepository<QuestionEntity, String> {
     List<QuestionEntity> findByQid(String qid);
-    List<QuestionEntity> finByQtype(String qtype);
+    List<QuestionEntity> findByQtype(String qtype);
     List<QuestionEntity> findByQunit(String qunit);
 }

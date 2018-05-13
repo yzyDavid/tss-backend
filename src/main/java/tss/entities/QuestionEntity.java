@@ -5,8 +5,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "questions", indexes = {
-        @Index(name = "qid_Index", columnList = "qid")
+@Table(name = "question", indexes = {
+        @Index(name = "question_qid_index", columnList = "question_qid"),
+        @Index(name = "question_qtype_index", columnList = "question_qtype"),
+        @Index(name = "question_qunit_index", columnList = "question_qunit"),
 })
 public class QuestionEntity{
     private String qid;
@@ -18,13 +20,15 @@ public class QuestionEntity{
     private int answerednum;
     private double correct;
 
+    private Set<PaperContainsQuestionEntity> paperquestion = new HashSet<>();
+
     @Id
     @Column(name = "question_qid", length = 10)
-    public String getId() {
+    public String getQid() {
         return  qid;
     }
 
-    public void setId(String qid) {
+    public void setQid(String qid) {
         this.qid = qid;
     }
 
@@ -40,7 +44,7 @@ public class QuestionEntity{
         return qanswer;
     }
 
-    public void setQAanswer(String qanswer) {
+    public void setQanswer(String qanswer) {
         this.qanswer = qanswer;
     }
 
@@ -78,6 +82,19 @@ public class QuestionEntity{
 
     public void setCorrect(double correct) {
         this.correct = correct;
+    }
+
+
+
+
+
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "question")
+    public Set<PaperContainsQuestionEntity> getPaperquestion() {
+        return paperquestion;
+    }
+
+    public void setPaperquestion(Set<PaperContainsQuestionEntity> paperquestion) {
+        this.paperquestion = paperquestion;
     }
 
 }
