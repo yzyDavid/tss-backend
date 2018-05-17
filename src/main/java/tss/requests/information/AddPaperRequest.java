@@ -5,6 +5,7 @@ public class AddPaperRequest {
     public String papername;
     public String begin;
     public String end;
+    public String last;
     public String count;
     public boolean isauto;
     public String[] qid;
@@ -25,6 +26,10 @@ public class AddPaperRequest {
     public String getEnd() {return end;}
 
     public void setEnd(String end) {this.end = end;}
+
+    public String getLast(){return last;}
+
+    public void setLast(String last){this.last = last;}
 
     public String getCount() {return count;}
 

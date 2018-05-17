@@ -11,6 +11,7 @@ public class PapersEntity{
     private String pid;
     private String begin;
     private String end;
+    private String last;
     private String count;
     private String papername;
     private boolean isauto;
@@ -44,6 +45,11 @@ public class PapersEntity{
     public void setEnd(String end) {
         this.end = end;
     }
+
+    @Column(name = "paper_last")
+    public String getLast(){return last;}
+
+    public void setLast(String last){this.last = last;}
 
     @Column(name = "paper_count")
     public  String getCount(){

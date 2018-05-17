@@ -18,14 +18,14 @@ import tss.repositories.PaperRepository;
 import tss.repositories.QuestionRepository;
 import tss.requests.information.AddPaperRequest;
 import tss.requests.information.DeletePaperRequest;
+import tss.requests.information.GetPaperRequest;
 import tss.requests.information.ModifyPaperRequest;
 import tss.responses.information.AddPaperResponse;
 import tss.responses.information.DeletePaperResponse;
+import tss.responses.information.GetPaperResponse;
 import tss.responses.information.ModifyPaperResponse;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 @RequestMapping(path = "testsys_paper")
@@ -51,11 +51,13 @@ public class PaperController {
         Set<PaperContainsQuestionEntity> paperquestions = new HashSet<>();
 
 
+
         paper.setPid(request.getPid());
         paper.setPapername(request.getPapername());
         paper.setIsauto(request.getIsauto());
         paper.setBegin(request.getBegin());
         paper.setEnd(request.getEnd());
+        paper.setLast(request.getLast());
         paper.setCount(request.getCount());
       //  paper.setPaperquestion();!!!!
 
@@ -110,6 +112,7 @@ public class PaperController {
         String pid = request.getPid();
         Optional<PapersEntity> ret = paperRepository.findById(pid);
         if(!ret.isPresent()){
+            System.out.println("Paper does not exist:"+request.getPid());
             return new ResponseEntity<>(new ModifyPaperResponse("Paper does not exist", request.pid), HttpStatus.BAD_REQUEST);
         }
         PapersEntity paper = ret.get();
@@ -121,6 +124,7 @@ public class PaperController {
         paper.setIsauto(request.getIsauto());
         paper.setBegin(request.getBegin());
         paper.setEnd(request.getEnd());
+        paper.setLast(request.getLast());
         paper.setCount(request.getCount());
 
         paper.setAnswerednum(0);
@@ -156,5 +160,27 @@ public class PaperController {
 
 
         return new ResponseEntity<>(new ModifyPaperResponse("ok", request.pid), HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/search")
+    public ResponseEntity<GetPaperResponse>searchPaper(@RequestBody GetPaperRequest request){
+        List<PapersEntity> papers = new ArrayList<>();
+
+        String type = request.getDirection();
+        if(type.equals("all")){
+            Iterable<PapersEntity> paper_find = paperRepository.findAll();
+            for(PapersEntity paper : paper_find){
+                papers.add(paper);
+            }
+
+        }
+        else{
+            System.out.println("Invalid direction: "+type);
+            return new ResponseEntity<>(new GetPaperResponse("Invalid direction", papers), HttpStatus.BAD_REQUEST);
+        }
+
+
+        System.out.println("search: "+type);
+        return new ResponseEntity<>(new GetPaperResponse("ok", papers), HttpStatus.OK);
     }
 }

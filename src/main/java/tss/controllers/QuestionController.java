@@ -5,21 +5,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import tss.annotations.session.Authorization;
-import tss.annotations.session.CurrentUser;
-import tss.entities.CourseEntity;
 import tss.entities.QuestionEntity;
-import tss.entities.UserEntity;
 import tss.repositories.QuestionRepository;
-import tss.repositories.SqlSessionRepository;
 import tss.requests.information.AddQuestionRequest;
 import tss.requests.information.DeleteQuestionRequest;
+import tss.requests.information.GetQuestionRequest;
 import tss.requests.information.ModifyQuestionRequest;
-import tss.responses.information.AddCourseResponse;
-import tss.responses.information.AddQuestionResponse;
-import tss.responses.information.DeleteQuestionResponse;
-import tss.responses.information.ModifyQuestionResponse;
+import tss.responses.information.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -82,12 +77,6 @@ public class QuestionController {
     public ResponseEntity<ModifyQuestionResponse>modifyQuestion(@RequestBody ModifyQuestionRequest request){
 
         String qid = request.getQid();
-        /*
-        int usertype = user.getType();
-        else if(usertype != UserEntity.TYPE_MANAGER && usertype != UserEntity.TYPE_TEACHER){
-            return new ResponseEntity<>(new ModifyQuestionResponse("permission denied", ""), HttpStatus.FORBIDDEN);
-        }
-        */
         Optional<QuestionEntity> ret = questionRepository.findById(qid);
         if(!ret.isPresent()){
             return new ResponseEntity<>(new ModifyQuestionResponse("Question does not exist",""),HttpStatus.BAD_REQUEST);
@@ -105,5 +94,36 @@ public class QuestionController {
         System.out.println("update question"+request.getQid());
         return new ResponseEntity<>(new ModifyQuestionResponse("ok", question.getQid()),  HttpStatus.CREATED);
 
+    }
+
+    @PostMapping(path = "/search")
+    public ResponseEntity<GetQuestionResponse>searchQuestion(@RequestBody GetQuestionRequest request){
+
+        String type = request.getDirection();
+        List<QuestionEntity> questions = new ArrayList<>();
+        if(type.equals("qid"))
+            questions = questionRepository.findByQid(request.getInfo());
+
+        else if(type.equals("qunit"))
+            questions = questionRepository.findByQunit(request.getInfo());
+
+        else if(type.equals("qtype"))
+            questions = questionRepository.findByQtype(request.getInfo());
+
+        else if(type.equals("all")){
+            Iterable<QuestionEntity> question_find = questionRepository.findAll();
+            for(QuestionEntity question: question_find){
+                questions.add(question);
+            }
+
+        }
+        else{
+            System.out.println("Invalid direction: "+type);
+            return new ResponseEntity<>(new GetQuestionResponse("Invalid direction", questions), HttpStatus.BAD_REQUEST);
+        }
+
+
+        System.out.println("search "+type);
+        return new ResponseEntity<>(new GetQuestionResponse("ok", questions), HttpStatus.OK);
     }
 }

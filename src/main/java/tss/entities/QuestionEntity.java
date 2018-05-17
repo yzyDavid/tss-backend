@@ -23,7 +23,7 @@ public class QuestionEntity{
     private Set<PaperContainsQuestionEntity> paperquestion = new HashSet<>();
 
     @Id
-    @Column(name = "question_qid", length = 10)
+    @Column(name = "question_qid")
     public String getQid() {
         return  qid;
     }

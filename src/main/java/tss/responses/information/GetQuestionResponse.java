@@ -1,21 +1,21 @@
 package tss.responses.information;
 
 import org.jetbrains.annotations.Nls;
-import tss.entities.QuestionResponseEntity;
+import tss.entities.QuestionEntity;
 
 import java.util.List;
 
 public class GetQuestionResponse {
     @Nls
     public final String status;
-    public final List<QuestionResponseEntity> questions;         //和QuestionEntity不一样
+    public final List<QuestionEntity> questions;
 
-    public GetQuestionResponse(String status, List<QuestionResponseEntity> questions){
+    public GetQuestionResponse(String status, List<QuestionEntity> questions){
         this.status = status;
         this.questions = questions;
     }
 
     public String getStatus() {return status;}
 
-    public List<QuestionResponseEntity> getQuestions() {return questions;}
+    public List<QuestionEntity> getQuestions() {return questions;}
 }
