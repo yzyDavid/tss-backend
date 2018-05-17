@@ -56,26 +56,45 @@ public class UserController {
     @PutMapping(path = "/add")
     @Authorization
     public ResponseEntity<AddUserResponse> addUser(@RequestBody AddUserRequest request) {
-        String uid = request.getUid();
-        if (userRepository.existsById(uid)) {
-            return new ResponseEntity<>(new AddUserResponse("failed with duplicated uid", null, null), HttpStatus.BAD_REQUEST);
+        String[] uids = request.getUids();
+        String[] names = request.getNames();
+        String[] genders = request.getGenders();
+        String[] passwords = request.getPasswords();
+        String type = request.getType();
+        if(uids.length != names.length || names.length != genders.length || genders.length != passwords.length) {
+            return new ResponseEntity<>(new AddUserResponse("User information number not matching", null, null), HttpStatus.BAD_REQUEST);
         }
-        UserEntity user = new UserEntity();
-        user.setUid(uid);
-        user.setName(request.getName());
-        String salt = getSalt();
-        String hashedPassword = getHashedPasswordByPasswordAndSalt(request.getPassword(), salt);
-        user.setSalt(salt);
-        user.setHashedPassword(hashedPassword);
-        if(request.getType() != null) {
-            Optional<TypeGroupEntity> typeGroup = typeGroupRepository.findByName(request.getType());
-            if(!typeGroup.isPresent()) {
-                return new ResponseEntity<>(new AddUserResponse("No such user type", uid, request.getName()), HttpStatus.BAD_REQUEST);
+
+        UserEntity[] users = new UserEntity[uids.length];
+
+        for(int i = 0; i < uids.length; i++) {
+            UserEntity user = users[i];
+            user.setUid(uids[i]);
+            user.setName(names[i]);
+            String salt = getSalt();
+            user.setSalt(salt);
+            String password = null;
+            if(passwords[i] != null) {
+                password = passwords[i];
+            } else {
+                password = Config.INIT_PWD;
             }
-            user.setTypeGroup(typeGroup.get());
+            String hashedPassword = getHashedPasswordByPasswordAndSalt(password, salt);
+            user.setHashedPassword(hashedPassword);
+            if(request.getType() != null) {
+                Optional<TypeGroupEntity> typeGroup = typeGroupRepository.findByName(request.getType());
+                if(!typeGroup.isPresent()) {
+                    return new ResponseEntity<>(new AddUserResponse("No such user type", uids[i], names[i]), HttpStatus.BAD_REQUEST);
+                }
+                user.setType(typeGroup.get());
+            }
         }
-        userRepository.save(user);
-        return new ResponseEntity<>(new AddUserResponse("OK", uid, request.getName()), HttpStatus.CREATED);
+
+        for(int i = 0; i < uids.length; i++) {
+            userRepository.save(users[i]);
+        }
+
+        return new ResponseEntity<>(new AddUserResponse("OK", null, null), HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "/delete")
@@ -173,7 +192,7 @@ public class UserController {
             if(!typeGroup.isPresent()) {
                 return new ResponseEntity<>(new ModifyUserResponse("No such user type", user.getUid(), user.getName()), HttpStatus.BAD_REQUEST);
             }
-            user.setTypeGroup(typeGroup.get());
+            user.setType(typeGroup.get());
         }
 
         userRepository.save(user);

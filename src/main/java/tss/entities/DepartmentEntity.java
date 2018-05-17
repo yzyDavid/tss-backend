@@ -8,9 +8,11 @@ import java.util.Set;
 @Table(name = "department", indexes = {
         @Index(name = "dept_name_index", columnList = "dept_name", unique = true)
 })
+
 public class DepartmentEntity {
     private short id;
     private String name;
+    private Set<MajorEntity> majors = new HashSet<>();
     private Set<UserEntity> users = new HashSet<>();
     private Set<CourseEntity> courses = new HashSet<>();
 
@@ -24,13 +26,22 @@ public class DepartmentEntity {
         this.id = id;
     }
 
-    @Column(name = "dept_name", length = 31, unique = true)
+    @Column(name = "dept_name", length = 20, unique = true)
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "department")
+    public Set<MajorEntity> getMajors() {
+        return majors;
+    }
+
+    public void setMajors(Set<MajorEntity> majors) {
+        this.majors = majors;
     }
 
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "department")
@@ -53,7 +64,13 @@ public class DepartmentEntity {
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        if(name != null) {
+            return name.hashCode();
+        } else {
+            return super.hashCode();
+        }
+
+
     }
 
     @Override

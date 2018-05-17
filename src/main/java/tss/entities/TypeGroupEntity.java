@@ -33,7 +33,7 @@ public class TypeGroupEntity {
         this.name = name;
     }
 
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "typeGroup", fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "type", fetch = FetchType.EAGER)
     public Set<UserEntity> getUsers() {
         return users;
     }

@@ -74,7 +74,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         Optional<AuthorityEntity> auth = authorityRepository.findByUri(uri);
         if(!auth.isPresent())
             return true; // no need to check
-        TypeGroupEntity typeGroup = curUser.getTypeGroup();
+        TypeGroupEntity typeGroup = curUser.getType();
         if(typeGroup != null) {
             for(RoleEntity role : typeGroup.getRoles()) {
                 if(role.getAuthorities().contains(auth.get())) {

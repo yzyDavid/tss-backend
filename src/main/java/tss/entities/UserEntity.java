@@ -15,9 +15,10 @@ import java.util.*;
 public class UserEntity {
 
     private String uid;
-    private String name;
     private String hashedPassword;
     private String salt;
+    private String name;
+    private String gender;
     private String email;
     private String telephone;
     private String intro;
@@ -26,19 +27,29 @@ public class UserEntity {
      */
     private String photo;
     private DepartmentEntity department;
-    private TypeGroupEntity typeGroup;
+    private TypeGroupEntity type;
+    private MajorClassEntity majorClass;
     private Set<TeachesEntity> teaches = new HashSet<>();
     private Set<TakesEntity> takes = new HashSet<>();
     //private Set<RoleEntity> roles = new HashSet<>();
 
 
-    @Column(name = "user_name")
+    @Column(name = "user_name", length = 30)
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Column(length = 2)
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     @Id
@@ -133,6 +144,17 @@ public class UserEntity {
         this.department = department;
     }
 
+
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "class_id")
+    public MajorClassEntity getMajorClass() {
+        return majorClass;
+    }
+
+    public void setMajorClass(MajorClassEntity majorClass) {
+        this.majorClass = majorClass;
+    }
+
     /*@ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
     public Set<RoleEntity> getRoles() {
@@ -149,17 +171,17 @@ public class UserEntity {
 
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "group_id")
-    public TypeGroupEntity getTypeGroup() {
-        return typeGroup;
+    public TypeGroupEntity getType() {
+        return type;
     }
 
-    public void setTypeGroup(TypeGroupEntity typeGroup) {
-        this.typeGroup = typeGroup;
+    public void setType(TypeGroupEntity type) {
+        this.type = type;
     }
 
     public String readTypeName() {
-        if(typeGroup != null) {
-            return typeGroup.getName();
+        if(type != null) {
+            return type.getName();
         } else {
             return null;
         }

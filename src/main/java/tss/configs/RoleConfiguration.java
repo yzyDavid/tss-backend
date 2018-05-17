@@ -54,7 +54,7 @@ public class RoleConfiguration implements CommandLineRunner {
             user.setHashedPassword(hashedPassword);
             Optional<TypeGroupEntity> typeGroup = typeGroupRepository.findByName(Config.TYPES[0]);
             if(typeGroup.isPresent()) {
-                user.setTypeGroup(typeGroup.get());
+                user.setType(typeGroup.get());
             }
             userRepository.save(user);
         }
