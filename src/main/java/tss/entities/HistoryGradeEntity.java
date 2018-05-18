@@ -3,7 +3,11 @@ package tss.entities;
 import javax.persistence.*;
 import java.util.Date;
 
-
+@Entity
+@Table(name = "HistoryGrade", indexes = {
+        @Index(name = "StudentID_Index", columnList = "StudentID"),
+        @Index(name = "PaperID_Index", columnList = "PaperID")
+})
 public class HistoryGradeEntity {
     private String Hid;
     private UserEntity Sid;
