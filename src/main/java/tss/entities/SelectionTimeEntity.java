@@ -24,7 +24,7 @@ public class SelectionTimeEntity {
         this.stid = stid;
     }
 
-    @Column(name = "startTime", nullable = false)
+    @Column(name = "start_time", nullable = false)
     public Timestamp getStartTime() {
         return startTime;
     }
@@ -33,7 +33,7 @@ public class SelectionTimeEntity {
     }
 
 
-    @Column(name = "endTime", nullable = false)
+    @Column(name = "end_time", nullable = false)
     public Timestamp getEndTime() {
         return endTime;
     }
@@ -42,7 +42,7 @@ public class SelectionTimeEntity {
     }
 
 
-    @Column(name = "regiPerm", nullable = false)
+    @Column(name = "regi_perm", nullable = false)
     public boolean getRegiPerm() {
         return regiPerm;
     }
@@ -51,7 +51,7 @@ public class SelectionTimeEntity {
     }
 
 
-    @Column(name = "dismPerm", nullable = false)
+    @Column(name = "dism_perm", nullable = false)
     public boolean getDismPerm() {
         return dismPerm;
     }
@@ -59,7 +59,7 @@ public class SelectionTimeEntity {
         this.dismPerm = dismPerm;
     }
 
-    @Column(name = "lowCrePerm", nullable = false)
+    @Column(name = "low_cre_perm", nullable = false)
     public boolean getLowCrePerm() {
         return lowCrePerm;
     }
@@ -67,7 +67,7 @@ public class SelectionTimeEntity {
         this.lowCrePerm = lowCrePerm;
     }
 
-    @Column(name = "compPerm", nullable = false)
+    @Column(name = "comp_perm", nullable = false)
     public boolean getCompPerm() {
         return compPerm;
     }
