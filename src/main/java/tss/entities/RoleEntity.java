@@ -1,7 +1,5 @@
 package tss.entities;
 
-import tss.entities.UserEntity;
-
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;

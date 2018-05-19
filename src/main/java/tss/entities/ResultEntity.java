@@ -3,7 +3,7 @@ package tss.entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Results", indexes={
+@Table(name = "Results", indexes = {
         @Index(name = "StudentID_Index", columnList = "StudentID"),
         @Index(name = "PaperID_Index", columnList = "PaperID"),
         @Index(name = "QuestionID_Index", columnList = "QuestionID"),
@@ -22,6 +22,7 @@ public class ResultEntity {
     public String getRid() {
         return Rid;
     }
+
     public void setRid(String rid) {
         Rid = rid;
     }
@@ -31,6 +32,7 @@ public class ResultEntity {
     public UserEntity getSid() {
         return Sid;
     }
+
     public void setSid(UserEntity sid) {
         Sid = sid;
     }
@@ -40,6 +42,7 @@ public class ResultEntity {
     public PapersEntity getPid() {
         return Pid;
     }
+
     public void setPid(PapersEntity pid) {
         Pid = pid;
     }
@@ -49,6 +52,7 @@ public class ResultEntity {
     public QuestionEntity getQid() {
         return Qid;
     }
+
     public void setQid(QuestionEntity qid) {
         Qid = qid;
     }
@@ -57,6 +61,7 @@ public class ResultEntity {
     public String getAns() {
         return Ans;
     }
+
     public void setAns(String ans) {
         Ans = ans;
     }

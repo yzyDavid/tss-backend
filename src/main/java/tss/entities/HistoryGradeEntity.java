@@ -9,54 +9,58 @@ import java.util.Date;
         @Index(name = "PaperID_Index", columnList = "PaperID")
 })
 public class HistoryGradeEntity {
-    private String Hid;
-    private UserEntity Sid;
-    private PapersEntity Pid;
-    private double Grade;
-    private Date StartTime;
+    private String hid;
+    private UserEntity sid;
+    private PapersEntity pid;
+    private double grade;
+    private Date startTime;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public String getHid() {
-        return Hid;
+        return hid;
     }
+
     public void setHid(String hid) {
-        Hid = hid;
+        this.hid = hid;
     }
 
     @JoinColumn(name = "StudentID")
     @ManyToOne
     public UserEntity getSid() {
-        return Sid;
+        return sid;
     }
+
     public void setSid(UserEntity sid) {
-        Sid = sid;
+        this.sid = sid;
     }
 
     @JoinColumn(name = "PaperID")
     @ManyToOne
     public PapersEntity getPid() {
-        return Pid;
-    }
-    public void setPid(PapersEntity pid) {
-        Pid = pid;
+        return pid;
     }
 
-    @Column (name = "Grade")
-    public double getGrade() {
-        return Grade;
+    public void setPid(PapersEntity pid) {
+        this.pid = pid;
     }
+
+    @Column(name = "Grade")
+    public double getGrade() {
+        return grade;
+    }
+
     public void setGrade(double grade) {
-        Grade = grade;
+        this.grade = grade;
     }
 
     @Column(name = "StartTime")
     @Temporal(TemporalType.TIMESTAMP)
     public Date getStartTime() {
-        return StartTime;
-    }
-    public void setStartTime(Date startTime) {
-        StartTime = startTime;
+        return startTime;
     }
 
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
 }

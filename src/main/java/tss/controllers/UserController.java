@@ -7,13 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tss.annotations.session.Authorization;
+import tss.annotations.session.CurrentUser;
 import tss.configs.Config;
 import tss.entities.UserEntity;
 import tss.repositories.UserRepository;
 import tss.requests.information.*;
 import tss.responses.information.*;
-import tss.annotations.session.Authorization;
-import tss.annotations.session.CurrentUser;
 import tss.utils.SecurityUtils;
 
 import java.io.IOException;
@@ -78,7 +78,7 @@ public class UserController {
             return new ResponseEntity<>(new DeleteUserResponse("permission denied", "", ""), HttpStatus.FORBIDDEN);
         }
         Optional<UserEntity> ret = userRepository.findById(uid);
-        if(!ret.isPresent()) {
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new DeleteUserResponse("non-existent uid", null, null), HttpStatus.BAD_REQUEST);
         }
         UserEntity entity = ret.get();
@@ -93,17 +93,17 @@ public class UserController {
     public ResponseEntity<ModifyPwdResponse> modifyPwd(@CurrentUser UserEntity user,
                                                        @RequestBody ModifyPwdRequest request) {
         String uid = (request.getUid() == null) ? user.getUid() : request.getUid();
-        if(user.getType() != UserEntity.TYPE_MANAGER || user.getUid() != request.getUid()) {
+        if (user.getType() != UserEntity.TYPE_MANAGER || user.getUid() != request.getUid()) {
             return new ResponseEntity<>(new ModifyPwdResponse("permission denied", uid, ""), HttpStatus.FORBIDDEN);
         }
         Optional<UserEntity> ret = userRepository.findById(uid);
-        if(!ret.isPresent()) {
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new ModifyPwdResponse("non-existent uid", uid, null), HttpStatus.BAD_REQUEST);
         }
         UserEntity tar = ret.get();
         String name = tar.getName();
         if ((tar.getType() != UserEntity.TYPE_MANAGER || uid.equals(user.getUid())) &&
-        !tar.getHashedPassword().equals(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getOldPwd(), tar.getSalt()))) {
+                !tar.getHashedPassword().equals(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getOldPwd(), tar.getSalt()))) {
             return new ResponseEntity<>(new ModifyPwdResponse("incorrect password", uid, name), HttpStatus.UNAUTHORIZED);
         }
         tar.setHashedPassword(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getNewPwd(), tar.getSalt()));
@@ -121,7 +121,7 @@ public class UserController {
         }
         String uid = (request.getUid() == null) ? user.getUid() : request.getUid();
         Optional<UserEntity> ret = userRepository.findById(uid);
-        if(!ret.isPresent()) {
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new ModifyUserResponse("non-existent uid", uid, null), HttpStatus.BAD_REQUEST);
         }
         UserEntity tar = ret.get();
@@ -144,7 +144,7 @@ public class UserController {
                                                         @RequestBody GetUserByUidRequest request) {
         String uid = (request.getUid() == null) ? curUser.getUid() : request.getUid();
         Optional<UserEntity> ret = userRepository.findById(uid);
-        if(!ret.isPresent()) {
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetUserByUidResponse("non-existent uid", "", "", -1,
                     "", "", ""), HttpStatus.BAD_REQUEST);
         }
@@ -158,7 +158,7 @@ public class UserController {
     public ResponseEntity<GetUsersByNameResponse> getUidsByName(@RequestBody GetUsersByNameRequest request) {
         List<String> uids = new ArrayList<>();
         List<UserEntity> ret = userRepository.findByName(request.getName());
-        for(UserEntity user : ret) {
+        for (UserEntity user : ret) {
             uids.add(user.getUid());
         }
         return new ResponseEntity<>(new GetUsersByNameResponse("OK", uids), HttpStatus.OK);

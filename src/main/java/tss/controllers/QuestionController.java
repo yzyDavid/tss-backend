@@ -101,16 +101,13 @@ public class QuestionController {
 
         String type = request.getDirection();
         List<QuestionEntity> questions = new ArrayList<>();
-        if(type.equals("qid"))
+        if(type.equals("qid")) {
             questions = questionRepository.findByQid(request.getInfo());
-
-        else if(type.equals("qunit"))
+        } else if(type.equals("qunit")) {
             questions = questionRepository.findByQunit(request.getInfo());
-
-        else if(type.equals("qtype"))
+        } else if(type.equals("qtype")) {
             questions = questionRepository.findByQtype(request.getInfo());
-
-        else if(type.equals("all")){
+        } else if(type.equals("all")){
             Iterable<QuestionEntity> question_find = questionRepository.findAll();
             for(QuestionEntity question: question_find){
                 questions.add(question);

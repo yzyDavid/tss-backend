@@ -17,7 +17,9 @@ import tss.repositories.UserRepository;
 import tss.requests.information.AddTeachesRequest;
 import tss.responses.information.AddTeachesResponse;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(path = "/teacher")
@@ -51,17 +53,17 @@ public class TeacherController {
         List<TeachesEntity> teaches = new ArrayList<>();
         for (String uid : uids) {
             Optional<UserEntity> retu = userRepository.findById(uid);
-            if(!retu.isPresent()) {
+            if (!retu.isPresent()) {
                 return new ResponseEntity<>(new AddTeachesResponse("uid does't exist", uid), HttpStatus.BAD_REQUEST);
             }
             UserEntity teacher = retu.get();
-            if(teacher.getType() != UserEntity.TYPE_TEACHER) {
+            if (teacher.getType() != UserEntity.TYPE_TEACHER) {
                 return new ResponseEntity<>(new AddTeachesResponse("user is not a teacher", uid), HttpStatus.BAD_REQUEST);
             }
             //TODO: check duplication
             teaches.add(new TeachesEntity(teacher, course));
         }
-        for(TeachesEntity item : teaches) {
+        for (TeachesEntity item : teaches) {
             teachesRepository.save(item);
         }
         return new ResponseEntity<>(new AddTeachesResponse("OK", null), HttpStatus.OK);

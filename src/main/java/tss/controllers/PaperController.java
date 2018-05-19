@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-
 import tss.entities.PaperContainsQuestionEntity;
 import tss.entities.PapersEntity;
 import tss.entities.QuestionEntity;
@@ -35,21 +33,20 @@ public class PaperController {
     private final PaperContainsQuestionRepository paperContainsQuestionRepository;
 
     @Autowired
-    public PaperController(PaperRepository paperRepository, QuestionRepository questionRepository, PaperContainsQuestionRepository paperContainsQuestionRepository){
+    public PaperController(PaperRepository paperRepository, QuestionRepository questionRepository, PaperContainsQuestionRepository paperContainsQuestionRepository) {
         this.paperRepository = paperRepository;
         this.questionRepository = questionRepository;
         this.paperContainsQuestionRepository = paperContainsQuestionRepository;
     }
 
     @PostMapping(path = "/insert")
-    public ResponseEntity<AddPaperResponse> addPaper(@RequestBody AddPaperRequest request){
-        if(paperRepository.existsById(request.getPid())){
+    public ResponseEntity<AddPaperResponse> addPaper(@RequestBody AddPaperRequest request) {
+        if (paperRepository.existsById(request.getPid())) {
             return new ResponseEntity<>(new AddPaperResponse("Failed with duplicate pid", ""), HttpStatus.BAD_REQUEST);
         }
 
         PapersEntity paper = new PapersEntity();
         Set<PaperContainsQuestionEntity> paperquestions = new HashSet<>();
-
 
 
         paper.setPid(request.getPid());
@@ -59,12 +56,12 @@ public class PaperController {
         paper.setEnd(request.getEnd());
         paper.setLast(request.getLast());
         paper.setCount(request.getCount());
-      //  paper.setPaperquestion();!!!!
+        //  paper.setPaperquestion();!!!!
 
         paper.setAnswerednum(0);
         paper.setAverage(0.0);
 
-        for(int i = 0; i < Integer.valueOf(request.getCount()); i++){
+        for (int i = 0; i < Integer.valueOf(request.getCount()); i++) {
             PaperContainsQuestionEntity contain = new PaperContainsQuestionEntity();
 
             int tempid = Integer.valueOf(request.getPid()) * 10000 + i;
@@ -74,7 +71,7 @@ public class PaperController {
 
             //setQuestion
             Optional<QuestionEntity> ret = questionRepository.findById(request.getQid()[i]);
-            if(!ret.isPresent()){
+            if (!ret.isPresent()) {
                 return new ResponseEntity<>(new AddPaperResponse("non-exist qid", paper.getPid()), HttpStatus.BAD_REQUEST);
             }
             QuestionEntity question = ret.get();
@@ -89,16 +86,16 @@ public class PaperController {
         paper.setPaperquestion(paperquestions);
 
         paperRepository.save(paper);
-        System.out.println("insert paper"+request.getPid());
+        System.out.println("insert paper" + request.getPid());
 
         return new ResponseEntity<>(new AddPaperResponse("ok", paper.getPid()), HttpStatus.CREATED);
 
     }
 
-    @DeleteMapping (path = "/delete")
-    public ResponseEntity<DeletePaperResponse>deletePaper(@RequestBody DeletePaperRequest request){
+    @DeleteMapping(path = "/delete")
+    public ResponseEntity<DeletePaperResponse> deletePaper(@RequestBody DeletePaperRequest request) {
         String pid = request.getPid();
-        if(!paperRepository.existsById(pid)){
+        if (!paperRepository.existsById(pid)) {
             return new ResponseEntity<>(new DeletePaperResponse("Paper does not exist"), HttpStatus.BAD_REQUEST);
         }
         paperRepository.deleteById(pid);
@@ -108,11 +105,11 @@ public class PaperController {
 
 
     @PostMapping(path = "/update")
-    public ResponseEntity<ModifyPaperResponse>modifyPaper(@RequestBody ModifyPaperRequest request){
+    public ResponseEntity<ModifyPaperResponse> modifyPaper(@RequestBody ModifyPaperRequest request) {
         String pid = request.getPid();
         Optional<PapersEntity> ret = paperRepository.findById(pid);
-        if(!ret.isPresent()){
-            System.out.println("Paper does not exist:"+request.getPid());
+        if (!ret.isPresent()) {
+            System.out.println("Paper does not exist:" + request.getPid());
             return new ResponseEntity<>(new ModifyPaperResponse("Paper does not exist", request.pid), HttpStatus.BAD_REQUEST);
         }
         PapersEntity paper = ret.get();
@@ -130,8 +127,8 @@ public class PaperController {
         paper.setAnswerednum(0);
         paper.setAverage(0.0);
 
-        System.out.println("count:"+request.getCount());
-        for(int i = 0; i < Integer.valueOf(request.getCount()); i++){
+        System.out.println("count:" + request.getCount());
+        for (int i = 0; i < Integer.valueOf(request.getCount()); i++) {
             PaperContainsQuestionEntity contain = new PaperContainsQuestionEntity();
 
             int tempid = Integer.valueOf(request.getPid()) * 10000 + i;
@@ -141,7 +138,7 @@ public class PaperController {
 
             //setQuestion
             Optional<QuestionEntity> ret2 = questionRepository.findById(request.getQid()[i]);
-            if(!ret2.isPresent()){
+            if (!ret2.isPresent()) {
                 return new ResponseEntity<>(new ModifyPaperResponse("non-exist qid", paper.getPid()), HttpStatus.BAD_REQUEST);
             }
             QuestionEntity question = ret2.get();
@@ -156,31 +153,30 @@ public class PaperController {
         paper.setPaperquestion(paperquestions);
 
         paperRepository.save(paper);
-        System.out.println("update paper"+request.getPid());
+        System.out.println("update paper" + request.getPid());
 
 
         return new ResponseEntity<>(new ModifyPaperResponse("ok", request.pid), HttpStatus.OK);
     }
 
     @PostMapping(path = "/search")
-    public ResponseEntity<GetPaperResponse>searchPaper(@RequestBody GetPaperRequest request){
+    public ResponseEntity<GetPaperResponse> searchPaper(@RequestBody GetPaperRequest request) {
         List<PapersEntity> papers = new ArrayList<>();
 
         String type = request.getDirection();
-        if(type.equals("all")){
+        if (type.equals("all")) {
             Iterable<PapersEntity> paper_find = paperRepository.findAll();
-            for(PapersEntity paper : paper_find){
+            for (PapersEntity paper : paper_find) {
                 papers.add(paper);
             }
 
-        }
-        else{
-            System.out.println("Invalid direction: "+type);
+        } else {
+            System.out.println("Invalid direction: " + type);
             return new ResponseEntity<>(new GetPaperResponse("Invalid direction", papers), HttpStatus.BAD_REQUEST);
         }
 
 
-        System.out.println("search: "+type);
+        System.out.println("search: " + type);
         return new ResponseEntity<>(new GetPaperResponse("ok", papers), HttpStatus.OK);
     }
 }
