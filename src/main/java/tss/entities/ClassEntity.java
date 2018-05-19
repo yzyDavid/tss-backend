@@ -79,7 +79,7 @@ public class ClassEntity {
         this.sections = sections;
     }
 
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "_class")
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "classEntity")
     public Set<TakesEntity> getTakes() {
         return takes;
     }
