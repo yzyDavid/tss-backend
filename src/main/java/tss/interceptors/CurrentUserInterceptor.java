@@ -9,10 +9,10 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import tss.annotations.session.CurrentUser;
 import tss.configs.Config;
 import tss.entities.UserEntity;
 import tss.repositories.UserRepository;
-import tss.annotations.session.CurrentUser;
 
 /**
  * @author yzy
