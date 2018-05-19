@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "program")
+@Table(name = "selection_time")
 public class SelectionTimeEntity {
     private int stid;
     private Timestamp startTime;

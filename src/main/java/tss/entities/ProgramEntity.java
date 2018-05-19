@@ -12,20 +12,24 @@ import java.util.Set;
 @Entity
 @Table(name = "program")
 public class ProgramEntity {
-    short pid;
+    String pid;
+    String uid;
     private Set<UserEntity> students;
     private Set<CourseEntity> courses = new HashSet<>();
 
     @Id
     @Column(name = "program_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
-
-    public short getId() {
+    public String getPid() {
         return pid;
     }
-    public void setId(short pid) {
+    public void setPid(String pid) {
         this.pid = pid;
     }
+
+    @Column(name = "uid")
+
+    public String getUid() { return uid;}
+    public void setUid(String uid) {this.uid = uid; }
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "program_course", joinColumns = {@JoinColumn(name = "program_id")},
@@ -38,15 +42,9 @@ public class ProgramEntity {
 
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
-    private Set<UserEntity> getStudents() { return students ;}
+    public Set<UserEntity> getStudents() { return students ;}
 
-    private void setStudents(Set<UserEntity> students) {
-        for (UserEntity user : students)
-        {
-            // in case that the user is not student
-            if (user.getType() != UserEntity.TYPE_STUDENT)
-                return;
-        }
+    public void setStudents(Set<UserEntity> students) {
         this.students = students;
     }
 

@@ -6,6 +6,7 @@ import tss.entities.ProgramEntity;
 import tss.entities.UserEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Author @zengzx
@@ -13,4 +14,5 @@ import java.util.List;
 
 public interface ProgramRepository extends CrudRepository<ProgramEntity, Short> {
     List<ProgramEntity> findByStudents(UserEntity student);
+    Optional<ProgramEntity> findByPid(String pid);
 }
