@@ -41,12 +41,6 @@ public class ProgramEntity {
     private Set<UserEntity> getStudents() { return students ;}
 
     private void setStudents(Set<UserEntity> students) {
-        for (UserEntity user : students)
-        {
-            // in case that the user is not student
-            if (user.getType() != UserEntity.TYPE_STUDENT)
-                return;
-        }
         this.students = students;
     }
 
