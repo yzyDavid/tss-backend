@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tss.annotations.session.Authorization;
+import tss.annotations.session.CurrentUser;
 import tss.configs.Config;
 import tss.entities.DepartmentEntity;
 import tss.entities.TypeGroupEntity;
@@ -16,8 +18,6 @@ import tss.repositories.TypeGroupRepository;
 import tss.repositories.UserRepository;
 import tss.requests.information.*;
 import tss.responses.information.*;
-import tss.annotations.session.Authorization;
-import tss.annotations.session.CurrentUser;
 import tss.utils.SecurityUtils;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ import static tss.utils.SecurityUtils.getSalt;
 
 /**
  * @author yzy
- * <p>
+ *
  * For management of User register, delete and query, etc.
  * NOT for sessions.
  */
@@ -67,9 +67,9 @@ public class UserController {
         String hashedPassword = getHashedPasswordByPasswordAndSalt(request.getPassword(), salt);
         user.setSalt(salt);
         user.setHashedPassword(hashedPassword);
-        if(request.getType() != null) {
+        if (request.getType() != null) {
             Optional<TypeGroupEntity> typeGroup = typeGroupRepository.findByName(request.getType());
-            if(!typeGroup.isPresent()) {
+            if (!typeGroup.isPresent()) {
                 return new ResponseEntity<>(new AddUserResponse("No such user type", uid, request.getName()), HttpStatus.BAD_REQUEST);
             }
             user.setTypeGroup(typeGroup.get());
@@ -84,7 +84,7 @@ public class UserController {
         String uid = request.getUid();
 
         Optional<UserEntity> ret = userRepository.findById(uid);
-        if(!ret.isPresent()) {
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new DeleteUserResponse("non-existent uid", null, null), HttpStatus.BAD_REQUEST);
         }
         UserEntity entity = ret.get();
@@ -113,7 +113,7 @@ public class UserController {
     public ResponseEntity<BasicResponse> resetPwd(@RequestBody BasicUserRequest request) {
         String uid = request.getUid();
         Optional<UserEntity> ret = userRepository.findById(uid);
-        if(!ret.isPresent()) {
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new BasicResponse("non-existent uid"), HttpStatus.BAD_REQUEST);
         }
         UserEntity tar = ret.get();
@@ -145,7 +145,7 @@ public class UserController {
     public ResponseEntity<ModifyUserResponse> modifyAllInfo(@RequestBody ModifyUserRequest request) {
         String uid = request.getUid();
         Optional<UserEntity> ret = userRepository.findById(uid);
-        if(!ret.isPresent()) {
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new ModifyUserResponse("non-existent uid", uid, null), HttpStatus.BAD_REQUEST);
         }
         UserEntity user = ret.get();
@@ -159,18 +159,18 @@ public class UserController {
             user.setIntro(request.getIntro());
         }
 
-        if(request.getDeptName() != null) {
+        if (request.getDeptName() != null) {
             Optional<DepartmentEntity> dept = departmentRepository.findByName(request.getDeptName());
-            if(dept.isPresent()) {
+            if (dept.isPresent()) {
                 user.setDepartment(dept.get());
             } else {
                 return new ResponseEntity<>(new ModifyUserResponse("No such department", user.getUid(), user.getName()), HttpStatus.BAD_REQUEST);
             }
         }
 
-        if(request.getType() != null) {
+        if (request.getType() != null) {
             Optional<TypeGroupEntity> typeGroup = typeGroupRepository.findByName(request.getType());
-            if(!typeGroup.isPresent()) {
+            if (!typeGroup.isPresent()) {
                 return new ResponseEntity<>(new ModifyUserResponse("No such user type", user.getUid(), user.getName()), HttpStatus.BAD_REQUEST);
             }
             user.setTypeGroup(typeGroup.get());
@@ -186,7 +186,7 @@ public class UserController {
                                                         @RequestBody GetUserByUidRequest request) {
         String uid = (request.getUid() == null) ? curUser.getUid() : request.getUid();
         Optional<UserEntity> ret = userRepository.findById(uid);
-        if(!ret.isPresent()) {
+        if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetUserByUidResponse("non-existent uid", "", "", "",
                     "", "", ""), HttpStatus.BAD_REQUEST);
         }
@@ -200,7 +200,7 @@ public class UserController {
     public ResponseEntity<GetUsersByNameResponse> getUidsByName(@RequestBody GetUsersByNameRequest request) {
         List<String> uids = new ArrayList<>();
         List<UserEntity> ret = userRepository.findByName(request.getName());
-        for(UserEntity user : ret) {
+        for (UserEntity user : ret) {
             uids.add(user.getUid());
         }
         return new ResponseEntity<>(new GetUsersByNameResponse("OK", uids), HttpStatus.OK);

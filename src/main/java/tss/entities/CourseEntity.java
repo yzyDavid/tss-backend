@@ -112,10 +112,10 @@ public class CourseEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass())) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
         } else {
-            return (cid.equals(((CourseEntity)obj).cid));
+            return (cid.equals(((CourseEntity) obj).cid));
         }
     }
 }

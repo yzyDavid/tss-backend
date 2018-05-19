@@ -113,6 +113,4 @@ public class PapersEntity {
     public void setAverage(double average) {
         this.average = average;
     }
-
-
 }

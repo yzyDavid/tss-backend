@@ -45,9 +45,9 @@ public class CourseController {
             return new ResponseEntity<>(new AddCourseResponse("failed with duplicated cid", null, null), HttpStatus.BAD_REQUEST);
         }
         DepartmentEntity dept = null;
-        if(request.getDept() != null) {
+        if (request.getDept() != null) {
             Optional<DepartmentEntity> ret = departmentRepository.findByName(request.getDept());
-            if(!ret.isPresent()) {
+            if (!ret.isPresent()) {
                 return new ResponseEntity<>(new AddCourseResponse("Department doesn't exist", null, null), HttpStatus.BAD_REQUEST);
             }
             dept = ret.get();
@@ -92,27 +92,27 @@ public class CourseController {
         }
         CourseEntity course = ret.get();
         DepartmentEntity dept = null;
-        if(request.getDept() != null) {
+        if (request.getDept() != null) {
             Optional<DepartmentEntity> retd = departmentRepository.findByName(request.getDept());
-            if(!retd.isPresent()) {
+            if (!retd.isPresent()) {
                 return new ResponseEntity<>(new ModifyCourseResponse("department doesn't exist", null, null), HttpStatus.BAD_REQUEST);
             }
             course.setDepartment(retd.get());
         }
 
-        if(request.getName() != null) {
+        if (request.getName() != null) {
             course.setName(request.getName());
         }
-        if(request.getCredit() != null) {
+        if (request.getCredit() != null) {
             course.setCredit(request.getCredit());
         }
-        if(request.getWeeklyNum() != null) {
+        if (request.getWeeklyNum() != null) {
             course.setWeeklyNum(request.getWeeklyNum());
         }
-        if(request.getSemester() != null) {
+        if (request.getSemester() != null) {
             course.setSemester(request.getSemester());
         }
-        if(request.getIntro() != null) {
+        if (request.getIntro() != null) {
             course.setIntro(request.getIntro());
         }
         courseRepository.save(course);
@@ -138,7 +138,7 @@ public class CourseController {
     public ResponseEntity<GetCoursesByNameResponse> getCidsByName(@RequestBody GetCoursesByNameRequest request) {
         List<String> cids = new ArrayList<>();
         List<CourseEntity> ret = courseRepository.findByName(request.getName());
-        for(CourseEntity user : ret) {
+        for (CourseEntity user : ret) {
             cids.add(user.getCid());
         }
         return new ResponseEntity<>(new GetCoursesByNameResponse("OK", cids), HttpStatus.OK);

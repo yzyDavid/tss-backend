@@ -57,7 +57,7 @@ public class SectionEntity {
 
     @Override
     public int hashCode() {
-        if(id == null) {
+        if (id == null) {
             return super.hashCode();
         } else {
             return id.hashCode();
@@ -66,10 +66,10 @@ public class SectionEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass()) || id == null) {
+        if (!obj.getClass().equals(this.getClass()) || id == null) {
             return false;
         } else {
-            return (id.equals(((SectionEntity)obj).id));
+            return (id.equals(((SectionEntity) obj).id));
         }
     }
 }

@@ -1,7 +1,8 @@
 package tss.entities;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author yzy
@@ -29,8 +30,6 @@ public class UserEntity {
     private TypeGroupEntity typeGroup;
     private Set<TeachesEntity> teaches = new HashSet<>();
     private Set<TakesEntity> takes = new HashSet<>();
-    //private Set<RoleEntity> roles = new HashSet<>();
-
 
     @Column(name = "user_name")
     public String getName() {
@@ -133,20 +132,6 @@ public class UserEntity {
         this.department = department;
     }
 
-    /*@ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    public Set<RoleEntity> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<RoleEntity> roles) {
-        this.roles = roles;
-    }
-
-    public void addRole(RoleEntity role) {
-        roles.add(role);
-    }*/
-
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "group_id")
     public TypeGroupEntity getTypeGroup() {
@@ -158,7 +143,7 @@ public class UserEntity {
     }
 
     public String readTypeName() {
-        if(typeGroup != null) {
+        if (typeGroup != null) {
             return typeGroup.getName();
         } else {
             return null;
@@ -167,7 +152,7 @@ public class UserEntity {
 
     @Override
     public int hashCode() {
-        if(uid == null) {
+        if (uid == null) {
             return super.hashCode();
         } else {
             return uid.hashCode();
@@ -176,11 +161,10 @@ public class UserEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass()) || uid == null) {
+        if (!obj.getClass().equals(this.getClass()) || uid == null) {
             return false;
         } else {
-            return (uid.equals(((UserEntity)obj).uid));
+            return (uid.equals(((UserEntity) obj).uid));
         }
     }
-
 }

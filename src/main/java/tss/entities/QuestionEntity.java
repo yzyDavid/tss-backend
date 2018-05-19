@@ -95,5 +95,4 @@ public class QuestionEntity {
     public void setPaperquestion(Set<PaperContainsQuestionEntity> paperquestion) {
         this.paperquestion = paperquestion;
     }
-
 }

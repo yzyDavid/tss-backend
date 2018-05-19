@@ -46,7 +46,7 @@ public class PaperController {
         }
 
         PapersEntity paper = new PapersEntity();
-        Set<PaperContainsQuestionEntity> paperquestions = new HashSet<>();
+        Set<PaperContainsQuestionEntity> paperQuestions = new HashSet<>();
 
 
         paper.setPid(request.getPid());
@@ -56,7 +56,6 @@ public class PaperController {
         paper.setEnd(request.getEnd());
         paper.setLast(request.getLast());
         paper.setCount(request.getCount());
-        //  paper.setPaperquestion();!!!!
 
         paper.setAnswerednum(0);
         paper.setAverage(0.0);
@@ -78,12 +77,12 @@ public class PaperController {
 
             contain.setQuestion(question);
 
-            paperquestions.add(contain);
+            paperQuestions.add(contain);
             paperContainsQuestionRepository.save(contain);
 
         }
 
-        paper.setPaperquestion(paperquestions);
+        paper.setPaperquestion(paperQuestions);
 
         paperRepository.save(paper);
         System.out.println("insert paper" + request.getPid());
@@ -169,7 +168,6 @@ public class PaperController {
             for (PapersEntity paper : paper_find) {
                 papers.add(paper);
             }
-
         } else {
             System.out.println("Invalid direction: " + type);
             return new ResponseEntity<>(new GetPaperResponse("Invalid direction", papers), HttpStatus.BAD_REQUEST);

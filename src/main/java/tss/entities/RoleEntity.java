@@ -1,8 +1,5 @@
 package tss.entities;
 
-import tss.entities.UserEntity;
-
-import javax.management.relation.Role;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +12,6 @@ public class RoleEntity {
     private Short id;
     private String name;
     private Set<AuthorityEntity> authorities = new HashSet<>();
-    //private Set<UserEntity> users = new HashSet<>();
     private TypeGroupEntity typeGroup;
 
     @Id
@@ -51,15 +47,6 @@ public class RoleEntity {
         authorities.add(authority);
     }
 
-    /*@ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "roles")
-    public Set<UserEntity> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<UserEntity> users) {
-        this.users = users;
-    }*/
-
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "group_id")
     public TypeGroupEntity getTypeGroup() {
@@ -77,10 +64,10 @@ public class RoleEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass())) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
         } else {
-            return (name.equals(((RoleEntity)obj).name));
+            return (name.equals(((RoleEntity) obj).name));
         }
     }
 }

@@ -58,10 +58,10 @@ public class DepartmentEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass())) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
         } else {
-            return (name.equals(((DepartmentEntity)obj).name));
+            return (name.equals(((DepartmentEntity) obj).name));
         }
     }
 }

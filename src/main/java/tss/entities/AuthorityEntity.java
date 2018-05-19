@@ -48,10 +48,10 @@ public class AuthorityEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass())) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
         } else {
-            return (uri.equals(((AuthorityEntity)obj).uri));
+            return (uri.equals(((AuthorityEntity) obj).uri));
         }
     }
 }
