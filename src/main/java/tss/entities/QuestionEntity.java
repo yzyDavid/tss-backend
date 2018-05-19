@@ -20,7 +20,6 @@ public class QuestionEntity{
     private int answerednum;
     private double correct;
 
-    private Set<PaperContainsQuestionEntity> paperquestion = new HashSet<>();
 
     @Id
     @Column(name = "question_qid")
@@ -88,13 +87,5 @@ public class QuestionEntity{
 
 
 
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "question")
-    public Set<PaperContainsQuestionEntity> getPaperquestion() {
-        return paperquestion;
-    }
-
-    public void setPaperquestion(Set<PaperContainsQuestionEntity> paperquestion) {
-        this.paperquestion = paperquestion;
-    }
 
 }

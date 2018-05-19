@@ -3,7 +3,9 @@ package tss.entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "contains")
+@Table(name = "contains", indexes = {
+        @Index(name = "paper_pid_index", columnList = "paper_pid"),
+})
 public class PaperContainsQuestionEntity {
     private String  id;
     private PapersEntity paper;
