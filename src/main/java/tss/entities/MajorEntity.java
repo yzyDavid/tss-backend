@@ -96,11 +96,11 @@ public class MajorEntity {
 
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "major")
     public Set<CourseEntity> getSelectiveCourses() {
-        return setOfCompulsory;
+        return setOfSelective;
     }
 
     public void setSelectiveCourses(Set<CourseEntity> courses) {
-        this.setOfCompulsory = courses;
+        this.setOfSelective = courses;
     }
 
     /*@OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "major")

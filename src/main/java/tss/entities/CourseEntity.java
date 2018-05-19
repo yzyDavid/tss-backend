@@ -18,6 +18,7 @@ public class CourseEntity {
     private Integer weeklyNum;
     private String semester;
     private String intro;
+    private MajorEntity major;
     private DepartmentEntity department;
     private Set<ClassEntity> classes = new HashSet<>();
     private Set<TeachesEntity> teaches = new HashSet<>();
@@ -103,6 +104,16 @@ public class CourseEntity {
 
     public void setDepartment(DepartmentEntity department) {
         this.department = department;
+    }
+
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "major_id")
+    public MajorEntity getMajor() {
+        return major;
+    }
+
+    public void setMajor(MajorEntity major) {
+        this.major = major;
     }
 
     @Override
