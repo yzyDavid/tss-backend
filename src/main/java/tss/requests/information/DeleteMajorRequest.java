@@ -1,6 +1,6 @@
 package tss.requests.information;
 
-public class GetCoursesByNameRequest {
+public class DeleteMajorRequest {
     private String name;
 
     public String getName() {

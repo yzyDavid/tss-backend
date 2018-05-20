@@ -31,7 +31,7 @@ public class UserEntity {
     private MajorClassEntity majorClass;
     private Set<TeachesEntity> teaches = new HashSet<>();
     private Set<TakesEntity> takes = new HashSet<>();
-    //private Set<RoleEntity> roles = new HashSet<>();
+    private Set<AuthorityEntity> dataAccessAuths = new HashSet<>();
 
 
     @Column(name = "user_name", length = 30)
@@ -144,6 +144,14 @@ public class UserEntity {
         this.department = department;
     }
 
+    public String readDepartmentName() {
+        if (department != null) {
+            return department.getName();
+        } else {
+            return null;
+        }
+    }
+
 
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "class_id")
@@ -155,19 +163,27 @@ public class UserEntity {
         this.majorClass = majorClass;
     }
 
-    /*@ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    public Set<RoleEntity> getRoles() {
-        return roles;
+    public String readClassName() {
+        if (majorClass != null) {
+            return majorClass.getName();
+        } else {
+            return null;
+        }
     }
 
-    public void setRoles(Set<RoleEntity> roles) {
-        this.roles = roles;
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(name = "user_authority", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "authority_id")})
+    public Set<AuthorityEntity> getDataAccessAuths() {
+        return dataAccessAuths;
     }
 
-    public void addRole(RoleEntity role) {
-        roles.add(role);
-    }*/
+    public void setDataAccessAuths(Set<AuthorityEntity> dataAccessAuths) {
+        this.dataAccessAuths = dataAccessAuths;
+    }
+
+    public void addDataAccessAuth(AuthorityEntity dataAccessAuth) {
+        this.dataAccessAuths.add(dataAccessAuth);
+    }
 
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "group_id")
@@ -180,7 +196,7 @@ public class UserEntity {
     }
 
     public String readTypeName() {
-        if(type != null) {
+        if (type != null) {
             return type.getName();
         } else {
             return null;
@@ -189,7 +205,7 @@ public class UserEntity {
 
     @Override
     public int hashCode() {
-        if(uid == null) {
+        if (uid == null) {
             return super.hashCode();
         } else {
             return uid.hashCode();
@@ -198,10 +214,12 @@ public class UserEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass()) || uid == null) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
+        } else if (uid != null) {
+            return (uid.equals(((UserEntity) obj).uid));
         } else {
-            return (uid.equals(((UserEntity)obj).uid));
+            return super.equals(obj);
         }
     }
 

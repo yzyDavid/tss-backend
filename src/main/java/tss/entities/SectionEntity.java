@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 /**
  * @author Mingqi Yi
- *
+ * <p>
  * TODO: equals and hashCode method
  */
 @Entity
@@ -57,7 +57,7 @@ public class SectionEntity {
 
     @Override
     public int hashCode() {
-        if(id == null) {
+        if (id == null) {
             return super.hashCode();
         } else {
             return id.hashCode();
@@ -66,10 +66,12 @@ public class SectionEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass()) || id == null) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
+        } else if (id != null) {
+            return (id.equals(((SectionEntity) obj).id));
         } else {
-            return (id.equals(((SectionEntity)obj).id));
+            return super.equals(obj);
         }
     }
 }

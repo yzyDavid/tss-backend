@@ -11,7 +11,8 @@ import java.util.Set;
 public class AuthorityEntity {
     private Short id;
     private String uri;
-    private Set<RoleEntity> role = new HashSet<>();
+    private Set<RoleEntity> roles = new HashSet<>();
+    private Set<UserEntity> users = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,25 +34,48 @@ public class AuthorityEntity {
     }
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "authorities")
-    public Set<RoleEntity> getRole() {
-        return role;
+    public Set<RoleEntity> getRoles() {
+        return roles;
     }
 
-    public void setRole(Set<RoleEntity> role) {
-        this.role = role;
+    public void setRoles(Set<RoleEntity> roles) {
+        this.roles = roles;
+    }
+
+    public void addRole(RoleEntity role) {
+        this.roles.add(role);
+    }
+
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "dataAccessAuths")
+    public Set<UserEntity> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<UserEntity> users) {
+        this.users = users;
+    }
+
+    public void addUser(UserEntity user) {
+        this.users.add(user);
     }
 
     @Override
     public int hashCode() {
-        return uri.hashCode();
+        if (uri != null) {
+            return uri.hashCode();
+        } else {
+            return super.hashCode();
+        }
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass())) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
+        } else if (uri != null) {
+            return (uri.equals(((AuthorityEntity) obj).uri));
         } else {
-            return (uri.equals(((AuthorityEntity)obj).uri));
+            return super.equals(obj);
         }
     }
 }

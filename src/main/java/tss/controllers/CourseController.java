@@ -11,15 +11,12 @@ import tss.repositories.*;
 import tss.requests.information.*;
 import tss.responses.information.*;
 import tss.annotations.session.Authorization;
-import tss.annotations.session.CurrentUser;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author Mingqi Yi
- */
+
 @Controller
 @RequestMapping(path = "/course")
 public class CourseController {
@@ -35,17 +32,18 @@ public class CourseController {
 
     @PutMapping(path = "/add")
     @Authorization
-    public ResponseEntity<AddCourseResponse> addCourse(@CurrentUser UserEntity user,
-                                                       @RequestBody AddCourseRequest request) {
+    public ResponseEntity<AddCourseResponse> addCourse(@RequestBody AddCourseRequest request) {
         String cid = request.getCid();
         if (courseRepository.existsById(cid)) {
-            return new ResponseEntity<>(new AddCourseResponse("failed with duplicated cid", null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AddCourseResponse("failed with duplicated cid", cid, null,
+                    null, null, null, null), HttpStatus.BAD_REQUEST);
         }
         DepartmentEntity dept = null;
-        if(request.getDept() != null) {
-            Optional<DepartmentEntity> ret = departmentRepository.findByName(request.getDept());
-            if(!ret.isPresent()) {
-                return new ResponseEntity<>(new AddCourseResponse("Department doesn't exist", null, null), HttpStatus.BAD_REQUEST);
+        if (request.getDepartment() != null) {
+            Optional<DepartmentEntity> ret = departmentRepository.findByName(request.getDepartment());
+            if (!ret.isPresent()) {
+                return new ResponseEntity<>(new AddCourseResponse("Department doesn't exist", null, null,
+                        null, null, null, request.getDepartment()), HttpStatus.BAD_REQUEST);
             }
             dept = ret.get();
         }
@@ -58,86 +56,103 @@ public class CourseController {
         course.setDepartment(dept);
         courseRepository.save(course);
 
-        return new ResponseEntity<>(new AddCourseResponse("ok", course.getCid(), course.getName()), HttpStatus.CREATED);
+        return new ResponseEntity<>(new AddCourseResponse("ok", course.getCid(), course.getName(), course.getCredit(),
+                course.getWeeklyNum(), course.getSemester(), course.readDepartmentName()), HttpStatus.CREATED);
 
     }
 
     @DeleteMapping(path = "/delete")
     @Authorization
-    public ResponseEntity<DeleteCourseResponse> deleteCourse(@CurrentUser UserEntity user,
-                                                             @RequestBody DeleteCourseRequest request) {
+    public ResponseEntity<DeleteCourseResponse> deleteCourse(@RequestBody DeleteCourseRequest request) {
         String cid = request.getCid();
         if (!courseRepository.existsById(cid)) {
-            return new ResponseEntity<>(new DeleteCourseResponse("course non-exist"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new DeleteCourseResponse("Non-exist course", cid, null), HttpStatus.BAD_REQUEST);
         }
+        CourseEntity course = courseRepository.findById(cid).get();
+        String name = course.getName();
+        courseRepository.delete(course);
 
-        courseRepository.deleteById(cid);
-
-        return new ResponseEntity<>(new DeleteCourseResponse("ok"), HttpStatus.OK);
+        return new ResponseEntity<>(new DeleteCourseResponse("ok", cid, name), HttpStatus.OK);
 
     }
 
 
     @PostMapping(path = "/modify")
     @Authorization
-    public ResponseEntity<ModifyCourseResponse> modifyInfo(@CurrentUser UserEntity user,
-                                                           @RequestBody ModifyCourseRequest request) {
+    public ResponseEntity<ModifyCourseResponse> modifyInfo(@RequestBody ModifyCourseRequest request) {
         String cid = request.getCid();
         Optional<CourseEntity> ret = courseRepository.findById(cid);
         if (!ret.isPresent()) {
-            return new ResponseEntity<>(new ModifyCourseResponse("course doesn't exist", null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ModifyCourseResponse("course doesn't exist", cid, null,
+                    null, null, null, null, null), HttpStatus.BAD_REQUEST);
         }
         CourseEntity course = ret.get();
         DepartmentEntity dept = null;
-        if(request.getDept() != null) {
-            Optional<DepartmentEntity> retd = departmentRepository.findByName(request.getDept());
-            if(!retd.isPresent()) {
-                return new ResponseEntity<>(new ModifyCourseResponse("department doesn't exist", null, null), HttpStatus.BAD_REQUEST);
+        if (request.getDepartment() != null) {
+            Optional<DepartmentEntity> retd = departmentRepository.findByName(request.getDepartment());
+            if (!retd.isPresent()) {
+                return new ResponseEntity<>(new ModifyCourseResponse("department doesn't exist", null, null,
+                        null, null, null, request.getDepartment(), null), HttpStatus.BAD_REQUEST);
             }
             course.setDepartment(retd.get());
         }
 
-        if(request.getName() != null) {
+        if (request.getName() != null) {
             course.setName(request.getName());
         }
-        if(request.getCredit() != null) {
+        if (request.getCredit() != null) {
             course.setCredit(request.getCredit());
         }
-        if(request.getWeeklyNum() != null) {
+        if (request.getWeeklyNum() != null) {
             course.setWeeklyNum(request.getWeeklyNum());
         }
-        if(request.getSemester() != null) {
+        if (request.getSemester() != null) {
             course.setSemester(request.getSemester());
         }
-        if(request.getIntro() != null) {
+        if (request.getIntro() != null) {
             course.setIntro(request.getIntro());
         }
         courseRepository.save(course);
 
-        return new ResponseEntity<>(new ModifyCourseResponse("ok", "", ""), HttpStatus.OK);
+        return new ResponseEntity<>(new ModifyCourseResponse("ok", course.getCid(), course.getName(), course.getCredit(),
+                course.getWeeklyNum(), course.getSemester(), course.readDepartmentName(), course.getIntro()), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/get")
+    @PostMapping(path = "/get/info")
     @Authorization
     public ResponseEntity<GetCourseResponse> getInfo(@RequestBody GetCourseRequest request) {
         Optional<CourseEntity> ret = courseRepository.findById(request.getCid());
         if (!ret.isPresent()) {
-            return new ResponseEntity<>(new GetCourseResponse("course non-exist", "", "", 0.0f,
-                    null, null, ""), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new GetCourseResponse("course non-exist", request.getCid(), null,
+                    null, null, null, null, null), HttpStatus.BAD_REQUEST);
         }
         CourseEntity course = ret.get();
-        return new ResponseEntity<>(new GetCourseResponse("ok", course.getCid(), course.getName(),
-                course.getCredit(), course.getWeeklyNum(), course.getSemester(), course.getIntro()), HttpStatus.OK);
+        return new ResponseEntity<>(new GetCourseResponse("ok", course.getCid(), course.getName(), course.getCredit(),
+                course.getWeeklyNum(), course.getSemester(), course.readDepartmentName(), course.getIntro()), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/name")
+    @PostMapping(path = "/query")
     @Authorization
-    public ResponseEntity<GetCoursesByNameResponse> getCidsByName(@RequestBody GetCoursesByNameRequest request) {
+    public ResponseEntity<QueryCoursesResponse> queryCourses(@RequestBody QueryCoursesRequest request) {
         List<String> cids = new ArrayList<>();
-        List<CourseEntity> ret = courseRepository.findByName(request.getName());
-        for(CourseEntity user : ret) {
-            cids.add(user.getCid());
+        List<String> names = new ArrayList<>();
+        List<String> departments = new ArrayList<>();
+        Optional<DepartmentEntity> department = departmentRepository.findByName(request.getDepartment());
+        if (!department.isPresent()) {
+            return new ResponseEntity<>(new QueryCoursesResponse("Non-exist department", null, null, null), HttpStatus.OK);
         }
-        return new ResponseEntity<>(new GetCoursesByNameResponse("OK", cids), HttpStatus.OK);
+
+        List<CourseEntity> ret = courseRepository.findByName(request.getName());
+        for (CourseEntity course : ret) {
+            cids.add(course.getCid());
+            names.add(course.getName());
+            DepartmentEntity dept = course.getDepartment();
+            String deptName = null;
+            if (dept != null) {
+                deptName = dept.getName();
+            }
+            departments.add(deptName);
+        }
+        return new ResponseEntity<>(new QueryCoursesResponse("OK", cids, names, departments), HttpStatus.OK);
     }
 }

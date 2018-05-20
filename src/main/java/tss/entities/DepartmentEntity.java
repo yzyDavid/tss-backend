@@ -64,7 +64,7 @@ public class DepartmentEntity {
 
     @Override
     public int hashCode() {
-        if(name != null) {
+        if (name != null) {
             return name.hashCode();
         } else {
             return super.hashCode();
@@ -75,10 +75,12 @@ public class DepartmentEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass())) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
+        } else if (name != null) {
+            return (name.equals(((DepartmentEntity) obj).name));
         } else {
-            return (name.equals(((DepartmentEntity)obj).name));
+            return super.equals(obj);
         }
     }
 }

@@ -61,7 +61,7 @@ public class TeachesEntity {
 
     @Override
     public int hashCode() {
-        if(id == null) {
+        if (id == null) {
             return super.hashCode();
         } else {
             return id.hashCode();
@@ -70,10 +70,12 @@ public class TeachesEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass()) || id == null) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
+        } else if (id != null) {
+            return (id.equals(((TeachesEntity) obj).id));
         } else {
-            return (id.equals(((TeachesEntity)obj).id));
+            return super.equals(obj);
         }
     }
 }

@@ -5,7 +5,7 @@ import tss.entities.TypeGroupEntity;
 
 import java.util.Optional;
 
-public interface TypeGroupRepository  extends CrudRepository<TypeGroupEntity, Short> {
+public interface TypeGroupRepository extends CrudRepository<TypeGroupEntity, Short> {
     Optional<TypeGroupEntity> findByName(String name);
 
     boolean existsByName(String name);

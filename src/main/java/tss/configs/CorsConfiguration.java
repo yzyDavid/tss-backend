@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * @author yzy
- *
+ * <p>
  * TODO: ensure it works
  */
 @Configuration

@@ -50,7 +50,8 @@ public class TypeGroupEntity {
         this.users.remove(user);
     }
 
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "typeGroup", fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @JoinTable(name = "group_role", joinColumns = {@JoinColumn(name = "group_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
     public Set<RoleEntity> getRoles() {
         return roles;
     }
@@ -67,5 +68,23 @@ public class TypeGroupEntity {
         this.roles.remove(role);
     }
 
+    @Override
+    public int hashCode() {
+        if (name != null) {
+            return name.hashCode();
+        } else {
+            return super.hashCode();
+        }
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!obj.getClass().equals(this.getClass())) {
+            return false;
+        } else if (name != null) {
+            return name.equals(((TypeGroupEntity) obj).name);
+        } else {
+            return super.equals(obj);
+        }
+    }
 }

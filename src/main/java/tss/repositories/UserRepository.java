@@ -2,6 +2,7 @@ package tss.repositories;
 
 import org.springframework.data.repository.CrudRepository;
 import tss.entities.UserEntity;
+
 import java.util.List;
 
 /**
@@ -14,4 +15,5 @@ public interface UserRepository extends CrudRepository<UserEntity, String> {
      * check exists of a UID
      */
     List<UserEntity> findByName(String name);
+
 }

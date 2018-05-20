@@ -105,6 +105,14 @@ public class CourseEntity {
         this.department = department;
     }
 
+    public String readDepartmentName() {
+        if (department != null) {
+            return department.getName();
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public int hashCode() {
         return cid.hashCode();
@@ -112,10 +120,12 @@ public class CourseEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass())) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
+        } else if (cid != null) {
+            return (cid.equals(((CourseEntity) obj).cid));
         } else {
-            return (cid.equals(((CourseEntity)obj).cid));
+            return super.equals(obj);
         }
     }
 }

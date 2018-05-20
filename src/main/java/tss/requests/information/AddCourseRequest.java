@@ -6,7 +6,7 @@ public class AddCourseRequest {
     private Float credit;
     private Integer weeklyNum;
     private String semester;
-    private String dept;
+    private String department;
 
     public String getCid() {
         return cid;
@@ -48,11 +48,11 @@ public class AddCourseRequest {
         this.semester = semester;
     }
 
-    public String getDept() {
-        return dept;
+    public String getDepartment() {
+        return department;
     }
 
-    public void setDept(String dept) {
-        this.dept = dept;
+    public void setDepartment(String department) {
+        this.department = department;
     }
 }

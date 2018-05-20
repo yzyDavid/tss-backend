@@ -1,7 +1,7 @@
 package tss.requests.information;
 
 
-public class GetUserByUidRequest {
+public class GetUserInfoRequest {
     private String uid;
 
     public String getUid() {

@@ -8,7 +8,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "major_class", indexes = {
-@Index(name = "class_name_index", columnList = "class_name", unique = true)
+        @Index(name = "class_name_index", columnList = "class_name", unique = true)
 })
 public class MajorClassEntity {
     Short id;
@@ -64,16 +64,16 @@ public class MajorClassEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj.getClass().equals(this.getClass()) && id != null) {
-            return id.equals(((MajorClassEntity)obj).id);
+        if (obj.getClass().equals(this.getClass()) && id != null) {
+            return id.equals(((MajorClassEntity) obj).id);
         } else {
-            return false;
+            return super.equals(obj);
         }
     }
 
     @Override
     public int hashCode() {
-        if(name != null) {
+        if (name != null) {
             return name.hashCode();
         } else {
             return super.hashCode();

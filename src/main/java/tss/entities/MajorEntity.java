@@ -93,16 +93,16 @@ public class MajorEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj.getClass().equals(this.getClass()) && id != null) {
-            return id.equals(((MajorClassEntity)obj).id);
+        if (obj.getClass().equals(this.getClass()) && id != null) {
+            return id.equals(((MajorClassEntity) obj).id);
         } else {
-            return false;
+            return super.equals(obj);
         }
     }
 
     @Override
     public int hashCode() {
-        if(name != null) {
+        if (name != null) {
             return name.hashCode();
         } else {
             return super.hashCode();

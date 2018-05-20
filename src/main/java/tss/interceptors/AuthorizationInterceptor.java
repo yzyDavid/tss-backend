@@ -50,7 +50,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
             SessionEntity session = sqlSessionRepository.findByToken(auth);
             String uid = session.getUid();
             request.setAttribute(Config.CURRENT_UID_ATTRIBUTE, uid);
-            if(!checkAuth(uid, request.getRequestURI()) && method.getAnnotation(Authorization.class) != null) {
+            if (!checkAuth(uid, request.getRequestURI()) && method.getAnnotation(Authorization.class) != null) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return false;
             }
@@ -67,17 +67,18 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 
     private boolean checkAuth(String uid, String uri) {
         Optional<UserEntity> ret = userRepository.findById(uid);
-        if(!ret.isPresent()) {
+        if (!ret.isPresent()) {
             return false;
         }
         UserEntity curUser = ret.get();
         Optional<AuthorityEntity> auth = authorityRepository.findByUri(uri);
-        if(!auth.isPresent())
-            return true; // no need to check
+        if (!auth.isPresent()) {
+            return true;
+        }
         TypeGroupEntity typeGroup = curUser.getType();
-        if(typeGroup != null) {
-            for(RoleEntity role : typeGroup.getRoles()) {
-                if(role.getAuthorities().contains(auth.get())) {
+        if (typeGroup != null) {
+            for (RoleEntity role : typeGroup.getRoles()) {
+                if (role.getAuthorities().contains(auth.get())) {
                     return true;
                 }
             }

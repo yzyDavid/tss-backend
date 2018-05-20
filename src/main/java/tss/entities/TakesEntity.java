@@ -12,7 +12,7 @@ import javax.persistence.*;
 public class TakesEntity {
     private final int SCORE_MAX = 100;
 
-    private long id;
+    private Long id;
     private UserEntity student;
     private Integer score;
     private Integer year;
@@ -22,11 +22,11 @@ public class TakesEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -90,15 +90,21 @@ public class TakesEntity {
 
     @Override
     public int hashCode() {
-        return (int)id;
+        if (id != null) {
+            return id.hashCode();
+        } else {
+            return super.hashCode();
+        }
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass())) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
+        } else if (id != null) {
+            return id.equals(((TakesEntity) obj).id);
         } else {
-            return (id == ((TakesEntity)obj).id);
+            return super.equals(obj);
         }
     }
 }

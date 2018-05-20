@@ -64,7 +64,7 @@ public class TimeSlotEntity {
 
     @Override
     public int hashCode() {
-        if(id == null) {
+        if (id == null) {
             return super.hashCode();
         } else {
             return id.hashCode();
@@ -73,10 +73,12 @@ public class TimeSlotEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if(!obj.getClass().equals(this.getClass()) || id == null) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
+        } else if (id != null) {
+            return (id.equals(((TimeSlotEntity) obj).id));
         } else {
-            return (id.equals(((TimeSlotEntity)obj).id));
+            return super.equals(obj);
         }
     }
 }
