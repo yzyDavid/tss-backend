@@ -3,9 +3,9 @@ package tss.controllers;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import tss.entities.UserEntity;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
+import tss.entities.UserEntity;
 
 /**
  * @author yzy

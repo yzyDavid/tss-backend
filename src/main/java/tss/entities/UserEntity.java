@@ -1,7 +1,8 @@
 package tss.entities;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author yzy
@@ -32,7 +33,6 @@ public class UserEntity {
     private Set<TeachesEntity> teaches = new HashSet<>();
     private Set<TakesEntity> takes = new HashSet<>();
     private Set<AuthorityEntity> dataAccessAuths = new HashSet<>();
-
 
     @Column(name = "user_name", length = 30)
     public String getName() {
@@ -222,5 +222,4 @@ public class UserEntity {
             return super.equals(obj);
         }
     }
-
 }

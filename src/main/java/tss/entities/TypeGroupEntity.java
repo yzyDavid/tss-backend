@@ -50,8 +50,7 @@ public class TypeGroupEntity {
         this.users.remove(user);
     }
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
-    @JoinTable(name = "group_role", joinColumns = {@JoinColumn(name = "group_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "typeGroups", fetch = FetchType.EAGER)
     public Set<RoleEntity> getRoles() {
         return roles;
     }

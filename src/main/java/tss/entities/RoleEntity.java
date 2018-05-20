@@ -1,8 +1,5 @@
 package tss.entities;
 
-import tss.entities.UserEntity;
-
-import javax.management.relation.Role;
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -51,7 +48,8 @@ public class RoleEntity {
     }
 
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "roles")
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(name = "role_group", joinColumns = {@JoinColumn(name = "role_id")}, inverseJoinColumns = {@JoinColumn(name = "group_id")})
     public Set<TypeGroupEntity> getTypeGroups() {
         return typeGroups;
     }

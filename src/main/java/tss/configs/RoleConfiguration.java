@@ -5,7 +5,6 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
 import tss.entities.AuthorityEntity;
 import tss.entities.RoleEntity;
 import tss.entities.TypeGroupEntity;

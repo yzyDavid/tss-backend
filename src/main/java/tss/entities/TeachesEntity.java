@@ -2,7 +2,6 @@ package tss.entities;
 
 
 import javax.persistence.*;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -17,7 +16,6 @@ public class TeachesEntity {
         this.teacher = user;
         this.course = course;
     }
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

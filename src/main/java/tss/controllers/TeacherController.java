@@ -17,7 +17,9 @@ import tss.repositories.UserRepository;
 import tss.requests.information.AddTeachesRequest;
 import tss.responses.information.AddTeachesResponse;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(path = "/teacher")
@@ -32,7 +34,6 @@ public class TeacherController {
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
     }
-
 
     @PutMapping(path = "/instructor")
     @Authorization

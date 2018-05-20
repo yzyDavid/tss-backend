@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import tss.annotations.session.Authorization;
+import tss.annotations.session.CurrentUser;
 import tss.configs.Config;
 import tss.entities.DepartmentEntity;
 import tss.entities.MajorClassEntity;
@@ -18,8 +20,6 @@ import tss.repositories.TypeGroupRepository;
 import tss.repositories.UserRepository;
 import tss.requests.information.*;
 import tss.responses.information.*;
-import tss.annotations.session.Authorization;
-import tss.annotations.session.CurrentUser;
 import tss.services.QueryService;
 import tss.utils.SecurityUtils;
 
