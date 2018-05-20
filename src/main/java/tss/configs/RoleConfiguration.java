@@ -93,7 +93,7 @@ public class RoleConfiguration implements CommandLineRunner {
                 }
                 JSONArray belongs = role.getJSONArray("belong2");
                 for (int i = 0; i < belongs.length(); i++) {
-                    roleEntity.setTypeGroup(typeGroups[belongs.getInt(i)]);
+                    roleEntity.addTypeGroup(typeGroups[belongs.getInt(i)]);
                 }
                 roleRepository.save(roleEntity);
             }

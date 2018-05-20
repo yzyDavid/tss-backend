@@ -32,7 +32,7 @@ import static tss.utils.SecurityUtils.getSalt;
 
 /**
  * @author yzy
- *
+ * <p>
  * For management of User register, delete and query, etc.
  * NOT for sessions.
  */
