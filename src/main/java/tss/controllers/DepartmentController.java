@@ -47,7 +47,7 @@ public class DepartmentController {
     }
 
     @PostMapping(path = "/getAll")
-    @Authorization
+//    @Authorization
     public ResponseEntity<GetAllDepartmentsResponse> getAllDepartments() {
         Iterable<DepartmentEntity> departments = departmentRepository.findAll();
         List<String> names = new ArrayList<>();

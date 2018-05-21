@@ -43,8 +43,9 @@ public class ClassController {
     }
 
     @PutMapping(path = "/add")
-    @Authorization
-    public ResponseEntity<AddClassResponse> addClass(@CurrentUser UserEntity user,
+//    @Authorization
+    public ResponseEntity<AddClassResponse> addClass(
+//            @CurrentUser UserEntity user,
                                                      @RequestBody AddClassRequest request) {
         String cid = request.getCid();
 
@@ -60,7 +61,6 @@ public class ClassController {
         classRepository.save(newClass);
         return new ResponseEntity<>(new AddClassResponse("OK"), HttpStatus.OK);
     }
-
     @PostMapping(path = "/info")
     @Authorization
     public ResponseEntity<ModifyClassResponse> modifyClass(@CurrentUser UserEntity user,

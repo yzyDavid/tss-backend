@@ -54,7 +54,7 @@ public class UserController {
     }
 
     @PutMapping(path = "/add")
-    @Authorization
+//    @Authorization
     public ResponseEntity<AddUserResponse> addUser(@RequestBody AddUserRequest request) {
         String uid = request.getUid();
         if (userRepository.existsById(uid)) {

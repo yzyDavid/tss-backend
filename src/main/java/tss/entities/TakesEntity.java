@@ -20,6 +20,18 @@ public class TakesEntity {
     private String cid;
     private ClassEntity classEntity;
 
+    public TakesEntity() {
+    }
+
+    public TakesEntity(UserEntity student, Integer score, Integer year, Character semester, String cid, ClassEntity classEntity) {
+        this.student = student;
+        this.score = score;
+        this.year = year;
+        this.semester = semester;
+        this.cid = cid;
+        this.classEntity = classEntity;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public long getId() {

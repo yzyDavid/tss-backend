@@ -12,6 +12,9 @@ public class TeachesEntity {
     private UserEntity teacher;
     private Set<ClassEntity> classes;
 
+    public TeachesEntity() {
+    }
+
     public TeachesEntity(UserEntity user, CourseEntity course) {
         this.teacher = user;
         this.course = course;
