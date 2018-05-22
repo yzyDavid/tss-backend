@@ -103,25 +103,26 @@ public class BbsSectionController {
     /* show all sections information, no need permission
      * permission: anyone
      * return: List ids , List names
+     * v1.0, done
      */
     @GetMapping(path = "/info")
     public ResponseEntity<GetInfoBbsSectionResponse> infoBbsSection(){
-        List<Long> ids = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
         List<String> names = new ArrayList<>();
 
         Iterator<BbsSectionEntity> iter = bbsSectionRepository.findAll().iterator();
         while(iter.hasNext()){
            Long id = iter.next().getId();
            String name = iter.next().getName();
-           ids.add(id);
+           ids.add(id.toString());
            names.add(name);
         }
 
         /* empty in sections */
         if(ids.isEmpty())
-            return new ResponseEntity<>(new GetInfoBbsSectionResponse("nothing to show", null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new GetInfoBbsSectionResponse(null, null), HttpStatus.BAD_REQUEST);
 
-        return new ResponseEntity<>(new GetInfoBbsSectionResponse("ok", ids, names), HttpStatus.OK);
+        return new ResponseEntity<>(new GetInfoBbsSectionResponse(ids, names), HttpStatus.OK);
     }
 
     /* find by section id
