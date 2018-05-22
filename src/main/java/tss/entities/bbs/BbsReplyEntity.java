@@ -12,6 +12,7 @@ public class BbsReplyEntity {
     private long id;
     private UserEntity author;
     private BbsTopicEntity belongedTopic;
+    private Integer index;
     private Date time;
     private String content;
 
@@ -66,5 +67,14 @@ public class BbsReplyEntity {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    @Column(name = "floor_index")
+    public Integer getIndex() {
+        return index;
+    }
+
+    public void setIndex(Integer index) {
+        this.index = index;
     }
 }

@@ -19,9 +19,11 @@ import tss.repositories.bbs.BbsReplyRepository;
 import tss.repositories.bbs.BbsTopicRepository;
 import tss.requests.information.bbs.AddBbsReplyRequest;
 import tss.requests.information.bbs.DeleteBbsReplyRequest;
+import tss.requests.information.bbs.GetAllReplyRequest;
 import tss.requests.information.bbs.ModifyReplyContentRequest;
 import tss.responses.information.bbs.AddBbsReplyResponse;
 import tss.responses.information.bbs.DeleteBbsReplyResponse;
+import tss.responses.information.bbs.GetAllReplyResponse;
 import tss.responses.information.bbs.ModifyReplyContentResponse;
 
 import java.text.DateFormat;
@@ -156,5 +158,19 @@ public class BbsReplyController {
 
         bbsReplyRepository.save(reply);
         return new ResponseEntity<>(new ModifyReplyContentResponse("ok", reply.getId(), reply.getContent(), reply.getTime()), HttpStatus.OK);
+    }
+
+
+    /* show all information under a certain topic
+     * request: topic id, pages to show(10 per page)
+     * return: see doc
+     * v1.0,
+     */
+    @PostMapping(path = "/info")
+    @Authorization
+    public ResponseEntity<GetAllReplyResponse> getAllReplyInfo(@CurrentUser UserEntity user,
+                                                               @RequestBody GetAllReplyRequest request){
+
+
     }
 }
