@@ -192,8 +192,9 @@ public class BbsReplyController {
         List<String> quoteIndexs = new ArrayList<>();
 
         /* all replied under the certain topic */
-        int index;
-        for(index = 1; index <= topic.getReplyNum(); index++){
+        int index = (request.getPageNum()-1)*10 + 1;
+        for( ; index <= request.getPageNum()*10 && index <= topic.getReplyNum(); index++){
+
             /* current index information */
             BbsReplyEntity reply = bbsReplyRepository.findByBelongedTopicAndIndex(topic, index);
             ids.add(String.valueOf(reply.getId()));
