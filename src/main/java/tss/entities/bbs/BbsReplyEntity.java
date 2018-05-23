@@ -15,6 +15,7 @@ public class BbsReplyEntity {
     private Integer index;
     private Date time;
     private String content;
+    private Integer quoteIndex;
 
     public BbsReplyEntity(UserEntity author, BbsTopicEntity belongedTopic){
         this.author = author;
@@ -76,5 +77,13 @@ public class BbsReplyEntity {
 
     public void setIndex(Integer index) {
         this.index = index;
+    }
+
+    public Integer getQuoteIndex() {
+        return quoteIndex;
+    }
+
+    public void setQuoteIndex(Integer quoteIndex) {
+        this.quoteIndex = quoteIndex;
     }
 }

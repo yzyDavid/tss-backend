@@ -1,6 +1,8 @@
 package tss.responses.information.bbs;
 
 
+import java.util.List;
+
 public class GetAllReplyResponse {
     private final String title;
     private final String totalPage;
@@ -9,17 +11,17 @@ public class GetAllReplyResponse {
     private final String boardName;
     private final String boardID;
     private final String topicID;
-    private final String[] ids;
-    private final String[] texts;
-    private final String[] quotes;
-    private final String[] times;
-    private final String[] photos;
-    private final String[] indexs;
-    private final String[] quoteAuthors;
-    private final String[] quoteTimes;
-    private final String[] quoteIndexs;
+    private final List<String> ids;
+    private final List<String> texts;
+    private final List<String> quotes;
+    private final List<String> times;
+    private final List<String> photos;
+    private final List<String> indexs;
+    private final List<String> quoteAuthors;
+    private final List<String> quoteTimes;
+    private final List<String> quoteIndexs;
 
-    public GetAllReplyResponse(String title, String totalPage, String currentPage, String postTime, String boardName, String boardID, String topicID, String[] ids, String[] texts, String[] quotes, String[] times, String[] photos, String[] indexs, String[] quoteAuthors, String[] quoteTimes, String[] quoteIndexs) {
+    public GetAllReplyResponse(String title, String totalPage, String currentPage, String postTime, String boardName, String boardID, String topicID, List<String> ids, List<String> texts, List<String> quotes, List<String> times, List<String> photos, List<String> indexs, List<String> quoteAuthors, List<String> quoteTimes, List<String> quoteIndexs) {
         this.title = title;
         this.totalPage = totalPage;
         this.currentPage = currentPage;
@@ -66,39 +68,39 @@ public class GetAllReplyResponse {
         return topicID;
     }
 
-    public String[] getIds() {
+    public List<String> getIds() {
         return ids;
     }
 
-    public String[] getTexts() {
+    public List<String> getTexts() {
         return texts;
     }
 
-    public String[] getQuotes() {
+    public List<String> getQuotes() {
         return quotes;
     }
 
-    public String[] getTimes() {
+    public List<String> getTimes() {
         return times;
     }
 
-    public String[] getPhotos() {
+    public List<String> getPhotos() {
         return photos;
     }
 
-    public String[] getIndexs() {
+    public List<String> getIndexs() {
         return indexs;
     }
 
-    public String[] getQuoteAuthors() {
+    public List<String> getQuoteAuthors() {
         return quoteAuthors;
     }
 
-    public String[] getQuoteTimes() {
+    public List<String> getQuoteTimes() {
         return quoteTimes;
     }
 
-    public String[] getQuoteIndexs() {
+    public List<String> getQuoteIndexs() {
         return quoteIndexs;
     }
 }
