@@ -21,12 +21,6 @@ import java.util.Set;
         }
 )
 public class UserEntity {
-    public static final int TYPE_MANAGER = 0;
-    public static final int TYPE_TEACHER = 1;
-    public static final int TYPE_TA = 2;
-    public static final int TYPE_STUDENT = 3;
-    public static final int TYPE_NUM = 3;
-
     @Id
     @Column(name = "user_id", length = 10)
     private String uid;
@@ -39,8 +33,6 @@ public class UserEntity {
 
     @Column(length = 24)
     private String salt;
-
-    private Integer type;
 
     @Column(length = 31)
     private String email;
@@ -60,38 +52,18 @@ public class UserEntity {
     @JoinColumn(name = "department_id")
     private DepartmentEntity department;
 
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "group_id")
+    private TypeGroupEntity typeGroup;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher")
     private List<ClassEntity> classesTeaching = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", orphanRemoval = true)
     private List<ClassRegistrationEntity> classRegistrations = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinTable(name = "user_role", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    private Set<RoleEntity> roles = new HashSet<>();
-
 
     // Getter and setter.
-
-    public static int getTypeManager() {
-        return TYPE_MANAGER;
-    }
-
-    public static int getTypeTeacher() {
-        return TYPE_TEACHER;
-    }
-
-    public static int getTypeTa() {
-        return TYPE_TA;
-    }
-
-    public static int getTypeStudent() {
-        return TYPE_STUDENT;
-    }
-
-    public static int getTypeNum() {
-        return TYPE_NUM;
-    }
 
     public String getUid() {
         return uid;
@@ -123,14 +95,6 @@ public class UserEntity {
 
     public void setSalt(String salt) {
         this.salt = salt;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
     }
 
     public String getEmail() {
@@ -181,27 +145,31 @@ public class UserEntity {
         return classRegistrations;
     }
 
-    public Set<RoleEntity> getRoles() {
-        return roles;
+    public TypeGroupEntity getTypeGroup() {
+        return typeGroup;
     }
 
-    public void setRoles(Set<RoleEntity> roles) {
-        this.roles = roles;
+    public void setTypeGroup(TypeGroupEntity typeGroup) {
+        this.typeGroup = typeGroup;
     }
 
-
-    // Utility methods.
-
-    public boolean haveAuthority(String uri) {
-        for (RoleEntity role : roles) {
-            for (AuthorityEntity authority : role.getAuthorities()) {
-                if (authority.getUri().equals(uri)) {
-                    return true;
-                }
-            }
+    public String readTypeName() {
+        if (typeGroup != null) {
+            return typeGroup.getName();
+        } else {
+            return null;
         }
-        return false;
     }
+
+    @Override
+    public int hashCode() {
+        if (uid == null) {
+            return super.hashCode();
+        } else {
+            return uid.hashCode();
+        }
+    }
+
 
     public void addClassTeaching(ClassEntity classEntity) {
         classesTeaching.add(classEntity);
@@ -211,5 +179,14 @@ public class UserEntity {
     public void addClassRegistration(ClassRegistrationEntity classRegistrationEntity) {
         classRegistrations.add(classRegistrationEntity);
         classRegistrationEntity.setStudent(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!obj.getClass().equals(this.getClass()) || uid == null) {
+            return false;
+        } else {
+            return (uid.equals(((UserEntity) obj).uid));
+        }
     }
 }

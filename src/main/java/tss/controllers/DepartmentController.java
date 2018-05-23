@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.DepartmentEntity;
@@ -34,9 +37,7 @@ public class DepartmentController {
     @Authorization
     public ResponseEntity<AddDepartmentResponse> addDepartment(@CurrentUser UserEntity user,
                                                                @RequestBody AddDepartmentRequest request) {
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new AddDepartmentResponse("permission denied"), HttpStatus.FORBIDDEN);
-        } else if (departmentRepository.existsByName(request.getName())) {
+        if (departmentRepository.existsByName(request.getName())) {
             return new ResponseEntity<>(new AddDepartmentResponse("duplicated name"), HttpStatus.BAD_REQUEST);
         }
         DepartmentEntity department = new DepartmentEntity();
@@ -62,9 +63,9 @@ public class DepartmentController {
     @Authorization
     public ResponseEntity<GetDepartmentResponse> getDepartment(@RequestBody GetDepartmentRequest request) {
         Optional<DepartmentEntity> ret = null;
-        if(request.getDid() != null) {
+        if (request.getDid() != null) {
             ret = departmentRepository.findById(request.getDid());
-        } else if(request.getName() != null) {
+        } else if (request.getName() != null) {
             ret = departmentRepository.findByName(request.getName());
         }
         if (ret == null || !ret.isPresent()) {

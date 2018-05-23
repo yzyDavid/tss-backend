@@ -1,0 +1,17 @@
+{
+  "user_administrator" : {
+    "prefix" : "user",
+    "paths" : ["add", "delete", "reset-pwd", "modify-all", "name"],
+    "belong2" : [0]
+  },
+  "course_administrator" : {
+    "prefix" : "course",
+    "paths" : ["add", "delete", "modify", "name"],
+    "belong2" : [0, 1]
+  },
+  "department_administrator" : {
+    "prefix" : "dept",
+    "paths" : ["add", "delete", "modify"],
+    "belong2" : [0, 1]
+  }
+}

@@ -2,6 +2,7 @@ package tss.repositories;
 
 import org.springframework.data.repository.CrudRepository;
 import tss.entities.UserEntity;
+
 import java.util.List;
 
 /**

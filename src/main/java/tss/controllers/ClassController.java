@@ -54,10 +54,6 @@ public class ClassController {
                                                      @RequestBody AddClassRequest request) {
         String cid = request.getCid();
 
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new AddClassResponse("permission denied"), HttpStatus.FORBIDDEN);
-        }
-
         Optional<CourseEntity> ret = courseRepository.findById(cid);
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new AddClassResponse("course doesn't exist"), HttpStatus.BAD_REQUEST);
@@ -77,9 +73,6 @@ public class ClassController {
                                                            @RequestBody ModifyClassRequest request) {
         Long cid = request.getCid();
 
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new ModifyClassResponse("permission denied"), HttpStatus.FORBIDDEN);
-        }
         Optional<ClassEntity> ret = classRepository.findById(cid);
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new ModifyClassResponse("can't find the class"), HttpStatus.BAD_REQUEST);
@@ -100,10 +93,6 @@ public class ClassController {
     public ResponseEntity<DeleteClassesResponse> deleteClasses(@CurrentUser UserEntity user,
                                                                @RequestBody DeleteClassesRequest request) {
         List<Long> cids = request.getIds();
-
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new DeleteClassesResponse("permission denied", null), HttpStatus.FORBIDDEN);
-        }
 
         List<Long> failIds = new ArrayList<>();
         for (Long cid : cids) {
@@ -170,139 +159,76 @@ public class ClassController {
         }
     }
 
-    /*@PutMapping(path = "/instructor")
-    @Authorization
-    public ResponseEntity<AddInstructorsResponse> addInstructors(@CurrentUser UserEntity user,
-                                                                 @RequestBody AddInstructorsRequest request) {
-        String cid = request.getCid();
-        Set<String> uids = request.getUids();
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new AddInstructorsResponse("permission denied", uids), HttpStatus.FORBIDDEN);
-        }
-        Optional<CourseEntity> ret = courseRepository.findById(cid);
+    class ClassItem {
+        private long classId;
+        private int numLeftSectionsOfSizeTwo = 0;
+        private int numLeftSectionsOfSizeThree = 0;
+        private ClassEntity classEntity;
 
-        if (!courseRepository.existsById(cid)) {
-            return new ResponseEntity<>(new AddInstructorsResponse("course doesn't exist", uids), HttpStatus.BAD_REQUEST);
+        ClassItem(ClassEntity classEntity) {
+            switch (classEntity.getCourse().getNumLessonsEachWeek()) {
+                case 2:
+                    numLeftSectionsOfSizeTwo = 1;
+                    break;
+                case 3:
+                    numLeftSectionsOfSizeThree = 1;
+                    break;
+                case 4:
+                    numLeftSectionsOfSizeTwo = 2;
+                    break;
+                case 5:
+                    numLeftSectionsOfSizeTwo = 1;
+                    numLeftSectionsOfSizeThree = 1;
+                    break;
+                case 6:
+                    numLeftSectionsOfSizeThree = 2;
+                default:
+            }
+            classId = classEntity.getId();
+            this.classEntity = classEntity;
         }
 
-        Set<String> fail = new HashSet<>();
-        for (String uid : uids) {
-            if (!userRepository.existsById(uid)) {
-                fail.add(uid);
+        int getNumLeftSectionsOfSize(int size) {
+            switch (size) {
+                case 2:
+                    return numLeftSectionsOfSizeTwo;
+                case 3:
+                    return numLeftSectionsOfSizeThree;
+                default:
+                    return 0;
             }
         }
-        if (!fail.isEmpty()) {
-            return new ResponseEntity<>(new AddInstructorsResponse("uids don't exist", fail), HttpStatus.BAD_REQUEST);
-        }
 
-        for (String uid : uids) {
-            if (userRepository.findById(uid).get().getType() != UserEntity.TYPE_TEACHER) {
-                fail.add(uid);
+        void setNumLeftSectionsOfSize(int size, int value) {
+            switch (size) {
+                case 2:
+                    numLeftSectionsOfSizeTwo = value;
+                    break;
+                case 3:
+                    numLeftSectionsOfSizeThree = value;
+                    break;
+                default:
             }
         }
-        if (!fail.isEmpty()) {
-            return new ResponseEntity<>(new AddInstructorsResponse("users are not teachers", fail), HttpStatus.BAD_REQUEST);
+
+        boolean hasNoLeftSection() {
+            return numLeftSectionsOfSizeTwo + numLeftSectionsOfSizeThree == 0;
         }
 
-        CourseEntity course = courseRepository.findById(cid).get();
-        for (String uid : uids) {
-            TeachesEntity teaches = new TeachesEntity(userRepository.findById(uid).get());
-            teaches
-            teachesRepository.save(teaches);
-        }
-        return new ResponseEntity<>(new AddInstructorsResponse("OK", null), HttpStatus.OK);
-    }
-
-    @DeleteMapping(path = "/instructor")
-    @Authorization
-    public ResponseEntity<DeleteInstructorsResponse> deleteInstructors(@CurrentUser UserEntity user,
-                                                                       @RequestBody DeleteInstructorsRequest request) {
-        String cid = request.getCid();
-        Set<String> uids = request.getUids();
-        if (!courseRepository.existsById(cid)) {
-            return new ResponseEntity<>(new DeleteInstructorsResponse("course doesn't exist"), HttpStatus.BAD_REQUEST);
-        } else if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new DeleteInstructorsResponse("permission denied"), HttpStatus.FORBIDDEN);
+        long getClassId() {
+            return classId;
         }
 
-        CourseEntity course = courseRepository.findById(cid).get();
-        for(TeachesEntity teaches: course.getTeaches()) {
-            if(uids.contains(teaches.getTeacher().getUid()))
-                teachesRepository.delete(teaches);
+        void setClassId(long classId) {
+            this.classId = classId;
         }
-        return new ResponseEntity<>(new DeleteInstructorsResponse("OK"), HttpStatus.OK);
-    }*/
-}
 
-class ClassItem {
-    private long classId;
-    private int numLeftSectionsOfSizeTwo = 0;
-    private int numLeftSectionsOfSizeThree = 0;
-    private ClassEntity classEntity;
-
-    ClassItem(ClassEntity classEntity) {
-        switch (classEntity.getCourse().getNumLessonsEachWeek()) {
-            case 2:
-                numLeftSectionsOfSizeTwo = 1;
-                break;
-            case 3:
-                numLeftSectionsOfSizeThree = 1;
-                break;
-            case 4:
-                numLeftSectionsOfSizeTwo = 2;
-                break;
-            case 5:
-                numLeftSectionsOfSizeTwo = 1;
-                numLeftSectionsOfSizeThree = 1;
-                break;
-            case 6:
-                numLeftSectionsOfSizeThree = 2;
-            default:
+        ClassEntity getClassEntity() {
+            return classEntity;
         }
-        classId = classEntity.getId();
-        this.classEntity = classEntity;
-    }
 
-    int getNumLeftSectionsOfSize(int size) {
-        switch (size) {
-            case 2:
-                return numLeftSectionsOfSizeTwo;
-            case 3:
-                return numLeftSectionsOfSizeThree;
-            default:
-                return 0;
+        void setClassEntity(ClassEntity classEntity) {
+            this.classEntity = classEntity;
         }
-    }
-
-    void setNumLeftSectionsOfSize(int size, int value) {
-        switch (size) {
-            case 2:
-                numLeftSectionsOfSizeTwo = value;
-                break;
-            case 3:
-                numLeftSectionsOfSizeThree = value;
-                break;
-            default:
-        }
-    }
-
-    boolean hasNoLeftSection() {
-        return numLeftSectionsOfSizeTwo + numLeftSectionsOfSizeThree == 0;
-    }
-
-    long getClassId() {
-        return classId;
-    }
-
-    void setClassId(long classId) {
-        this.classId = classId;
-    }
-
-    ClassEntity getClassEntity() {
-        return classEntity;
-    }
-
-    void setClassEntity(ClassEntity classEntity) {
-        this.classEntity = classEntity;
     }
 }

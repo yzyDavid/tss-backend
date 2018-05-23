@@ -8,7 +8,6 @@ import tss.entities.ClassEntity;
 import tss.entities.TimeSlotEntity;
 import tss.entities.UserEntity;
 import tss.exceptions.ClazzNotFoundException;
-import tss.exceptions.PermissionDeniedException;
 import tss.exceptions.TeacherNotFoundException;
 import tss.models.Clazz;
 import tss.models.TimeSlotTypeEnum;
@@ -17,7 +16,6 @@ import tss.repositories.UserRepository;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * @author reeve
@@ -38,12 +36,8 @@ public class TeacherController {
     @Authorization
     public void addClassTeaching(@CurrentUser UserEntity user,
                                  @PathVariable String userId, @PathVariable long classId) {
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            throw new PermissionDeniedException();
-        }
-
         UserEntity teacherEntity = userRepository.findById(userId).orElseThrow(TeacherNotFoundException::new);
-        if (teacherEntity.getType() != UserEntity.TYPE_TEACHER) {
+        if (!"Teacher".equals(teacherEntity.readTypeName())) {
             throw new TeacherNotFoundException();
         }
         ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
@@ -56,7 +50,7 @@ public class TeacherController {
     @ResponseStatus(HttpStatus.OK)
     public Map<String, Clazz> getSchedule(@PathVariable String userId) {
         UserEntity teacherEntity = userRepository.findById(userId).orElseThrow(TeacherNotFoundException::new);
-        if (teacherEntity.getType() != UserEntity.TYPE_TEACHER) {
+        if (!"Teacher".equals(teacherEntity.readTypeName())) {
             throw new TeacherNotFoundException();
         }
 

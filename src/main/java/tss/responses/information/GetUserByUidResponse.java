@@ -7,12 +7,12 @@ public class GetUserByUidResponse {
     String status;
     private final String uid;
     private final String name;
-    private final Integer type;
+    private final String type;
     private final String email;
     private final String telephone;
     private final String intro;
 
-    public GetUserByUidResponse(String status, String uid, String name, int type, String email,
+    public GetUserByUidResponse(String status, String uid, String name, String type, String email,
                                 String telephone, String intro) {
         this.status = status;
         this.uid = uid;
@@ -35,7 +35,7 @@ public class GetUserByUidResponse {
         return name;
     }
 
-    public Integer getType() {
+    public String getType() {
         return type;
     }
 

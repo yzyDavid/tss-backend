@@ -87,5 +87,19 @@ public class CourseEntity {
     public void setClasses(List<ClassEntity> classes) {
         this.classes = classes;
     }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!obj.getClass().equals(this.getClass())) {
+            return false;
+        } else {
+            return (id.equals(((CourseEntity) obj).id));
+        }
+    }
 }
 

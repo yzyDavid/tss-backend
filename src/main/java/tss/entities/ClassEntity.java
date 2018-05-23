@@ -12,7 +12,7 @@ import java.util.List;
 public class ClassEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     private Integer year;
 
@@ -57,7 +57,7 @@ public class ClassEntity {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -128,5 +128,23 @@ public class ClassEntity {
     public void addClassRegistration(ClassRegistrationEntity classRegistrationEntity) {
         classRegistrations.add(classRegistrationEntity);
         classRegistrationEntity.setClazz(this);
+    }
+
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return super.hashCode();
+        } else {
+            return id.hashCode();
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!obj.getClass().equals(this.getClass()) || id == null) {
+            return false;
+        } else {
+            return (id.equals(((ClassEntity) obj).id));
+        }
     }
 }

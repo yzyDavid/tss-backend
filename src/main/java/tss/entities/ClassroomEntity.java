@@ -97,4 +97,22 @@ public class ClassroomEntity {
         timeSlots.add(timeSlotEntity);
         getTimeSlotDirectory().put(timeSlotEntity.getTypeName(), timeSlotEntity);
     }
+
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return super.hashCode();
+        } else {
+            return id.hashCode();
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!obj.getClass().equals(this.getClass()) || id == null) {
+            return false;
+        } else {
+            return (id.equals(((ClassroomEntity) obj).id));
+        }
+    }
 }

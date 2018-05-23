@@ -53,4 +53,18 @@ public class DepartmentEntity {
     public void setCourses(Set<CourseEntity> courses) {
         this.courses = courses;
     }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!obj.getClass().equals(this.getClass())) {
+            return false;
+        } else {
+            return (name.equals(((DepartmentEntity) obj).name));
+        }
+    }
 }

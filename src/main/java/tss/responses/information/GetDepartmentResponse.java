@@ -3,7 +3,8 @@ package tss.responses.information;
 import org.jetbrains.annotations.Nls;
 
 public class GetDepartmentResponse {
-    @Nls private final String status;
+    @Nls
+    private final String status;
     private final Short id;
     private final String name;
 
