@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import sun.rmi.log.LogInputStream;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.UserEntity;
@@ -16,14 +17,10 @@ import tss.repositories.bbs.BbsTopicRepository;
 import tss.requests.information.bbs.AddBbsTopicRequest;
 import tss.requests.information.bbs.DeleteBbsTopicRequest;
 import tss.requests.information.bbs.ModifyTopicContentRequest;
-import tss.responses.information.bbs.AddBbsTopicResponse;
-import tss.responses.information.bbs.DeleteBbsTopicResponse;
-import tss.responses.information.bbs.GetTopicInfoByIdResponse;
-import tss.responses.information.bbs.ModifyTopicContentResponse;
+import tss.responses.information.bbs.*;
 
 import java.text.DateFormat;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping(path = "/topic")
@@ -166,5 +163,46 @@ public class BbsTopicController {
 
         return new ResponseEntity<>(new GetTopicInfoByIdResponse("ok", topic.getId(), name, content,
                                     time, authorName, sectionName, replyNum), HttpStatus.OK);
+    }
+
+    /* published topics by current user
+     * v1.0, done
+     */
+    @GetMapping(path = "/published")
+    public ResponseEntity<GetUserPublishedResponse> getUserPublished(@CurrentUser UserEntity user,
+                                                                     @RequestParam String page){
+        Optional<List<BbsTopicEntity>> ret = bbsTopicRepository.findByAuthor(user);
+        if(!ret.isPresent())
+            return new ResponseEntity<>(new GetUserPublishedResponse(null,null,null,null, null,null,null,null), HttpStatus.BAD_REQUEST);
+
+        List<BbsTopicEntity> topics = ret.get();
+
+        String userName = user.getName();
+        String currentPage = page;
+        String totalPage = String.valueOf(topics.size()/20); // +1?
+        List<String> titles = new ArrayList<>();
+        List<String> times = new ArrayList<>();
+        List<String> topicIDs = new ArrayList<>();
+        List<String> boardIDs = new ArrayList<>();
+        List<String> boardNames = new ArrayList<>();
+
+        Iterator<BbsTopicEntity> iter = topics.iterator();
+        int count = 0;
+        while(iter.hasNext()){
+            count++;
+            if(count < (Integer.valueOf(page)-1)*20 + 1)
+                continue;
+            if(count > (Integer.valueOf(page)*20))
+                break;
+
+            BbsTopicEntity topic = iter.next();
+            titles.add(topic.getName());
+            topicIDs.add(String.valueOf(topic.getId()));
+            boardNames.add(topic.getBelongedSection().getName());
+            boardIDs.add(String.valueOf(topic.getBelongedSection().getId()));
+            times.add(topic.getTime().toString());
+        }
+
+        return new ResponseEntity<>(new GetUserPublishedResponse(userName, titles, times, topicIDs, boardIDs, boardNames, currentPage, totalPage), HttpStatus.BAD_REQUEST);
     }
 }

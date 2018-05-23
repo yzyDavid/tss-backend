@@ -48,6 +48,7 @@ public class BbsReplyController {
      * request: tid, text, quoteIndex
      * permission: user in the section?
      * return: status
+     * v1.0, done
      */
     @PostMapping(path = "/add")
     @Authorization

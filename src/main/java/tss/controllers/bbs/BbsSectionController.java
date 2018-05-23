@@ -125,6 +125,7 @@ public class BbsSectionController {
         return new ResponseEntity<>(new GetInfoBbsSectionResponse(ids, names), HttpStatus.OK);
     }
 
+
     /* find by section id
      * get par: id
      * permission: anyone
