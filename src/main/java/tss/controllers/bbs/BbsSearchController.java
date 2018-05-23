@@ -1,6 +1,7 @@
 package tss.controllers.bbs;
 
 
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
@@ -17,11 +18,14 @@ import tss.entities.UserEntity;
 import tss.entities.bbs.BbsReplyEntity;
 import tss.entities.bbs.BbsSectionEntity;
 import tss.entities.bbs.BbsTopicEntity;
+import tss.repositories.UserRepository;
 import tss.repositories.bbs.BbsReplyRepository;
 import tss.repositories.bbs.BbsSectionRepository;
 import tss.repositories.bbs.BbsTopicRepository;
 import tss.requests.information.bbs.SearchInSectionRequest;
+import tss.requests.information.bbs.SearchUserRequest;
 import tss.responses.information.bbs.SearchInSectionResponse;
+import tss.responses.information.bbs.SearchUserResponse;
 
 import java.util.*;
 
@@ -33,12 +37,14 @@ public class BbsSearchController {
     private BbsSectionRepository bbsSectionRepository;
     private BbsTopicRepository bbsTopicRepository;
     private BbsReplyRepository bbsReplyRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    public BbsSearchController(BbsSectionRepository bbsSectionRepository, BbsTopicRepository bbsTopicRepository, BbsReplyRepository bbsReplyRepository) {
+    public BbsSearchController(BbsSectionRepository bbsSectionRepository, BbsTopicRepository bbsTopicRepository, BbsReplyRepository bbsReplyRepository, UserRepository userRepository) {
         this.bbsSectionRepository = bbsSectionRepository;
         this.bbsTopicRepository = bbsTopicRepository;
         this.bbsReplyRepository = bbsReplyRepository;
+        this.userRepository = userRepository;
     }
 
     /* match String function */
@@ -61,8 +67,28 @@ public class BbsSearchController {
     }
 
 
+    /* search user
+     * v1.0, done
+     */
+    @PostMapping(path = "/user")
+    @Authorization
+    public ResponseEntity<SearchUserResponse> searchUser(@CurrentUser UserEntity user,
+                                                         @RequestBody SearchUserRequest request){
+        List<String> userNames = new ArrayList<>();
+        List<String> userIDs = new ArrayList<>();
+        List<String> photoURLs = new ArrayList<>();
 
-
+        Iterator<UserEntity> iterator = userRepository.findAll().iterator();
+        while(iterator.hasNext()){
+            UserEntity account = iterator.next();
+            if(contentMatch(request.getKey(), account.getName())) {
+                userNames.add(account.getName());
+                userIDs.add(account.getUid());
+                userIDs.add(account.getPhoto());
+            }
+        }
+        return new ResponseEntity<>(new SearchUserResponse(userNames, userIDs, photoURLs));
+    }
 
 
 
