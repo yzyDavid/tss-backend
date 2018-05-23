@@ -44,59 +44,57 @@ public class BbsReplyController {
         this.bbsReplyRepository = bbsReplyRepository;
     }
 
-    /* create a new reply to a topic
-     * request: id , topic id, content
-     * permission: user in the section
-     * return: id, topic name, content, time
+    /* create a new reply to a topic/reply
+     * request: tid, text, quoteIndex
+     * permission: user in the section?
+     * return: status
      */
-    @PostMapping(path = "add")
+    @PostMapping(path = "/add")
     @Authorization
     public ResponseEntity<AddBbsReplyResponse> addReply(@CurrentUser UserEntity user,
                                                         @RequestBody AddBbsReplyRequest request){
         /* permission error & invalid topic id error */
-        long topicId = request.getTopic();
+        long topicId = request.getTid();
         Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(topicId);
         if(!ret.isPresent())
-            return new ResponseEntity<>(new AddBbsReplyResponse("no such topic", -1, null, null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AddBbsReplyResponse("no such topic"), HttpStatus.BAD_REQUEST);
 
         BbsTopicEntity topic = ret.get();
 
-        /* duplicate id error */
-        if(bbsReplyRepository.findById(request.getId()).isPresent())
-            return new ResponseEntity<>(new AddBbsReplyResponse("duplicate reply id", -1, null, null, null), HttpStatus.BAD_REQUEST);
+//        BbsSectionEntity section = topic.getBelongedSection();
+//        TeachesEntity teaches = section.getTeaches();
 
-        BbsSectionEntity section = topic.getBelongedSection();
-        TeachesEntity teaches = section.getTeaches();
-
-        /* list user's teaches */
-        boolean permission = false;
-        Set<TeachesEntity> userTeaches = user.getTeaches();
-        for(TeachesEntity t : userTeaches){
-            if(t.getId() == teaches.getId()){
-                permission = true;
-                break;
-            }
-        }
-
-        if(!permission)
-            return new ResponseEntity<>(new AddBbsReplyResponse("permission error", -1, null, null, null), HttpStatus.FORBIDDEN);
+//        /* list user's teaches, check permission */
+//        boolean permission = false;
+//        Set<TeachesEntity> userTeaches = user.getTeaches();
+//        for(TeachesEntity t : userTeaches){
+//            if(t.getId() == teaches.getId()){
+//                permission = true;
+//                break;
+//            }
+//        }
+//
+//        if(!permission)
+//            return new ResponseEntity<>(new AddBbsReplyResponse("permission error"), HttpStatus.FORBIDDEN);
 
         BbsReplyEntity reply = new BbsReplyEntity(user, topic);
-        reply.setId(request.getId());
-        reply.setContent(request.getContent());
+
+        reply.setContent(request.getText());
 
         Date time = new Date();
         DateFormat mediumDateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
         mediumDateFormat.format(time);
         reply.setTime(time);
 
+        reply.setQuoteIndex(request.getQuoteIndex());
+        reply.setIndex(topic.getReplyNum()+1);
+
         bbsReplyRepository.save(reply);
 
         /* need to add the reply number in the topic */
         topic.setReplyNum(topic.getReplyNum()+1);
 
-        return new ResponseEntity<>(new AddBbsReplyResponse("ok", reply.getId(), reply.getBelongedTopic().getName(),
-                reply.getContent(), reply.getTime()), HttpStatus.OK);
+        return new ResponseEntity<>(new AddBbsReplyResponse("add ok"), HttpStatus.OK);
     }
 
 
@@ -207,11 +205,20 @@ public class BbsReplyController {
             photos.add(user.getPhoto());
 
             /* quoted reply information */
-            BbsReplyEntity quoteReply = bbsReplyRepository.findByBelongedTopicAndIndex(topic, reply.getQuoteIndex());
+            Integer quoteIndex = reply.getQuoteIndex();
+            /* no quote */
+            if(quoteIndex == 0){
+                quotes.add("");
+                quoteAuthors.add("");
+                quoteTimes.add("");
+                quoteIndexs.add("0");
+                continue;
+            }
+            BbsReplyEntity quoteReply = bbsReplyRepository.findByBelongedTopicAndIndex(topic, quoteIndex);
             quotes.add(quoteReply.getContent());
             quoteAuthors.add(quoteReply.getAuthor().getName());
             quoteTimes.add(quoteReply.getTime().toString());
-            quoteIndexs.add(quoteReply.getQuoteIndex().toString());
+            quoteIndexs.add(quoteReply.getIndex().toString());
         }
 
         if(ids.isEmpty())
