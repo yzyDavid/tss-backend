@@ -1,19 +1,19 @@
 package tss.requests.information.bbs;
 
 public class SearchInSectionRequest {
-    private final long id;
-    private final String[] keyWords;
+    private final String key;
+    private final String page;
 
-    public SearchInSectionRequest(long id, String[] keyWords) {
-        this.id = id;
-        this.keyWords = keyWords;
+    public SearchInSectionRequest(String key, String page) {
+        this.key = key;
+        this.page = page;
     }
 
-    public long getId() {
-        return id;
+    public String getKey() {
+        return key;
     }
 
-    public String[] getKeyWords() {
-        return keyWords;
+    public String getPage() {
+        return page;
     }
 }

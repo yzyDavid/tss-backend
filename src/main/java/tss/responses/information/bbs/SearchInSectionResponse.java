@@ -1,43 +1,64 @@
 package tss.responses.information.bbs;
 
-import org.jetbrains.annotations.Nls;
 
-import java.util.Date;
 import java.util.List;
 
 public class SearchInSectionResponse {
-    @Nls
-    private final String status;
-    private final List<Long> ids;
-    private final List<String> authorNames;
-    private final List<String> contents;
-    private final List<Date> times;
+    private final String currentPage;
+    private final String totalPage;
+    private final List<String> titles;
+    private final List<String> authors;
+    private final List<String> times;
+    private final List<String> boardNames;
+    private final List<String> boardIDs;
+    private final List<String> topicIDs;
+    private final List<String> replyNums;
 
-    public SearchInSectionResponse(String status, List<Long> ids, List<String> authorNames, List<String> contents, List<Date> times) {
-        this.status = status;
-        this.ids = ids;
-        this.authorNames = authorNames;
-        this.contents = contents;
+    public SearchInSectionResponse(String currentPage, String totalPage, List<String> titles, List<String> authors, List<String> times, List<String> boardNames, List<String> boardIDs, List<String> topicIDs, List<String> replyNums) {
+        this.currentPage = currentPage;
+        this.totalPage = totalPage;
+        this.titles = titles;
+        this.authors = authors;
         this.times = times;
+        this.boardNames = boardNames;
+        this.boardIDs = boardIDs;
+        this.topicIDs = topicIDs;
+        this.replyNums = replyNums;
     }
 
-    public String getStatus() {
-        return status;
+    public String getCurrentPage() {
+        return currentPage;
     }
 
-    public List<Long> getIds() {
-        return ids;
+    public String getTotalPage() {
+        return totalPage;
     }
 
-    public List<String> getAuthorNames() {
-        return authorNames;
+    public List<String> getTitles() {
+        return titles;
     }
 
-    public List<String> getContents() {
-        return contents;
+    public List<String> getAuthors() {
+        return authors;
     }
 
-    public List<Date> getTimes() {
+    public List<String> getTimes() {
         return times;
+    }
+
+    public List<String> getBoardNames() {
+        return boardNames;
+    }
+
+    public List<String> getBoardIDs() {
+        return boardIDs;
+    }
+
+    public List<String> getTopicIDs() {
+        return topicIDs;
+    }
+
+    public List<String> getReplyNums() {
+        return replyNums;
     }
 }

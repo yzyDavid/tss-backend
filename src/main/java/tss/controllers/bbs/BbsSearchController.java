@@ -42,8 +42,9 @@ public class BbsSearchController {
     }
 
     /* match String function */
-    private static boolean contentMatch(String[] keys, String content){
+    private static boolean contentMatch(String key, String content){
         int match = 0;
+        String[] keys = key.split(" ");
         for(String k : keys){
             String[] words = content.split(" ");
             for(String w : words){
@@ -59,69 +60,68 @@ public class BbsSearchController {
         return match == keys.length;
     }
 
-    /* search by content key words
-     * request: section-id, String[] keywords
-     * permission: in the section
-     * return: L-ids, L-authorsName, L-contents, L-times
+
+
+
+
+
+
+    /* search by content key words for topic
+     * request: key page
+     * permission: in the section?
+     * return: see doc
+     * v1.0, done
      */
-    @PostMapping(path = "/content")
+    @PostMapping(path = "/topic")
     @Authorization
     public ResponseEntity<SearchInSectionResponse> searchInSection(@CurrentUser UserEntity user,
                                                                    @RequestBody SearchInSectionRequest request){
-        /* no such section */
-        long sectionId = request.getId();
-        Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(sectionId);
-        if(!ret.isPresent())
-            return new ResponseEntity<>(new SearchInSectionResponse("invalid id", null,
-                                                null, null, null), HttpStatus.BAD_REQUEST);
-        BbsSectionEntity section = ret.get();
-        TeachesEntity teaches = section.getTeaches();
+        String currentPage = request.getPage();
+        String totalPage;
 
-        /* list user's teaches */
-        boolean permission = false;
-        Set<TeachesEntity> userTeaches = user.getTeaches();
-        for(TeachesEntity t : userTeaches){
-            if(t.getId() == teaches.getId()){
-                permission = true;
-                break;
+        List<String> titles = new ArrayList<>();
+        List<String> authors = new ArrayList<>();
+        List<String> times = new ArrayList<>();
+        List<String> boardNames = new ArrayList<>();
+        List<String> boardIDs = new ArrayList<>();
+        List<String> topicIDs = new ArrayList<>();
+        List<String> replyNums = new ArrayList<>();
+
+        Iterator<BbsSectionEntity> iter = bbsSectionRepository.findAll().iterator();
+
+        String key = request.getKey();
+
+        int count = 0;
+        while(iter.hasNext()){
+            BbsSectionEntity section = iter.next();
+
+            Set<BbsTopicEntity> topics = section.getTopics();
+            for(BbsTopicEntity t : topics){
+                /* search topic */
+                /* topic content match */
+                if(BbsSearchController.contentMatch(key, t.getContent())){
+                    count++;
+                    if(count < (Integer.valueOf(currentPage)-1)*10+1)
+                        continue;
+                    if(count > Integer.valueOf(currentPage)*10)
+                        continue;
+
+                    topicIDs.add(String.valueOf(t.getId()));
+                    authors.add(t.getAuthor().getName());
+                    titles.add(t.getName());
+                    times.add(t.getTime().toString());
+                    boardNames.add(t.getBelongedSection().getName());
+                    boardIDs.add(String.valueOf(t.getBelongedSection().getId()));
+                    replyNums.add(String.valueOf(t.getReplyNum()));
+                }
             }
         }
 
-        /* current user not in this section, can't search */
-        if(!permission)
-            return new ResponseEntity<>(new SearchInSectionResponse("permission denied", null, null, null,
-                                            null), HttpStatus.FORBIDDEN);
+        if(count%20 == 0)
+            totalPage = String.valueOf(count/20);
+        else
+            totalPage = String.valueOf(count/20+1);
 
-        String[] keys = request.getKeyWords();
-
-        List<Long> ids = new ArrayList<>();
-        List<String> authorNames = new ArrayList<>();
-        List<String> contents = new ArrayList<>();
-        List<Date> times = new ArrayList<>();
-
-        Set<BbsTopicEntity> topics = section.getTopics();
-        for(BbsTopicEntity t : topics){
-           /* search topic */
-            /* topic content match */
-           if(BbsSearchController.contentMatch(keys, t.getContent())){
-               ids.add(t.getId());
-               authorNames.add(t.getAuthor().getName());
-               contents.add(t.getContent());
-               times.add(t.getTime());
-           }
-
-           /* list all it's reply */
-           Set<BbsReplyEntity> replies = t.getReplies();
-           for(BbsReplyEntity r : replies)
-               /* search topic's replies */
-               if(BbsSearchController.contentMatch(keys, r.getContent())){
-                   ids.add(r.getId());
-                   authorNames.add(r.getAuthor().getName());
-                   contents.add(r.getContent());
-                   times.add(r.getTime());
-               }
-        }
-
-        return new ResponseEntity<>(new SearchInSectionResponse("ok", ids, authorNames, contents, times), HttpStatus.OK);
+        return new ResponseEntity<>(new SearchInSectionResponse(currentPage,totalPage,titles,authors,times,boardNames,boardIDs,topicIDs,replyNums), HttpStatus.OK);
     }
 }

@@ -126,44 +126,6 @@ public class BbsSectionController {
     }
 
 
-    /* find by section id
-     * get par: id
-     * permission: anyone
-     * return: id, name, userNum, Set<topic name>
-     */
-    @GetMapping(path = "/id")
-    public ResponseEntity<GetSectionInfoByIdResponse> getSectionInfoById(@RequestParam Long id){
-        Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(id);
-        if(!ret.isPresent())
-            return new ResponseEntity<>(new GetSectionInfoByIdResponse("no such section", -1, null, -1, null), HttpStatus.BAD_REQUEST);
-
-        BbsSectionEntity section = ret.get();
-        Set<String> names = new HashSet<>();
-        for(BbsTopicEntity e : section.getTopics())
-            names.add(e.getName());
-
-        return new ResponseEntity<>(new GetSectionInfoByIdResponse("ok", section.getId(), section.getName(), section.getUsrNum(), names), HttpStatus.OK);
-    }
-
-
-    /* find by section name
-     * get par: name
-     * permission: anyone
-     * return: id, name , userNum, Set<topic-name>
-     */
-    @GetMapping(path = "/name")
-    public ResponseEntity<GetSectionInfoByNameResponse> getSectionInfoById(@RequestParam String name){
-        Optional<BbsSectionEntity> ret = bbsSectionRepository.findByName(name);
-        if(!ret.isPresent())
-            return new ResponseEntity<>(new GetSectionInfoByNameResponse("no such section", -1, null, -1, null), HttpStatus.BAD_REQUEST);
-
-        BbsSectionEntity section = ret.get();
-        Set<String> names = new HashSet<>();
-        for(BbsTopicEntity e : section.getTopics())
-            names.add(e.getName());
-        return new ResponseEntity<>(new GetSectionInfoByNameResponse("ok", section.getId(), section.getName(), section.getUsrNum(), names), HttpStatus.OK);
-    }
-
     /* to do: modify, many add section introduction part */
 
 }
