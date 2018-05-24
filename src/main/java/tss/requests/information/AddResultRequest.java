@@ -2,17 +2,10 @@ package tss.requests.information;
 
 public class AddResultRequest {
 
-    private String Sid;
     private String Pid;
     private String[] Qid;
-    private String [] Ans;
+    private String[] Ans;
 
-    public String getSid() {
-        return Sid;
-    }
-    public void setSid(String sid) {
-        Sid = sid;
-    }
     public String getPid() {
         return Pid;
     }

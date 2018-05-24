@@ -44,12 +44,13 @@ public class PaperController {
     }
 
     @PostMapping(path = "/insert")
-    public ResponseEntity<AddPaperResponse> addPaper(@RequestBody AddPaperRequest request){
+    public ResponseEntity<AddPaperResponse> addPaper(@RequestBody AddPaperRequest request){  //用jason传过来的请求体
         if(paperRepository.existsById(request.getPid())){
             System.out.println("Duplicate pid");
             return new ResponseEntity<>(new AddPaperResponse("Failed with duplicate pid", ""), HttpStatus.BAD_REQUEST);
-        }
+        }//处理重复pid的问题
 
+        //如果不重复就创建新的paper
         PapersEntity paper = new PapersEntity();
         Set<PaperContainsQuestionEntity> paperquestions = new HashSet<>();
 
@@ -67,12 +68,13 @@ public class PaperController {
         paper.setAnswerednum(0);
         paper.setAverage(0.0);
 
-        if(!request.getIsauto()){
+        if(!request.getIsauto()){// 如果不是自动生成试卷
             paper.setCount(request.getCount());
 
             for(int i = 0; i < Integer.valueOf(request.getCount()); i++){
                 PaperContainsQuestionEntity contain = new PaperContainsQuestionEntity();
 
+                //request中的pid和score本身是字符串，每次读取相应的id和score，id需要进行一下计算
                 int tempid = Integer.valueOf(request.getPid()) * 10000 + i;
                 contain.setId(String.valueOf(tempid));
                 contain.setPaper(paper);
@@ -179,7 +181,7 @@ public class PaperController {
             System.out.println("Paper does not exist:"+request.getPid());
             return new ResponseEntity<>(new ModifyPaperResponse("Paper does not exist", request.pid), HttpStatus.BAD_REQUEST);
         }
-        PapersEntity paper = ret.get();
+        PapersEntity paper = ret.get();//先判断是否存在卷子，如果存在，就把找到的paper从option放回 entity类型
 
 
    //     paperContainsQuestionRepository.deleteByPaper(paper);

@@ -10,9 +10,9 @@ import java.util.Date;
 })
 public class HistoryGradeEntity {
     private String hid;
-    private UserEntity sid;
-    private PapersEntity pid;
-    private double grade;
+    private UserEntity student;
+    private PapersEntity paper;
+    private int grade;
     private Date startTime;
 
     @Id
@@ -27,30 +27,30 @@ public class HistoryGradeEntity {
 
     @JoinColumn(name = "StudentID")
     @ManyToOne
-    public UserEntity getSid() {
-        return sid;
+    public UserEntity getStudent() {
+        return student;
     }
 
-    public void setSid(UserEntity sid) {
-        this.sid = sid;
+    public void setStudent(UserEntity student) {
+        this.student = student;
     }
 
     @JoinColumn(name = "PaperID")
     @ManyToOne
-    public PapersEntity getPid() {
-        return pid;
+    public PapersEntity getPaper() {
+        return paper;
     }
 
-    public void setPid(PapersEntity pid) {
-        this.pid = pid;
+    public void setPaper(PapersEntity paper) {
+        this.paper = paper;
     }
 
     @Column(name = "Grade")
-    public double getGrade() {
+    public int getGrade() {
         return grade;
     }
 
-    public void setGrade(double grade) {
+    public void setGrade(int grade) {
         this.grade = grade;
     }
 
@@ -63,4 +63,52 @@ public class HistoryGradeEntity {
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
+
+
+    /*
+
+    public String getHid() {
+        return hid;
+    }
+
+    public void setHid(String hid) {
+        this.hid = hid;
+    }
+
+
+    public UserEntity getSid() {
+        return sid;
+    }
+
+    public void setSid(UserEntity sid) {
+        this.sid = sid;
+    }
+
+
+    public PapersEntity getPid() {
+        return pid;
+    }
+
+    public void setPid(PapersEntity pid) {
+        this.pid = pid;
+    }
+
+
+    public int getGrade() {
+        return grade;
+    }
+
+    public void setGrade(int grade) {
+        this.grade = grade;
+    }
+
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+    */
 }
