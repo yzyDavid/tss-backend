@@ -3,22 +3,18 @@ package tss.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
-import tss.annotations.session.CurrentUser;
 import tss.entities.*;
 import tss.exceptions.ClazzNotFoundException;
+import tss.exceptions.CourseNotFoundException;
+import tss.exceptions.TeacherNotFoundException;
+import tss.models.Clazz;
 import tss.models.TimeSlotTypeEnum;
-import tss.repositories.ClassRepository;
-import tss.repositories.ClassroomRepository;
-import tss.repositories.CourseRepository;
-import tss.repositories.TimeSlotRepository;
-import tss.requests.information.AddClassRequest;
+import tss.repositories.*;
 import tss.requests.information.DeleteClassesRequest;
 import tss.requests.information.GetInstructorsRequest;
 import tss.requests.information.ModifyClassRequest;
-import tss.responses.information.AddClassResponse;
 import tss.responses.information.DeleteClassesResponse;
 import tss.responses.information.GetInstructorResponse;
 import tss.responses.information.ModifyClassResponse;
@@ -29,48 +25,52 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * @author Mingqi Yi
  * @author reeve
  */
-@Controller
-@RequestMapping(path = "/class")
+@RestController
+@RequestMapping()
 public class ClassController {
     private final CourseRepository courseRepository;
     private final ClassRepository classRepository;
+    private final UserRepository userRepository;
     private final ClassroomRepository classroomRepository;
     private final TimeSlotRepository timeSlotRepository;
 
     @Autowired
-    public ClassController(CourseRepository courseRepository, ClassRepository classRepository, ClassroomRepository classroomRepository, TimeSlotRepository timeSlotRepository) {
+    public ClassController(CourseRepository courseRepository, ClassRepository classRepository, UserRepository
+            userRepository, ClassroomRepository classroomRepository, TimeSlotRepository timeSlotRepository) {
         this.courseRepository = courseRepository;
         this.classRepository = classRepository;
+        this.userRepository = userRepository;
         this.classroomRepository = classroomRepository;
         this.timeSlotRepository = timeSlotRepository;
     }
 
-    @PutMapping(path = "/add")
-    @Authorization
-    public ResponseEntity<AddClassResponse> addClass(@CurrentUser UserEntity user,
-                                                     @RequestBody AddClassRequest request) {
-        String cid = request.getCid();
+    @PostMapping("/courses/{courseId}/classes")
+    @ResponseStatus(HttpStatus.CREATED)
+//    @Authorization
+    public Clazz insertClass(@PathVariable String courseId, @RequestBody Clazz clazz) {
 
-        Optional<CourseEntity> ret = courseRepository.findById(cid);
-        if (!ret.isPresent()) {
-            return new ResponseEntity<>(new AddClassResponse("course doesn't exist"), HttpStatus.BAD_REQUEST);
-        }
-        CourseEntity course = ret.get();
-        ClassEntity newClass = new ClassEntity();
-        newClass.setCapacity(request.getCapacity());
-        newClass.setYear(request.getYear());
-        newClass.setCourse(course);
-        classRepository.save(newClass);
-        return new ResponseEntity<>(new AddClassResponse("OK"), HttpStatus.OK);
+        CourseEntity courseEntity = courseRepository.findById(courseId).orElseThrow(CourseNotFoundException::new);
+        UserEntity userEntity = userRepository.findById(clazz.getTeacherId()).orElseThrow
+                (TeacherNotFoundException::new);
+
+        ClassEntity classEntity = new ClassEntity();
+        classEntity.setYear(clazz.getYear());
+        classEntity.setSemester(clazz.getSemester());
+        classEntity.setCapacity(clazz.getCapacity());
+        classEntity.setNumStudent(clazz.getNumStudent());
+        classEntity.setTeacher(userEntity);
+        classEntity.setCourse(courseEntity);
+
+        classEntity = classRepository.save(classEntity);
+        System.out.println(classEntity.getId());
+        return new Clazz(classEntity);
     }
 
     @PostMapping(path = "/info")
     @Authorization
-    public ResponseEntity<ModifyClassResponse> modifyClass(@CurrentUser UserEntity user,
-                                                           @RequestBody ModifyClassRequest request) {
+    public ResponseEntity<ModifyClassResponse> modifyClass(@RequestBody ModifyClassRequest request) {
         Long cid = request.getCid();
 
         Optional<ClassEntity> ret = classRepository.findById(cid);
@@ -90,8 +90,7 @@ public class ClassController {
 
     @DeleteMapping(path = "/delete")
     @Authorization
-    public ResponseEntity<DeleteClassesResponse> deleteClasses(@CurrentUser UserEntity user,
-                                                               @RequestBody DeleteClassesRequest request) {
+    public ResponseEntity<DeleteClassesResponse> deleteClasses(@RequestBody DeleteClassesRequest request) {
         List<Long> cids = request.getIds();
 
         List<Long> failIds = new ArrayList<>();
@@ -107,6 +106,23 @@ public class ClassController {
             classRepository.deleteById(cid);
         }
         return new ResponseEntity<>(new DeleteClassesResponse("OK", failIds), HttpStatus.OK);
+    }
+
+    @GetMapping()
+    @Authorization
+    public List<Clazz> listClasses() {
+        List<Clazz> classes = new ArrayList<>();
+        for (ClassEntity classEntity : classRepository.findAll()) {
+            classes.add(new Clazz(classEntity));
+        }
+        return classes;
+    }
+
+    @GetMapping(path = "/{classId}")
+    @Authorization
+    public Clazz getClass(@PathVariable long classId) {
+        ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
+        return new Clazz(classEntity);
     }
 
     @PostMapping(path = "/getInstructor")
@@ -158,77 +174,77 @@ public class ClassController {
             }
         }
     }
+}
 
-    class ClassItem {
-        private long classId;
-        private int numLeftSectionsOfSizeTwo = 0;
-        private int numLeftSectionsOfSizeThree = 0;
-        private ClassEntity classEntity;
+class ClassItem {
+    private long classId;
+    private int numLeftSectionsOfSizeTwo = 0;
+    private int numLeftSectionsOfSizeThree = 0;
+    private ClassEntity classEntity;
 
-        ClassItem(ClassEntity classEntity) {
-            switch (classEntity.getCourse().getNumLessonsEachWeek()) {
-                case 2:
-                    numLeftSectionsOfSizeTwo = 1;
-                    break;
-                case 3:
-                    numLeftSectionsOfSizeThree = 1;
-                    break;
-                case 4:
-                    numLeftSectionsOfSizeTwo = 2;
-                    break;
-                case 5:
-                    numLeftSectionsOfSizeTwo = 1;
-                    numLeftSectionsOfSizeThree = 1;
-                    break;
-                case 6:
-                    numLeftSectionsOfSizeThree = 2;
-                default:
-            }
-            classId = classEntity.getId();
-            this.classEntity = classEntity;
+    ClassItem(ClassEntity classEntity) {
+        switch (classEntity.getCourse().getNumLessonsEachWeek()) {
+            case 2:
+                numLeftSectionsOfSizeTwo = 1;
+                break;
+            case 3:
+                numLeftSectionsOfSizeThree = 1;
+                break;
+            case 4:
+                numLeftSectionsOfSizeTwo = 2;
+                break;
+            case 5:
+                numLeftSectionsOfSizeTwo = 1;
+                numLeftSectionsOfSizeThree = 1;
+                break;
+            case 6:
+                numLeftSectionsOfSizeThree = 2;
+            default:
         }
+        classId = classEntity.getId();
+        this.classEntity = classEntity;
+    }
 
-        int getNumLeftSectionsOfSize(int size) {
-            switch (size) {
-                case 2:
-                    return numLeftSectionsOfSizeTwo;
-                case 3:
-                    return numLeftSectionsOfSizeThree;
-                default:
-                    return 0;
-            }
+    int getNumLeftSectionsOfSize(int size) {
+        switch (size) {
+            case 2:
+                return numLeftSectionsOfSizeTwo;
+            case 3:
+                return numLeftSectionsOfSizeThree;
+            default:
+                return 0;
         }
+    }
 
-        void setNumLeftSectionsOfSize(int size, int value) {
-            switch (size) {
-                case 2:
-                    numLeftSectionsOfSizeTwo = value;
-                    break;
-                case 3:
-                    numLeftSectionsOfSizeThree = value;
-                    break;
-                default:
-            }
+    void setNumLeftSectionsOfSize(int size, int value) {
+        switch (size) {
+            case 2:
+                numLeftSectionsOfSizeTwo = value;
+                break;
+            case 3:
+                numLeftSectionsOfSizeThree = value;
+                break;
+            default:
         }
+    }
 
-        boolean hasNoLeftSection() {
-            return numLeftSectionsOfSizeTwo + numLeftSectionsOfSizeThree == 0;
-        }
+    boolean hasNoLeftSection() {
+        return numLeftSectionsOfSizeTwo + numLeftSectionsOfSizeThree == 0;
+    }
 
-        long getClassId() {
-            return classId;
-        }
+    long getClassId() {
+        return classId;
+    }
 
-        void setClassId(long classId) {
-            this.classId = classId;
-        }
+    void setClassId(long classId) {
+        this.classId = classId;
+    }
 
-        ClassEntity getClassEntity() {
-            return classEntity;
-        }
+    ClassEntity getClassEntity() {
+        return classEntity;
+    }
 
-        void setClassEntity(ClassEntity classEntity) {
-            this.classEntity = classEntity;
-        }
+    void setClassEntity(ClassEntity classEntity) {
+        this.classEntity = classEntity;
     }
 }

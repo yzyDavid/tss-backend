@@ -11,12 +11,13 @@ import java.util.List;
 @Table(name = "class")
 public class ClassEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue()
     private Long id;
 
     private Integer year;
 
-    private String semester;
+    @Enumerated(EnumType.STRING)
+    private SemesterEnum semester;
 
     private Integer capacity;
 
@@ -40,7 +41,7 @@ public class ClassEntity {
     public ClassEntity() {
     }
 
-    public ClassEntity(Integer year, String semester, Integer capacity, Integer numStudent, CourseEntity course,
+    public ClassEntity(Integer year, SemesterEnum semester, Integer capacity, Integer numStudent, CourseEntity course,
                        UserEntity teacher) {
         this.year = year;
         this.semester = semester;
@@ -53,7 +54,7 @@ public class ClassEntity {
 
     // Getter and setter.
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -69,11 +70,11 @@ public class ClassEntity {
         this.year = year;
     }
 
-    public String getSemester() {
+    public SemesterEnum getSemester() {
         return semester;
     }
 
-    public void setSemester(String semester) {
+    public void setSemester(SemesterEnum semester) {
         this.semester = semester;
     }
 
