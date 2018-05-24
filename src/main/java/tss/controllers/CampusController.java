@@ -64,13 +64,13 @@ public class CampusController {
     }
 
     @PatchMapping("/{campusId}")
-    @ResponseStatus(value = HttpStatus.OK)
-    public Campus updateCampus(@PathVariable int campusId, @RequestBody Campus campus) {
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void updateCampus(@PathVariable int campusId, @RequestBody Campus campus) {
         CampusEntity campusEntity = campusRepository.findById(campusId).orElseThrow(CampusNotFoundException::new);
         if (campus.getName() != null) {
             campusEntity.setName(campus.getName());
         }
-        return new Campus(campusRepository.save(campusEntity));
+        campusRepository.save(campusEntity);
     }
 
     @PostMapping("/{campusId}/buildings")

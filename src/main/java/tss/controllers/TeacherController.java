@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
+import tss.configs.Config;
 import tss.entities.ClassEntity;
 import tss.entities.TimeSlotEntity;
 import tss.entities.UserEntity;
@@ -37,7 +38,7 @@ public class TeacherController {
     public void addClassTeaching(@CurrentUser UserEntity user,
                                  @PathVariable String userId, @PathVariable long classId) {
         UserEntity teacherEntity = userRepository.findById(userId).orElseThrow(TeacherNotFoundException::new);
-        if (!"Teacher".equals(teacherEntity.readTypeName())) {
+        if (!Config.TYPES[2].equals(teacherEntity.readTypeName())) {
             throw new TeacherNotFoundException();
         }
         ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
@@ -48,17 +49,17 @@ public class TeacherController {
 
     @GetMapping("/{userId}/schedule")
     @ResponseStatus(HttpStatus.OK)
-    public Map<String, Clazz> getSchedule(@PathVariable String userId) {
+    public Map<TimeSlotTypeEnum, Clazz> getSchedule(@PathVariable String userId) {
         UserEntity teacherEntity = userRepository.findById(userId).orElseThrow(TeacherNotFoundException::new);
-        if (!"Teacher".equals(teacherEntity.readTypeName())) {
+        if (!Config.TYPES[2].equals(teacherEntity.readTypeName())) {
             throw new TeacherNotFoundException();
         }
 
-        Map<String, Clazz> schedule = new HashMap<>(TimeSlotTypeEnum.values().length);
+        Map<TimeSlotTypeEnum, Clazz> schedule = new HashMap<>(TimeSlotTypeEnum.values().length);
         for (ClassEntity classEntity : teacherEntity.getClassesTeaching()) {
             Clazz clazz = new Clazz(classEntity);
             for (TimeSlotEntity timeSlotEntity : classEntity.getTimeSlots()) {
-                schedule.put(timeSlotEntity.getTypeName(), clazz);
+                schedule.put(timeSlotEntity.getType(), clazz);
             }
         }
         return schedule;

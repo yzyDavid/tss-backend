@@ -24,7 +24,7 @@ public class Clazz {
     private Integer numLessonsEachWeek;
     private String courseIntro;
 
-    private List<ClassroomTimeSlotTypeNamePair> arrangements;
+    private List<ClassroomTimeSlotTypePair> arrangements;
     private Integer numLessonsLeft;
 
     public Clazz() {
@@ -50,8 +50,8 @@ public class Clazz {
         numLessonsLeft = numLessonsEachWeek;
         for (TimeSlotEntity timeSlotEntity : classEntity.getTimeSlots()) {
             Classroom classroom = new Classroom(timeSlotEntity.getClassroom());
-            arrangements.add(new ClassroomTimeSlotTypeNamePair(classroom, timeSlotEntity.getTypeName()));
-            numLessonsLeft -= TimeSlotTypeEnum.valueOf(timeSlotEntity.getTypeName()).getSize();
+            arrangements.add(new ClassroomTimeSlotTypePair(classroom, timeSlotEntity.getType()));
+            numLessonsLeft -= timeSlotEntity.getType().getSize();
         }
     }
 
@@ -143,11 +143,11 @@ public class Clazz {
         this.courseIntro = courseIntro;
     }
 
-    public List<ClassroomTimeSlotTypeNamePair> getArrangements() {
+    public List<ClassroomTimeSlotTypePair> getArrangements() {
         return arrangements;
     }
 
-    public void setArrangements(List<ClassroomTimeSlotTypeNamePair> arrangements) {
+    public void setArrangements(List<ClassroomTimeSlotTypePair> arrangements) {
         this.arrangements = arrangements;
     }
 

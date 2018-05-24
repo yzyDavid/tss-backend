@@ -1,5 +1,7 @@
 package tss.entities;
 
+import tss.models.TimeSlotTypeEnum;
+
 import javax.persistence.*;
 
 /**
@@ -12,7 +14,8 @@ public class TimeSlotEntity {
     @GeneratedValue
     private Long id;
 
-    private String typeName;
+    @Enumerated(EnumType.STRING)
+    private TimeSlotTypeEnum type;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "classroom_id")
@@ -25,8 +28,8 @@ public class TimeSlotEntity {
     public TimeSlotEntity() {
     }
 
-    public TimeSlotEntity(String typeName, ClassroomEntity classroom, ClassEntity clazz) {
-        this.typeName = typeName;
+    public TimeSlotEntity(TimeSlotTypeEnum type, ClassroomEntity classroom, ClassEntity clazz) {
+        this.type = type;
         this.classroom = classroom;
         this.clazz = clazz;
     }
@@ -39,12 +42,12 @@ public class TimeSlotEntity {
         this.id = id;
     }
 
-    public String getTypeName() {
-        return typeName;
+    public TimeSlotTypeEnum getType() {
+        return type;
     }
 
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
+    public void setType(TimeSlotTypeEnum type) {
+        this.type = type;
     }
 
     public ClassroomEntity getClassroom() {

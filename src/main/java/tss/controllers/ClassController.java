@@ -48,7 +48,7 @@ public class ClassController {
 
     @PostMapping("/courses/{courseId}/classes")
     @ResponseStatus(HttpStatus.CREATED)
-//    @Authorization
+    @Authorization
     public Clazz insertClass(@PathVariable String courseId, @RequestBody Clazz clazz) {
 
         CourseEntity courseEntity = courseRepository.findById(courseId).orElseThrow(CourseNotFoundException::new);
@@ -157,7 +157,7 @@ public class ClassController {
                 if (classItems.size() == 0) {
                     break;
                 }
-                final int timeSlotSize = TimeSlotTypeEnum.valueOf(timeSlotEntity.getTypeName()).getSize();
+                final int timeSlotSize = timeSlotEntity.getType().getSize();
                 for (int i = 0; i < classItems.size(); i++) {
                     ClassItem classItem = classItems.get(i);
                     if (classItem.getNumLeftSectionsOfSize(timeSlotSize) > 0) {

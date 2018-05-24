@@ -1,5 +1,7 @@
 package tss.entities;
 
+import tss.models.TimeSlotTypeEnum;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +32,7 @@ public class ClassroomEntity {
     private List<TimeSlotEntity> timeSlots = new ArrayList<>();
 
     @Transient
-    private Map<String, TimeSlotEntity> timeSlotDirectory;
+    private Map<TimeSlotTypeEnum, TimeSlotEntity> timeSlotDirectory;
 
     public ClassroomEntity() {
     }
@@ -80,11 +82,11 @@ public class ClassroomEntity {
         return timeSlots;
     }
 
-    public Map<String, TimeSlotEntity> getTimeSlotDirectory() {
+    public Map<TimeSlotTypeEnum, TimeSlotEntity> getTimeSlotDirectory() {
         if (timeSlotDirectory == null) {
             timeSlotDirectory = new HashMap<>(timeSlots.size());
             for (TimeSlotEntity timeSlotEntity : timeSlots) {
-                timeSlotDirectory.put(timeSlotEntity.getTypeName(), timeSlotEntity);
+                timeSlotDirectory.put(timeSlotEntity.getType(), timeSlotEntity);
             }
         }
         return timeSlotDirectory;
@@ -95,7 +97,7 @@ public class ClassroomEntity {
     public void addTimeSlot(TimeSlotEntity timeSlotEntity) {
         timeSlotEntity.setClassroom(this);
         timeSlots.add(timeSlotEntity);
-        getTimeSlotDirectory().put(timeSlotEntity.getTypeName(), timeSlotEntity);
+        getTimeSlotDirectory().put(timeSlotEntity.getType(), timeSlotEntity);
     }
 
     @Override
