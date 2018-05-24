@@ -185,7 +185,7 @@ public class UserEntity {
         this.dataAccessAuths.add(dataAccessAuth);
     }
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     public TypeGroupEntity getType() {
         return type;

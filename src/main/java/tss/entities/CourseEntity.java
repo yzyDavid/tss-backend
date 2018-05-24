@@ -59,7 +59,7 @@ public class CourseEntity {
         this.weeklyNum = weeklyNum;
     }
 
-    @Column(name = "course_semester", length = 8)
+    @Column(name = "course_semester", length = 6)
     public String getSemester() {
         return semester;
     }

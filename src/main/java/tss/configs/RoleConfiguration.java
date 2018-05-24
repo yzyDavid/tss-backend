@@ -5,19 +5,22 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import tss.entities.AuthorityEntity;
-import tss.entities.RoleEntity;
-import tss.entities.TypeGroupEntity;
-import tss.entities.UserEntity;
+import org.springframework.transaction.annotation.Transactional;
+import tss.entities.*;
 import tss.repositories.AuthorityRepository;
 import tss.repositories.RoleRepository;
 import tss.repositories.TypeGroupRepository;
 import tss.repositories.UserRepository;
+import tss.services.QueryService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static tss.utils.SecurityUtils.getHashedPasswordByPasswordAndSalt;
 import static tss.utils.SecurityUtils.getSalt;
@@ -32,6 +35,9 @@ public class RoleConfiguration implements CommandLineRunner {
     private AuthorityRepository authorityRepository;
     @Autowired
     private TypeGroupRepository typeGroupRepository;
+    @Autowired
+    private QueryService queryService;
+    private static Pattern pattern = Pattern.compile("\\{.*}");
 
     @Override
     public void run(String... args) throws Exception {
@@ -85,7 +91,8 @@ public class RoleConfiguration implements CommandLineRunner {
                 String prefix = role.getString("prefix");
                 JSONArray paths = role.getJSONArray("paths");
                 for (int i = 0; i < paths.length(); i++) {
-                    String uri = String.format(uriFormat, prefix, paths.getString(i));
+                    Matcher matcher = pattern.matcher(paths.getString(i));
+                    String uri = String.format(uriFormat, prefix, matcher.replaceAll("*"));
                     AuthorityEntity authority = new AuthorityEntity();
                     authority.setUri(uri);
                     roleEntity.addAuthority(authority);

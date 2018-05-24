@@ -13,6 +13,7 @@ import tss.repositories.CourseRepository;
 import tss.repositories.DepartmentRepository;
 import tss.requests.information.*;
 import tss.responses.information.*;
+import tss.services.QueryService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,12 +25,15 @@ import java.util.Optional;
 public class CourseController {
     private final CourseRepository courseRepository;
     private final DepartmentRepository departmentRepository;
+    private final QueryService queryService;
 
 
     @Autowired
-    CourseController(CourseRepository courseRepository, DepartmentRepository departmentRepository) {
+    CourseController(CourseRepository courseRepository, DepartmentRepository departmentRepository,
+                     QueryService queryService) {
         this.courseRepository = courseRepository;
         this.departmentRepository = departmentRepository;
+        this.queryService = queryService;
     }
 
     @PutMapping(path = "/add")
@@ -144,7 +148,7 @@ public class CourseController {
             return new ResponseEntity<>(new QueryCoursesResponse("Non-exist department", null, null, null), HttpStatus.OK);
         }
 
-        List<CourseEntity> ret = courseRepository.findByName(request.getName());
+        List<CourseEntity> ret = queryService.queryCourses(request.getCid(), request.getDepartment(), department.get().getId());
         for (CourseEntity course : ret) {
             cids.add(course.getCid());
             names.add(course.getName());

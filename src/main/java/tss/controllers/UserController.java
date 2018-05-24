@@ -69,7 +69,9 @@ public class UserController {
         String[] genders = request.getGenders();
         String[] passwords = request.getPasswords();
         String type = request.getType();
-        if (uids.length != names.length || names.length != genders.length || genders.length != passwords.length) {
+        if (uids == null || names == null || genders == null || passwords == null || type == null) {
+            return new ResponseEntity<>(new AddUserResponse("Invalid request", null, null, null, null), HttpStatus.BAD_REQUEST);
+        } else if (uids.length != names.length || names.length != genders.length || genders.length != passwords.length) {
             return new ResponseEntity<>(new AddUserResponse("User information number not matching", null, null, null, null), HttpStatus.BAD_REQUEST);
         }
 
@@ -109,6 +111,9 @@ public class UserController {
     @Authorization
     public ResponseEntity<DeleteUserResponse> deleteUser(@RequestBody DeleteUserRequest request) {
         String[] uids = request.getUids();
+        if(uids == null) {
+            return new ResponseEntity<>(new DeleteUserResponse("Invalid request", null), HttpStatus.BAD_REQUEST);
+        }
         List<String> fails = new ArrayList<>();
         for (String uid : uids) {
             Optional<UserEntity> ret = userRepository.findById(uid);

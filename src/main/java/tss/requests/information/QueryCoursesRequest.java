@@ -1,17 +1,17 @@
 package tss.requests.information;
 
 public class QueryCoursesRequest {
-    private String uid;
+    private String cid;
     private String name;
     private String department;
 
 
-    public String getUid() {
-        return uid;
+    public String getCid() {
+        return cid;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setCid(String cid) {
+        this.cid = cid;
     }
 
     public String getName() {
