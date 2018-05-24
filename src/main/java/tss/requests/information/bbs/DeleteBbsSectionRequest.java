@@ -1,13 +1,13 @@
 package tss.requests.information.bbs;
 
 public class DeleteBbsSectionRequest {
-    private final long id;
-
-    public DeleteBbsSectionRequest(long id){
-        this.id = id;
-    }
+    private long id;
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

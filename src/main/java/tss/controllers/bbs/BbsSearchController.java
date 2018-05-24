@@ -87,7 +87,7 @@ public class BbsSearchController {
                 userIDs.add(account.getPhoto());
             }
         }
-        return new ResponseEntity<>(new SearchUserResponse(userNames, userIDs, photoURLs));
+        return new ResponseEntity<>(new SearchUserResponse(userNames, userIDs, photoURLs), HttpStatus.OK);
     }
 
 

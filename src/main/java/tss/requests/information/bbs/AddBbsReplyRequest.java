@@ -1,25 +1,31 @@
 package tss.requests.information.bbs;
 
 public class AddBbsReplyRequest {
-    private final long tid;
-    private final String text;
-    private final Integer quoteIndex;
-
-    public AddBbsReplyRequest(long tid, String text, Integer quoteIndex) {
-        this.tid = tid;
-        this.text = text;
-        this.quoteIndex = quoteIndex;
-    }
+    private long tid;
+    private String text;
+    private Integer quoteIndex;
 
     public long getTid() {
         return tid;
+    }
+
+    public void setTid(long tid) {
+        this.tid = tid;
     }
 
     public String getText() {
         return text;
     }
 
+    public void setText(String text) {
+        this.text = text;
+    }
+
     public Integer getQuoteIndex() {
         return quoteIndex;
+    }
+
+    public void setQuoteIndex(Integer quoteIndex) {
+        this.quoteIndex = quoteIndex;
     }
 }
