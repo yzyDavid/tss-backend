@@ -109,10 +109,12 @@ public class ClassroomEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if (!obj.getClass().equals(this.getClass()) || id == null) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
-        } else {
+        } else if (id != null) {
             return (id.equals(((ClassroomEntity) obj).id));
+        } else {
+            return super.equals(obj);
         }
     }
 }

@@ -1,36 +1,52 @@
 package tss.requests.information;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * @author yzy
  */
 public class AddUserRequest {
-    private String uid;
-    private String name;
-    private String password;
+    @NotNull
+    private String[] uids;
+    @NotNull
+    private String[] names;
+    @NotNull
+    private String[] passwords;
+    @NotNull
+    private String[] genders;
+    @NotNull
     private String type;
 
-    public String getUid() {
-        return uid;
+    public String[] getUids() {
+        return uids;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setUids(String[] uids) {
+        this.uids = uids;
     }
 
-    public String getName() {
-        return name;
+    public String[] getNames() {
+        return names;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNames(String[] names) {
+        this.names = names;
     }
 
-    public String getPassword() {
-        return password;
+    public String[] getGenders() {
+        return genders;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setGenders(String[] genders) {
+        this.genders = genders;
+    }
+
+    public String[] getPasswords() {
+        return passwords;
+    }
+
+    public void setPasswords(String[] passwords) {
+        this.passwords = passwords;
     }
 
     public String getType() {
