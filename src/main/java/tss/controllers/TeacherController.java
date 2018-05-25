@@ -53,13 +53,13 @@ public class TeacherController {
     @ResponseStatus(HttpStatus.OK)
     public List<TimeSlot> getSchedule(@PathVariable String userId) {
         UserEntity teacherEntity = userRepository.findById(userId).orElseThrow(TeacherNotFoundException::new);
+        // TODO: commented for testing.
 //        if (!Config.TYPES[2].equals(teacherEntity.readTypeName())) {
 //            throw new TeacherNotFoundException();
 //        }
 
-        List<TimeSlot> schedule = new ArrayList<>(TimeSlotTypeEnum.values().length);
+        List<TimeSlot> schedule = new ArrayList<>();
         for (ClassEntity classEntity : teacherEntity.getClassesTeaching()) {
-            Clazz clazz = new Clazz(classEntity);
             for (TimeSlotEntity timeSlotEntity : classEntity.getTimeSlots()) {
                 schedule.add(new TimeSlot(timeSlotEntity));
             }

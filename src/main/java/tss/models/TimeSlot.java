@@ -4,6 +4,8 @@ import tss.entities.ClassEntity;
 import tss.entities.ClassroomEntity;
 import tss.entities.TimeSlotEntity;
 
+import javax.swing.text.html.Option;
+
 /**
  * @author reeve
  */
@@ -21,9 +23,11 @@ public class TimeSlot {
 
     public TimeSlot(TimeSlotEntity timeSlotEntity) {
         typeName = timeSlotEntity.getType().name();
-        ClassEntity classEntity = timeSlotEntity.getClazz();
-        classId = classEntity.getId();
-        courseName = classEntity.getCourse().getName();
+        ClassEntity classEntity;
+        if ((classEntity = timeSlotEntity.getClazz()) != null) {
+            classId = classEntity.getId();
+            courseName = classEntity.getCourse().getName();
+        }
         ClassroomEntity classroomEntity = timeSlotEntity.getClassroom();
         classroomId = classroomEntity.getId();
         classroomName = classroomEntity.getName();
