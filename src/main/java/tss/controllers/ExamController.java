@@ -1,5 +1,6 @@
 package tss.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -36,6 +37,7 @@ public class ExamController {
     private final HistoryGradeRepository historyGradeRepository;
     private final ResultRepository resultRepository;
 
+    @Autowired
     public ExamController(PaperRepository paperRepository, QuestionRepository questionRepository,
                           PaperContainsQuestionRepository paperContainsQuestionRepository,
                           HistoryGradeRepository historyGradeRepository, ResultRepository resultRepository) {
