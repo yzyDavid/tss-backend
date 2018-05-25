@@ -8,10 +8,11 @@ import tss.entities.TimeSlotEntity;
  * @author reeve
  */
 public class TimeSlot {
-    private TimeSlotTypeEnum type;
+    private String typeName;
     private Long classId;
     private String courseName;
     private Integer classroomId;
+    private String classroomName;
     private String buildingName;
     private String campusName;
 
@@ -19,22 +20,23 @@ public class TimeSlot {
     }
 
     public TimeSlot(TimeSlotEntity timeSlotEntity) {
-        type = timeSlotEntity.getType();
+        typeName = timeSlotEntity.getType().name();
         ClassEntity classEntity = timeSlotEntity.getClazz();
         classId = classEntity.getId();
         courseName = classEntity.getCourse().getName();
         ClassroomEntity classroomEntity = timeSlotEntity.getClassroom();
         classroomId = classroomEntity.getId();
+        classroomName = classroomEntity.getName();
         buildingName = classroomEntity.getBuilding().getName();
         campusName = classroomEntity.getBuilding().getCampus().getName();
     }
 
-    public TimeSlotTypeEnum getType() {
-        return type;
+    public String getTypeName() {
+        return typeName;
     }
 
-    public void setType(TimeSlotTypeEnum type) {
-        this.type = type;
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
     }
 
     public Long getClassId() {
@@ -59,6 +61,14 @@ public class TimeSlot {
 
     public void setClassroomId(Integer classroomId) {
         this.classroomId = classroomId;
+    }
+
+    public String getClassroomName() {
+        return classroomName;
+    }
+
+    public void setClassroomName(String classroomName) {
+        this.classroomName = classroomName;
     }
 
     public String getBuildingName() {
