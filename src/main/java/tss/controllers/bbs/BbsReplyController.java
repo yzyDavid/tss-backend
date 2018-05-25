@@ -87,6 +87,9 @@ public class BbsReplyController {
         mediumDateFormat.format(time);
         reply.setTime(time);
 
+        /* set topic last reply time */
+        reply.getBelongedTopic().setLastReplyTime(time);
+
         reply.setQuoteIndex(request.getQuoteIndex());
         reply.setIndex(topic.getReplyNum()+1);
 

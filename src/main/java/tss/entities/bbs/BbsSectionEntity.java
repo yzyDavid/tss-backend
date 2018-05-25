@@ -14,6 +14,7 @@ public class BbsSectionEntity {
     public static int usrNum = 0;
     private TeachesEntity teaches;
     private Set<BbsTopicEntity> topics;
+    private String notice;
 
     public BbsSectionEntity(TeachesEntity teaches){
         this.teaches = teaches;
@@ -65,5 +66,14 @@ public class BbsSectionEntity {
 
     public void setTopics(Set<BbsTopicEntity> topics) {
         this.topics = topics;
+    }
+
+    @Column(name = "section_notice")
+    public String getNotice() {
+        return notice;
+    }
+
+    public void setNotice(String notice) {
+        this.notice = notice;
     }
 }

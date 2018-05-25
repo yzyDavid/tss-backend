@@ -15,6 +15,8 @@ public class BbsTopicEntity {
     private BbsSectionEntity belongedSection;
     private Date time;
     private String content;
+    private Date lastReplyTime;
+    private boolean isTop;
 
     private int replyNum = 0;
     private Set<BbsReplyEntity> replies;
@@ -97,5 +99,23 @@ public class BbsTopicEntity {
 
     public void setReplies(Set<BbsReplyEntity> replies) {
         this.replies = replies;
+    }
+
+    @Column(name = "topic_lastReply")
+    public Date getLastReplyTime() {
+        return lastReplyTime;
+    }
+
+    public void setLastReplyTime(Date lastReplyTime) {
+        this.lastReplyTime = lastReplyTime;
+    }
+
+    @Column(name = "topic_isTop")
+    public boolean isTop() {
+        return isTop;
+    }
+
+    public void setTop(boolean top) {
+        isTop = top;
     }
 }

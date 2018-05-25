@@ -1,6 +1,7 @@
 package tss.controllers.bbs;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.reactive.context.ReactiveWebServerApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -14,9 +15,7 @@ import tss.entities.bbs.BbsTopicEntity;
 import tss.repositories.UserRepository;
 import tss.repositories.bbs.BbsSectionRepository;
 import tss.repositories.bbs.BbsTopicRepository;
-import tss.requests.information.bbs.AddBbsTopicRequest;
-import tss.requests.information.bbs.DeleteBbsTopicRequest;
-import tss.requests.information.bbs.ModifyTopicContentRequest;
+import tss.requests.information.bbs.*;
 import tss.responses.information.bbs.*;
 
 import java.text.DateFormat;
@@ -205,4 +204,57 @@ public class BbsTopicController {
 
         return new ResponseEntity<>(new GetUserPublishedResponse(userName, titles, times, topicIDs, boardIDs, boardNames, currentPage, totalPage), HttpStatus.BAD_REQUEST);
     }
+
+
+    /* show all topics under a certain section
+     * public part/ top part
+     * v1.0, done
+     */
+    @PostMapping(path = "/topinfo")
+    public ResponseEntity<GetAllTopicsPublicResponse> getAllTopTopics(@CurrentUser UserEntity user,
+                                                                   @RequestBody GetAllTopicsPublicRequest request){
+        /* haven't deal with not found situation */
+        Optional<BbsSectionEntity> sret = bbsSectionRepository.findById(Long.valueOf(request.getBoardID()));
+        if(!sret.isPresent())
+            return new ResponseEntity<>(new GetAllTopicsPublicResponse(null, null,null,null,null,null,null,null,null), HttpStatus.BAD_REQUEST);
+
+        BbsSectionEntity section = sret.get();
+
+        String boardName = section.getName();
+        String boardID = String.valueOf(section.getId());
+        String boardText = section.getNotice();
+
+        List<String> topTitles = new ArrayList<>();
+        List<String> topAuthors = new ArrayList<>();
+        List<String> topTimes = new ArrayList<>();
+        List<String> topReplys = new ArrayList<>();
+        List<String> topTopicIDs = new ArrayList<>();
+        List<String> topLastReplyTimes = new ArrayList<>();
+
+        Set<BbsTopicEntity> topics = section.getTopics();
+        for(BbsTopicEntity topic : topics){
+            /* find topic been set top */
+            if(topic.isTop()){
+                topTitles.add(topic.getName());
+                topAuthors.add(topic.getAuthor().getName());
+                topTimes.add(topic.getTime().toString());
+                topReplys.add(String.valueOf(topic.getReplyNum()));
+                topTopicIDs.add(String.valueOf(topic.getId()));
+                topLastReplyTimes.add(topic.getLastReplyTime().toString());
+            }
+        }
+        return new ResponseEntity<>(new GetAllTopicsPublicResponse(boardName,boardID,boardText,topTitles,topAuthors,topTimes,topReplys,topTopicIDs,topLastReplyTimes), HttpStatus.OK);
+    }
+
+    /* show all topics under a certain section
+     * page show, / not top part
+     * v1.0,
+     */
+    @PostMapping(path = "/info")
+    public ResponseEntity<GetAllNotTopTopicsResponse> getAllNotTopTopics(@CurrentUser UserEntity user,
+                                               @RequestBody GetAllNotTopTopicsRequest request){
+        
+    }
+
+
 }
