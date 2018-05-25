@@ -2,6 +2,7 @@ package tss.models;
 
 import org.jetbrains.annotations.NotNull;
 import tss.entities.BuildingEntity;
+import tss.entities.CampusEntity;
 
 /**
  * @author reeve
@@ -9,17 +10,18 @@ import tss.entities.BuildingEntity;
 public class Building {
     private Integer id;
     private String name;
+    private Integer campusId;
+    private String campusName;
 
     public Building() {
     }
 
-    public Building(Integer id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
     public Building(@NotNull BuildingEntity buildingEntity) {
-        this(buildingEntity.getId(), buildingEntity.getName());
+        id = buildingEntity.getId();
+        name = buildingEntity.getName();
+        CampusEntity campusEntity = buildingEntity.getCampus();
+        campusId = campusEntity.getId();
+        campusName = campusEntity.getName();
     }
 
     public Integer getId() {
@@ -36,5 +38,21 @@ public class Building {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getCampusId() {
+        return campusId;
+    }
+
+    public void setCampusId(Integer campusId) {
+        this.campusId = campusId;
+    }
+
+    public String getCampusName() {
+        return campusName;
+    }
+
+    public void setCampusName(String campusName) {
+        this.campusName = campusName;
     }
 }

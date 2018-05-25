@@ -1,6 +1,7 @@
 package tss.models;
 
 import org.jetbrains.annotations.NotNull;
+import tss.entities.BuildingEntity;
 import tss.entities.ClassroomEntity;
 
 /**
@@ -10,18 +11,19 @@ public class Classroom {
     private Integer id;
     private String name;
     private Integer capacity;
+    private Integer buildingId;
+    private String buildingName;
 
     public Classroom() {
     }
 
-    public Classroom(Integer id, String name, Integer capacity) {
-        this.id = id;
-        this.name = name;
-        this.capacity = capacity;
-    }
-
     public Classroom(@NotNull ClassroomEntity classroomEntity) {
-        this(classroomEntity.getId(), classroomEntity.getName(), classroomEntity.getCapacity());
+        id = classroomEntity.getId();
+        name = classroomEntity.getName();
+        capacity = classroomEntity.getCapacity();
+        BuildingEntity buildingEntity = classroomEntity.getBuilding();
+        buildingId = buildingEntity.getId();
+        buildingName = buildingEntity.getName();
     }
 
     public Integer getId() {
@@ -46,5 +48,21 @@ public class Classroom {
 
     public void setCapacity(Integer capacity) {
         this.capacity = capacity;
+    }
+
+    public Integer getBuildingId() {
+        return buildingId;
+    }
+
+    public void setBuildingId(Integer buildingId) {
+        this.buildingId = buildingId;
+    }
+
+    public String getBuildingName() {
+        return buildingName;
+    }
+
+    public void setBuildingName(String buildingName) {
+        this.buildingName = buildingName;
     }
 }
