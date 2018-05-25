@@ -10,7 +10,6 @@ import tss.exceptions.ClazzNotFoundException;
 import tss.exceptions.CourseNotFoundException;
 import tss.exceptions.TeacherNotFoundException;
 import tss.models.Clazz;
-import tss.models.TimeSlotTypeEnum;
 import tss.repositories.*;
 import tss.requests.information.DeleteClassesRequest;
 import tss.requests.information.GetInstructorsRequest;
@@ -48,7 +47,7 @@ public class ClassController {
 
     @PostMapping("/courses/{courseId}/classes")
     @ResponseStatus(HttpStatus.CREATED)
-    @Authorization
+//    @Authorization
     public Clazz insertClass(@PathVariable String courseId, @RequestBody Clazz clazz) {
 
         CourseEntity courseEntity = courseRepository.findById(courseId).orElseThrow(CourseNotFoundException::new);

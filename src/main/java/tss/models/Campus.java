@@ -13,13 +13,9 @@ public class Campus {
     public Campus() {
     }
 
-    public Campus(Integer id, String name) {
-        this.id = id;
-        this.name = name;
-    }
-
     public Campus(@NotNull CampusEntity campusEntity) {
-        this(campusEntity.getId(), campusEntity.getName());
+        id = campusEntity.getId();
+        name = campusEntity.getName();
     }
 
     public Integer getId() {
