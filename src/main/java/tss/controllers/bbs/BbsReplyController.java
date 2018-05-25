@@ -168,7 +168,7 @@ public class BbsReplyController {
     @Authorization
     public ResponseEntity<GetAllReplyResponse> getAllReplyInfo(@CurrentUser UserEntity user,
                                                                @RequestBody GetAllReplyRequest request){
-        Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(request.getTid());
+        Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTid()));
         if(!ret.isPresent())
             return new ResponseEntity<>(new GetAllReplyResponse(null, null,null,null,null,null,null,null,null,null,null,null,null,null,null,null), HttpStatus.BAD_REQUEST);
 
@@ -176,7 +176,7 @@ public class BbsReplyController {
 
         String title = topic.getName();
         String totalPage = String.valueOf(topic.getReplyNum()/10);
-        String currentPage = request.getPageNum().toString();
+        String currentPage = request.getPage().toString();
         String postTime = topic.getTime().toString();
         String boardName = topic.getBelongedSection().getName();
         String boardID = String.valueOf(topic.getBelongedSection().getId());
@@ -193,8 +193,9 @@ public class BbsReplyController {
         List<String> quoteIndexs = new ArrayList<>();
 
         /* all replied under the certain topic */
-        int index = (request.getPageNum()-1)*10 + 1;
-        for( ; index <= request.getPageNum()*10 && index <= topic.getReplyNum(); index++){
+        String page = request.getPage();
+        int index = (Integer.valueOf(page)-1)*10 + 1;
+        for( ; index <= Integer.valueOf(page)*10 && index <= topic.getReplyNum(); index++){
 
             /* current index information */
             BbsReplyEntity reply = bbsReplyRepository.findByBelongedTopicAndIndex(topic, index);

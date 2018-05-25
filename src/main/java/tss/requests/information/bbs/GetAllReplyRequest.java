@@ -1,22 +1,27 @@
 package tss.requests.information.bbs;
 
 public class GetAllReplyRequest {
-    private long tid;
-    private Integer pageNum;
+    private String tid;
+    private String page;
 
-    public long getTid() {
+    public GetAllReplyRequest(String tid, String page) {
+        this.tid = tid;
+        this.page = page;
+    }
+
+    public String getTid() {
         return tid;
     }
 
-    public void setTid(long tid) {
+    public void setTid(String tid) {
         this.tid = tid;
     }
 
-    public Integer getPageNum() {
-        return pageNum;
+    public String getPage() {
+        return page;
     }
 
-    public void setPageNum(Integer pageNum) {
-        this.pageNum = pageNum;
+    public void setPage(String page) {
+        this.page = page;
     }
 }
