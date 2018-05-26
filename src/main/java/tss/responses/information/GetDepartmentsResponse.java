@@ -4,21 +4,21 @@ import org.jetbrains.annotations.Nls;
 
 import java.util.List;
 
-public class GetCoursesByNameResponse {
+public class GetDepartmentsResponse {
     @Nls
     private final String status;
-    private final List<String> cids;
+    private final List<String> names;
 
-    public GetCoursesByNameResponse(String status, List<String> cids) {
+    public GetDepartmentsResponse(String status, List<String> deptName) {
         this.status = status;
-        this.cids = cids;
+        this.names = deptName;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public List<String> getCids() {
-        return cids;
+    public List<String> getNames() {
+        return names;
     }
 }

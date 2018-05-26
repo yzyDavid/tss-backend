@@ -47,6 +47,7 @@ public class RoleEntity {
         authorities.add(authority);
     }
 
+
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "role_group", joinColumns = {@JoinColumn(name = "role_id")}, inverseJoinColumns = {@JoinColumn(name = "group_id")})
     public Set<TypeGroupEntity> getTypeGroups() {
@@ -57,21 +58,27 @@ public class RoleEntity {
         this.typeGroups = typeGroups;
     }
 
-    public void addTypeGroup(TypeGroupEntity typeGroupEntity) {
-        this.typeGroups.add(typeGroupEntity);
+    public void addTypeGroup(TypeGroupEntity typeGroup) {
+        this.typeGroups.add(typeGroup);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        if (name != null) {
+            return name.hashCode();
+        } else {
+            return super.hashCode();
+        }
     }
 
     @Override
     public boolean equals(Object obj) {
         if (!obj.getClass().equals(this.getClass())) {
             return false;
-        } else {
+        } else if (name != null) {
             return (name.equals(((RoleEntity) obj).name));
+        } else {
+            return super.equals(obj);
         }
     }
 }
