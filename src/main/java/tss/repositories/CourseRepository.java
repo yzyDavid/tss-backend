@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface CourseRepository extends CrudRepository<CourseEntity, String> {
     List<CourseEntity> findByName(String name);
-    Optional<CourseEntity> findByCid(String cid);
+    Optional<CourseEntity> findById(String cid);
 }

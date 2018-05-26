@@ -78,7 +78,7 @@ public class ProgramController {
             return new ResponseEntity<>(new AddCourseinProgramResponse("permission denied"), HttpStatus.FORBIDDEN);
         }*/
 
-        CourseEntity course = courseRepository.findByCid(request.getCid()).get();
+        CourseEntity course = courseRepository.findById(request.getCid()).get();
         ProgramEntity program = programRepository.findByPid(request.getPid()).get();
         if (course == null)
             return new ResponseEntity<>(new AddCourseinProgramResponse("no such course"), HttpStatus.FORBIDDEN);
@@ -93,7 +93,7 @@ public class ProgramController {
 
 
         programcourse.setType(request.getType());
-        programcourse.setCourse(courseRepository.findByCid(request.getCid()).get());
+        programcourse.setCourse(courseRepository.findById(request.getCid()).get());
         programcourse.setProgram(programRepository.findByPid(request.getPid()).get());
         programCourseRepository.save(programcourse);
 
@@ -120,7 +120,7 @@ public class ProgramController {
             return new ResponseEntity<>(new DeleteCourseinProgramResponse("non-existent program id",null,null,null), HttpStatus.BAD_REQUEST);
         }
 
-        Optional<CourseEntity> ret2 = courseRepository.findByCid(cid);
+        Optional<CourseEntity> ret2 = courseRepository.findById(cid);
         if (!ret2.isPresent())
         {
             return new ResponseEntity<>(new DeleteCourseinProgramResponse("non-existent course id",null,null,null), HttpStatus.BAD_REQUEST);

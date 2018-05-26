@@ -1,5 +1,7 @@
 package tss.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,6 +96,7 @@ public class ClassEntity {
         this.numStudent = numStudent;
     }
 
+    @JsonIgnore
     public CourseEntity getCourse() {
         return course;
     }
@@ -102,6 +105,7 @@ public class ClassEntity {
         this.course = course;
     }
 
+    @JsonIgnore
     public UserEntity getTeacher() {
         return teacher;
     }
@@ -110,6 +114,7 @@ public class ClassEntity {
         this.teacher = teacher;
     }
 
+    @JsonIgnore
     public List<TimeSlotEntity> getTimeSlots() {
         return timeSlots;
     }
