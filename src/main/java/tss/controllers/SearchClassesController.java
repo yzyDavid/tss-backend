@@ -38,11 +38,12 @@ public class SearchClassesController {
         this.userRepository = userRepository;
     }
 
-    @PutMapping(path = "/search")
+    @GetMapping(path = "/search-by-course-name")
     @Authorization
     public ResponseEntity<GetClassesBySearchingNameResponse> searchClassByName(@CurrentUser UserEntity user,
                                                      @RequestBody GetClassesBySearchingNameRequest request) {
         String name = request.getName();
+        Integer year = request.getYear();
 
         List<CourseEntity> ret = courseRepository.findByName(name);
         if (ret.isEmpty()) {
@@ -53,17 +54,23 @@ public class SearchClassesController {
         Set<ClassEntity> classesAll = new HashSet<>();
 
         for (CourseEntity course : ret) {
-            classesAll.addAll(course.getClasses());
+            Set<ClassEntity> classes = course.getClasses();
+            for (ClassEntity clazz : classes) {
+                if (clazz.getYear().equals(year)) {
+                    classesAll.add(clazz);
+                }
+            }
         }
 
         return new ResponseEntity<>(new GetClassesBySearchingNameResponse("OK", classesAll), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/by_teacher")
+    @GetMapping(path = "/search-by-teacher-name")
     @Authorization
-    public ResponseEntity<GetClassesBySearchingTeacherResponse> modifyClass(@CurrentUser UserEntity user,
+    public ResponseEntity<GetClassesBySearchingTeacherResponse> searchClassByTeacher(@CurrentUser UserEntity user,
                                                            @RequestBody GetClassesBySearchingTeacherRequest request) {
         String name = request.getName();
+        Integer year = request.getYear();
 
         List<UserEntity> ret = userRepository.findByName(name);
 
@@ -80,19 +87,26 @@ public class SearchClassesController {
             Set<TeachesEntity> teachesAll = teacher.getTeaches();
             for (TeachesEntity teaches : teachesAll) {
                 Set<ClassEntity> classes = teaches.getClasses();
-                classesAll.addAll(classes);
+
+                for (ClassEntity clazz : classes) {
+                    if (clazz.getYear().equals(year)) {
+                        classesAll.add(clazz);
+                    }
+                }
             }
+
         }
 
         return new ResponseEntity<>(new GetClassesBySearchingTeacherResponse("OK", classesAll), HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "/by_course_and_teacher")
+    @GetMapping(path = "/search-by-both-names")
     @Authorization
-    public ResponseEntity<GetClassesBySearchingBothResponse> deleteClasses(@CurrentUser UserEntity user,
+    public ResponseEntity<GetClassesBySearchingBothResponse> searchClassBoth(@CurrentUser UserEntity user,
                                                                @RequestBody GetClassesBySearchingBothRequest request) {
         String courseName = request.getCourseName();
         String teacherName = request.getTeacherName();
+        Integer year = request.getYear();
 
         List<CourseEntity> ret = courseRepository.findByName(courseName);
         if (ret.isEmpty()) {
@@ -111,7 +125,13 @@ public class SearchClassesController {
         Set<ClassEntity> classesByTeacherName = new HashSet<>();
 
         for (CourseEntity course : ret) {
-            classesByCourseName.addAll(course.getClasses());
+            Set<ClassEntity> classes = course.getClasses();
+
+            for (ClassEntity clazz : classes) {
+                if (clazz.getYear().equals(year)) {
+                    classesByCourseName.add(clazz);
+                }
+            }
         }
 
         for (UserEntity teacher : retu) {
@@ -121,7 +141,11 @@ public class SearchClassesController {
             Set<TeachesEntity> teachesAll = teacher.getTeaches();
             for (TeachesEntity teaches : teachesAll) {
                 Set<ClassEntity> classes = teaches.getClasses();
-                classesByTeacherName.addAll(classes);
+                for (ClassEntity clazz : classes) {
+                    if (clazz.getYear().equals(year)) {
+                        classesByTeacherName.add(clazz);
+                    }
+                }
             }
         }
 
