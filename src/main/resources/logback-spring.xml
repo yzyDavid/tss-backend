@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOG_PATH" value="/Users/yimingqi/Public/TSS_logs"></property>
+    <property name="LOG_PATH" value="\SE_log\2018.log"></property>
     <contextName>TSS</contextName>
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">

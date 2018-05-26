@@ -25,16 +25,11 @@ import tss.repositories.*;
 @RequestMapping(path = "/search_classes")
 public class SearchClassesController {
     private final CourseRepository courseRepository;
-    private final ClassRepository classRepository;
-    private final TeachesRepository teachesRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public SearchClassesController(CourseRepository courseRepository, ClassRepository classRepository,
-                           TeachesRepository teachesRepository, UserRepository userRepository) {
+    public SearchClassesController(CourseRepository courseRepository, UserRepository userRepository) {
         this.courseRepository = courseRepository;
-        this.teachesRepository = teachesRepository;
-        this.classRepository = classRepository;
         this.userRepository = userRepository;
     }
 
@@ -54,7 +49,7 @@ public class SearchClassesController {
         Set<ClassEntity> classesAll = new HashSet<>();
 
         for (CourseEntity course : ret) {
-            Set<ClassEntity> classes = course.getClasses();
+            List<ClassEntity> classes = course.getClasses();
             for (ClassEntity clazz : classes) {
                 if (clazz.getYear().equals(year)) {
                     classesAll.add(clazz);
@@ -84,17 +79,12 @@ public class SearchClassesController {
             if (!teacher.readTypeName().equals("Teacher")) {
                 continue;
             }
-            Set<TeachesEntity> teachesAll = teacher.getTeaches();
-            for (TeachesEntity teaches : teachesAll) {
-                Set<ClassEntity> classes = teaches.getClasses();
-
-                for (ClassEntity clazz : classes) {
-                    if (clazz.getYear().equals(year)) {
-                        classesAll.add(clazz);
-                    }
+            List<ClassEntity> classes = teacher.getClassesTeaching();
+            for (ClassEntity clazz : classes) {
+                if (clazz.getYear().equals(year)) {
+                    classesAll.add(clazz);
                 }
             }
-
         }
 
         return new ResponseEntity<>(new GetClassesBySearchingTeacherResponse("OK", classesAll), HttpStatus.OK);
@@ -125,7 +115,7 @@ public class SearchClassesController {
         Set<ClassEntity> classesByTeacherName = new HashSet<>();
 
         for (CourseEntity course : ret) {
-            Set<ClassEntity> classes = course.getClasses();
+            List<ClassEntity> classes = course.getClasses();
 
             for (ClassEntity clazz : classes) {
                 if (clazz.getYear().equals(year)) {
@@ -138,15 +128,12 @@ public class SearchClassesController {
             if (!teacher.readTypeName().equals("Teacher")) {
                 continue;
             }
-            Set<TeachesEntity> teachesAll = teacher.getTeaches();
-            for (TeachesEntity teaches : teachesAll) {
-                Set<ClassEntity> classes = teaches.getClasses();
-                for (ClassEntity clazz : classes) {
-                    if (clazz.getYear().equals(year)) {
-                        classesByTeacherName.add(clazz);
-                    }
+            List<ClassEntity> classes = teacher.getClassesTeaching();
+
+            for (ClassEntity clazz : classes)
+                if (clazz.getYear().equals(year)) {
+                    classesByTeacherName.add(clazz);
                 }
-            }
         }
 
         Set<ClassEntity> res = new HashSet<>();
