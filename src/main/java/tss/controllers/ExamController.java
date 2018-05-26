@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import tss.annotations.session.CurrentUser;
@@ -48,16 +49,19 @@ public class ExamController {
         this.resultRepository = resultRepository;
     }
 
-    public ResponseEntity<GetPaperResponse> ShowPapers(@RequestBody ShowPapersRequest request){
-        List<PaperResponseStruct> papers = new ArrayList<>();
+    @PostMapping(path = "/getpaperlist")
+    public ResponseEntity<ShowPapersResponse> ShowPapers(@RequestBody ShowPapersRequest request){
+       // List<PaperResponseStruct> papers = new ArrayList<>();
         Date nowdate= new Date();
+        List<String> pid = new ArrayList<String>();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date datebegin = null, dateend = null;
+        Date datebegin = new Date();
+        Date dateend = new Date();
 
         Iterable<PapersEntity> paper_find = paperRepository.findAll();
         for(PapersEntity paper : paper_find){
-            PaperResponseStruct paper_return = new PaperResponseStruct();
+           /* PaperResponseStruct paper_return = new PaperResponseStruct();
             paper_return.setPid(paper.getPid());
             paper_return.setBegin(paper.getBegin());
             paper_return.setEnd(paper.getEnd());
@@ -66,26 +70,26 @@ public class ExamController {
             paper_return.setLast(paper.getLast());
             paper_return.setPapername(paper.getPapername());
             paper_return.setQid(null);
-            paper_return.setScore(null);
+            paper_return.setScore(null); */
 
             try {
-                datebegin = formatter.parse(paper_return.getBegin());
-                dateend = formatter.parse(paper_return.getEnd());
+                datebegin = formatter.parse(paper.getBegin());
+                dateend = formatter.parse(paper.getEnd());
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 
             if(nowdate.after(datebegin)&& nowdate.before(dateend)){
-                papers.add(paper_return);
+                pid.add(paper.getPid());
             }
         }
         System.out.println("ok");
-        return new ResponseEntity<>(new GetPaperResponse("ok", papers), HttpStatus.OK);
+        return new ResponseEntity<>(new ShowPapersResponse("ok", pid), HttpStatus.OK);
     }
 
 
 
-    @RequestMapping(path = "testsys_?????")
+    @PostMapping(path = "/getpaper")
     public ResponseEntity<SelectPaperResponse> SelectPaper(@RequestBody SelectPaperRequest request){
         PaperResponseStruct paper_return;
         paper_return = new PaperResponseStruct();
@@ -112,7 +116,7 @@ public class ExamController {
     }
 
 
-    @RequestMapping(path = "testsys_?????")
+    @PostMapping(path = "/getquestions")
     public ResponseEntity<StartExamResponse> StartExam(@CurrentUser UserEntity user, @RequestBody StartExamRequest request){
         PaperResponseStruct paper_return;
         HistoryGradeEntity graderecord=new HistoryGradeEntity();
@@ -175,7 +179,7 @@ public class ExamController {
 
     }
 
-    @RequestMapping(path = "testsys_?????")
+    @PostMapping(path = "/save")
     public ResponseEntity<AddResultResponse> SavePaper(@CurrentUser UserEntity user, @RequestBody AddResultRequest request){
         ResultEntity result= new ResultEntity();
         QuestionEntity question;
@@ -206,7 +210,7 @@ public class ExamController {
     }
 
 
-    @RequestMapping(path = "testsys_?????")
+    @PostMapping(path = "/submit")
     public ResponseEntity<DeleteResultResponse> SubmitPaper(@CurrentUser UserEntity user, @RequestBody DeleteResultRequest request){
 // ret: paper     ret2: result  ret3: Question ret4: historygrade
         PapersEntity paper;

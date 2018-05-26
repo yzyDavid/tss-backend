@@ -9,11 +9,15 @@ public class GetGradeResponse {
     private final String status;
     private final List<String> Qid;
     private final List<Double> rate;
+    private final List<String> pid;
+    private final List<String> score;
 
-    public GetGradeResponse(String status, List<String> qid, List<Double> rate) {
+    public GetGradeResponse(String status, List<String> qid, List<Double> rate, List<String> pid, List<String> score) {
         this.status = status;
         Qid = qid;
         this.rate = rate;
+        this.pid = pid;
+        this.score = score;
     }
 
     public String getStatus() {
@@ -26,5 +30,13 @@ public class GetGradeResponse {
 
     public List<Double> getRate() {
         return rate;
+    }
+
+    public List<String> getPid() {
+        return pid;
+    }
+
+    public List<String> getScore() {
+        return score;
     }
 }
