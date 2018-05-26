@@ -5,25 +5,18 @@ import org.jetbrains.annotations.Nls;
 public class DeleteUserResponse {
     private final @Nls
     String status;
-    private final String uid;
-    private final String name;
+    private final String[] uids;
 
-    public DeleteUserResponse(String status, String uid, String name) {
+    public DeleteUserResponse(String status, String[] uids) {
         this.status = status;
-        this.uid = uid;
-        this.name = name;
+        this.uids = uids;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public String getUid() {
-        return uid;
+    public String[] getUids() {
+        return uids;
     }
-
-    public String getName() {
-        return name;
-    }
-
 }

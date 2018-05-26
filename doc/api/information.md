@@ -29,10 +29,10 @@
 
 |  方法  |       uri        |                        请求参数(json)                        |                        返回参数(json)                        |        说明        |
 | :----: | :--------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------: |
-|  PUT   |   /course/add    | cid:String(required) name:String(requierd) credit:Float(optional) weeklyNum:Int(optional) semester:String(optional)  department:String(optinal) | status:String   cid:String    name:String credit:Float weeklyNum:Int semester:String  department:String |      添加课程      |
-| DELETE |  /course/delete  |                     cid:String(required)                     |          status:String   cid:String    name:String           |      删除课程      |
-|  POST  |  /course/modify  | cid:String(required) name:String(optional) credit:Float(optional) weeklyNum:Int(optional) semester:String(optional)  department:String(optinal) intro:String(optional) | status:String   cid:String    name:String credit:Float weeklyNum:Int semester:String  department:String  intro:String | 修改指定课程的信息 |
-|  GET   | /course/get/info |                     cid:String(required)                     | status:String   cid:String    name:String credit:Float weeklyNum:Int semester:String  department:String  intro:String | 获取指定课程的信息 |
+|  PUT   |   /course/add    | courseId:String(required) name:String(requierd) credit:Float(optional) weeklyNum:Int(optional) semester:String(optional)  department:String(optinal) | status:String   courseId:String    name:String credit:Float weeklyNum:Int semester:String  department:String |      添加课程      |
+| DELETE |  /course/delete  |                     courseId:String(required)                     |          status:String   courseId:String    name:String           |      删除课程      |
+|  POST  |  /course/modify  | courseId:String(required) name:String(optional) credit:Float(optional) weeklyNum:Int(optional) semester:String(optional)  department:String(optinal) intro:String(optional) | status:String   courseId:String    name:String credit:Float weeklyNum:Int semester:String  department:String  intro:String | 修改指定课程的信息 |
+|  GET   | /course/get/info |                     courseId:String(required)                     | status:String   courseId:String    name:String credit:Float weeklyNum:Int semester:String  department:String  intro:String | 获取指定课程的信息 |
 |  POST  |  /course/query   |      name:String(optional) department:String(optional)       | status:String   cids:String[] names:String[] departments:String[] |    模糊查找课程    |
 
 

@@ -1,65 +1,69 @@
 package tss.entities;
 
+import tss.models.TimeSlotTypeEnum;
+
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
- * @author Mingqi Yi
+ * @author reeve
  */
 @Entity
 @Table(name = "time_slot")
 public class TimeSlotEntity {
-    private Short id;
-    private String day;
-    private int start;
-    private int end;
-    private Set<SectionEntity> sections = new HashSet();
-
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Short getId() {
+    @GeneratedValue
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    private TimeSlotTypeEnum type;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "classroom_id")
+    private ClassroomEntity classroom;
+
+    @ManyToOne
+    @JoinColumn(name = "class_id")
+    private ClassEntity clazz;
+
+    public TimeSlotEntity() {
+    }
+
+    public TimeSlotEntity(TimeSlotTypeEnum type, ClassroomEntity classroom, ClassEntity clazz) {
+        this.type = type;
+        this.classroom = classroom;
+        this.clazz = clazz;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Short id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    @Column(name = "day", length = 4, nullable = false)
-    public String getDay() {
-        return day;
+    public TimeSlotTypeEnum getType() {
+        return type;
     }
 
-    public void setDay(String day) {
-        this.day = day;
+    public void setType(TimeSlotTypeEnum type) {
+        this.type = type;
     }
 
-    @Column(name = "start_time", nullable = false)
-    public int getStart() {
-        return start;
+    public ClassroomEntity getClassroom() {
+        return classroom;
     }
 
-    public void setStart(int start) {
-        this.start = start;
+    public void setClassroom(ClassroomEntity classroom) {
+        this.classroom = classroom;
     }
 
-    @Column(name = "end_time", nullable = false)
-    public int getEnd() {
-        return end;
+    public ClassEntity getClazz() {
+        return clazz;
     }
 
-    public void setEnd(int end) {
-        this.end = end;
-    }
-
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "timeSlot")
-    public Set<SectionEntity> getSections() {
-        return sections;
-    }
-
-    public void setSections(Set<SectionEntity> sections) {
-        this.sections = sections;
+    public void setClazz(ClassEntity clazz) {
+        this.clazz = clazz;
     }
 
     @Override
@@ -73,10 +77,12 @@ public class TimeSlotEntity {
 
     @Override
     public boolean equals(Object obj) {
-        if (!obj.getClass().equals(this.getClass()) || id == null) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
-        } else {
+        } else if (id != null) {
             return (id.equals(((TimeSlotEntity) obj).id));
+        } else {
+            return super.equals(obj);
         }
     }
 }

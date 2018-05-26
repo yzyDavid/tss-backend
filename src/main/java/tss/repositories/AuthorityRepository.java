@@ -6,5 +6,7 @@ import tss.entities.AuthorityEntity;
 import java.util.Optional;
 
 public interface AuthorityRepository extends CrudRepository<AuthorityEntity, Short> {
-    Optional<AuthorityEntity> findByUri(String Uri);
+    Optional<AuthorityEntity> findByUri(String uri);
+
+    boolean existsByUri(String uri);
 }

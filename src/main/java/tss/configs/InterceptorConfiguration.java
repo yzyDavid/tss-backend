@@ -11,6 +11,7 @@ import tss.interceptors.CurrentUserInterceptor;
 import tss.repositories.AuthorityRepository;
 import tss.repositories.SqlSessionRepository;
 import tss.repositories.UserRepository;
+import tss.services.AuthorizationService;
 
 import java.util.List;
 
@@ -21,14 +22,14 @@ import java.util.List;
 public class InterceptorConfiguration {
     private final SqlSessionRepository sqlSessionRepository;
     private final UserRepository userRepository;
-    private final AuthorityRepository authorityRepository;
+    private final AuthorizationService authorizationService;
 
     @Autowired
     public InterceptorConfiguration(SqlSessionRepository sqlSessionRepository, UserRepository userRepository,
-                                    AuthorityRepository authorityRepository) {
+                                    AuthorizationService authorizationService) {
         this.sqlSessionRepository = sqlSessionRepository;
         this.userRepository = userRepository;
-        this.authorityRepository = authorityRepository;
+        this.authorizationService = authorizationService;
     }
 
     @Bean
@@ -36,7 +37,7 @@ public class InterceptorConfiguration {
         return new WebMvcConfigurer() {
             @Override
             public void addInterceptors(InterceptorRegistry registry) {
-                registry.addInterceptor(new AuthorizationInterceptor(sqlSessionRepository, userRepository, authorityRepository));
+                registry.addInterceptor(new AuthorizationInterceptor(sqlSessionRepository, userRepository, authorizationService));
             }
         };
     }

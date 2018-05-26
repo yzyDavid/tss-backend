@@ -5,11 +5,19 @@ public class GetPaperRequest {
     public String info;
 
 
-    public String getDirection() {return direction;}
+    public String getDirection() {
+        return direction;
+    }
 
-    public void setDirection(String direction) {this.direction = direction;}
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
 
-    public String getInfo() {return info;}
+    public String getInfo() {
+        return info;
+    }
 
-    public void setInfo(String info) {this.info = info;}
+    public void setInfo(String info) {
+        this.info = info;
+    }
 }

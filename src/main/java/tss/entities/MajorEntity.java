@@ -19,8 +19,6 @@ public class MajorEntity {
     private Set<CourseEntity> setOfCompulsory = new HashSet<>();
     private Set<CourseEntity> setOfSelective = new HashSet<>();
 
-    // Set<MajorClassEntity> classes = new HashSet<>();
-
     @Id
     public Short getId() {
         return id;
@@ -103,27 +101,19 @@ public class MajorEntity {
         this.setOfSelective = courses;
     }
 
-    /*@OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "major")
-    public Set<MajorClassEntity> getClasses() {
-        return classes;
-    }
-
-    public void setClasses(Set<MajorClassEntity> classes) {
-        this.classes = classes;
-    }
 
     @Override
     public boolean equals(Object obj) {
-        if(obj.getClass().equals(this.getClass()) && id != null) {
-            return id.equals(((MajorClassEntity)obj).id);
+        if (obj.getClass().equals(this.getClass()) && id != null) {
+            return id.equals(((MajorClassEntity) obj).id);
         } else {
-            return false;
+            return super.equals(obj);
         }
-    }*/
+    }
 
     @Override
     public int hashCode() {
-        if(name != null) {
+        if (name != null) {
             return name.hashCode();
         } else {
             return super.hashCode();

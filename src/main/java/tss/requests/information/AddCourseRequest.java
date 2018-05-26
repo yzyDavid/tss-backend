@@ -4,9 +4,8 @@ public class AddCourseRequest {
     private String cid;
     private String name;
     private Float credit;
-    private Integer weeklyNum;
-    private String semester;
-    private String dept;
+    private Integer numLessonsEachWeek;
+    private String department;
 
     public String getCid() {
         return cid;
@@ -32,27 +31,19 @@ public class AddCourseRequest {
         this.credit = credit;
     }
 
-    public Integer getWeeklyNum() {
-        return weeklyNum;
+    public Integer getNumLessonsEachWeek() {
+        return numLessonsEachWeek;
     }
 
-    public void setWeeklyNum(Integer weeklyNum) {
-        this.weeklyNum = weeklyNum;
+    public void setNumLessonsEachWeek(Integer numLessonsEachWeek) {
+        this.numLessonsEachWeek = numLessonsEachWeek;
     }
 
-    public String getSemester() {
-        return semester;
+    public String getDepartment() {
+        return department;
     }
 
-    public void setSemester(String semester) {
-        this.semester = semester;
-    }
-
-    public String getDept() {
-        return dept;
-    }
-
-    public void setDept(String dept) {
-        this.dept = dept;
+    public void setDepartment(String department) {
+        this.department = department;
     }
 }

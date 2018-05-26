@@ -3,3 +3,10 @@ INSERT INTO course VALUES(0, 2, 'an important introductory course', 'Data Struct
 INSERT INTO course VALUES(1, 2, 'an important introductory course', 'ADS', 'S', 5, 0, 0);
 INSERT INTO course VALUES(2, 2, 'an important introductory course', 'BDS', 'S', 5, 0, 0);
 INSERT INTO course VALUES(3, 2, 'an important introductory course', 'CDS', 'S', 5, 0, 0);
+insert into department (id, dept_name) values (0, 'Computer Science');
+insert into course (id, credit, intro, name, num_lessons_each_week, department_id) values ('20011', 2.0, 'An Description', 'Data Structure', 5, 0);
+insert into class (id, capacity, num_student, semester, year, course_id, teacher_id) values (10001, 100, 50, 'FIRST', 2017, '20011', 'root');
+insert into campus (id, name) values (1, 'Yuquan');
+insert into building (id, name, campus_id) values (1, '7th Building', 1);
+insert into classroom (id, capacity, name, building_id) values (1, 120, '101', 1);
+insert into time_slot (id, type, classroom_id, class_id) values (1, 'MON_1_2', 1, 10001);
