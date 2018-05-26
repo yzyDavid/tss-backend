@@ -85,7 +85,7 @@ public class ExamController {
 
 
 
-
+    @RequestMapping(path = "testsys_?????")
     public ResponseEntity<SelectPaperResponse> SelectPaper(@RequestBody SelectPaperRequest request){
         PaperResponseStruct paper_return;
         paper_return = new PaperResponseStruct();
@@ -112,7 +112,7 @@ public class ExamController {
     }
 
 
-
+    @RequestMapping(path = "testsys_?????")
     public ResponseEntity<StartExamResponse> StartExam(@CurrentUser UserEntity user, @RequestBody StartExamRequest request){
         PaperResponseStruct paper_return;
         HistoryGradeEntity graderecord=new HistoryGradeEntity();
@@ -175,6 +175,7 @@ public class ExamController {
 
     }
 
+    @RequestMapping(path = "testsys_?????")
     public ResponseEntity<AddResultResponse> SavePaper(@CurrentUser UserEntity user, @RequestBody AddResultRequest request){
         ResultEntity result= new ResultEntity();
         QuestionEntity question;
@@ -205,6 +206,7 @@ public class ExamController {
     }
 
 
+    @RequestMapping(path = "testsys_?????")
     public ResponseEntity<DeleteResultResponse> SubmitPaper(@CurrentUser UserEntity user, @RequestBody DeleteResultRequest request){
 // ret: paper     ret2: result  ret3: Question ret4: historygrade
         PapersEntity paper;

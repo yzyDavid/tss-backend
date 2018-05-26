@@ -5,9 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import tss.annotations.session.CurrentUser;
 import tss.entities.*;
 import tss.repositories.*;
+import tss.requests.information.GetGradeBySidRequest;
 import tss.requests.information.GetGradeRequest;
 import tss.responses.information.GetGradeBySidResponse;
 import tss.responses.information.GetGradeResponse;
@@ -35,16 +37,23 @@ public class GradeController {
         this.historyGradeRepository = historyGradeRepository;
     }
 
-    public ResponseEntity<GetGradeBySidResponse> StudentGrade(@CurrentUser UserEntity user, @RequestBody GetGradeBySidResponse request){
+    @RequestMapping(path = "testsys_?????")
+    public ResponseEntity<GetGradeBySidResponse> StudentGrade(@CurrentUser UserEntity user, @RequestBody GetGradeBySidRequest request){
         List<String> pid = new ArrayList<String>();
         List<String> score = new ArrayList<String>();
+        Iterable<HistoryGradeEntity> records_find;
+        if(request.getSid()!=null) {
+           records_find =  historyGradeRepository.findByStudent(request.getSid());
+        }
+        else{
+           records_find =  historyGradeRepository.findByStudent(user.getUid());
+        }
 
-        Iterable<HistoryGradeEntity> records_find =  historyGradeRepository.findByStudent(user.getUid());
         if(((List<HistoryGradeEntity>) records_find).isEmpty()){
             return new ResponseEntity<>(new GetGradeBySidResponse("This student haven't take any exam yet", user.getUid(), null, null), HttpStatus.BAD_REQUEST);
         }
         int i=0;
-        int size = ((List<HistoryGradeEntity>) records_find).size();
+        //int size = ((List<HistoryGradeEntity>) records_find).size();
 
         for(HistoryGradeEntity record : records_find){
             pid.add(i,record.getPaper().getPid());
@@ -54,6 +63,7 @@ public class GradeController {
         return  new ResponseEntity<>(new GetGradeBySidResponse("Ok", user.getUid(), pid, score),HttpStatus.OK);
     }
 
+    @RequestMapping(path = "testsys_?????")
     public ResponseEntity<GetGradeResponse> GetGrade(@CurrentUser UserEntity user, @RequestBody GetGradeRequest request){
 
         GetGradeRequest.QueryType type = request.getType();
