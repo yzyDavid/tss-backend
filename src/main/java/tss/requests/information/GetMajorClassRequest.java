@@ -1,6 +1,6 @@
 package tss.requests.information;
 
-public class GetDepartmentRequest {
+public class GetMajorClassRequest {
     private String name;
 
     public String getName() {

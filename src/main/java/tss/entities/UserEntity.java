@@ -25,16 +25,18 @@ public class UserEntity {
     @Column(name = "user_id", length = 10)
     private String uid;
 
-    @Column(name = "user_name")
-    private String name;
-
     @Column(name = "hashed_pwd", length = 44)
     private String hashedPassword;
 
     @Column(length = 24)
     private String salt;
 
-    @Column(length = 31)
+    @Column(name = "user_name", length = 31)
+    private String name;
+
+    @Column(length = 3)
+    private String gender;
+
     private String email;
 
     @Column(length = 16)
@@ -52,9 +54,17 @@ public class UserEntity {
     @JoinColumn(name = "department_id")
     private DepartmentEntity department;
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
-    private TypeGroupEntity typeGroup;
+    private TypeGroupEntity type;
+
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "class_id")
+    private MajorClassEntity majorClass;
+
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(name = "user_authority", joinColumns = {@JoinColumn(name = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "authority_id")})
+    private Set<AuthorityEntity> dataAccessAuths = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacher")
     private List<ClassEntity> classesTeaching = new ArrayList<>();
@@ -63,7 +73,13 @@ public class UserEntity {
     private List<ClassRegistrationEntity> classRegistrations = new ArrayList<>();
 
 
-    // Getter and setter.
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
 
     public String getUid() {
         return uid;
@@ -137,28 +153,82 @@ public class UserEntity {
         this.department = department;
     }
 
+    public String readDepartmentName() {
+        if (department != null) {
+            return department.getName();
+        } else {
+            return null;
+        }
+    }
+
+    public MajorClassEntity getMajorClass() {
+        return majorClass;
+    }
+
+    public void setMajorClass(MajorClassEntity majorClass) {
+        this.majorClass = majorClass;
+    }
+
+    public String readClassName() {
+        if (majorClass != null) {
+            return majorClass.getName();
+        } else {
+            return null;
+        }
+    }
+
+    public Set<AuthorityEntity> getDataAccessAuths() {
+        return dataAccessAuths;
+    }
+
+    public void setDataAccessAuths(Set<AuthorityEntity> dataAccessAuths) {
+        this.dataAccessAuths = dataAccessAuths;
+    }
+
+    public void addDataAccessAuth(AuthorityEntity dataAccessAuth) {
+        this.dataAccessAuths.add(dataAccessAuth);
+    }
+
+    public TypeGroupEntity getType() {
+        return type;
+    }
+
+    public void setType(TypeGroupEntity type) {
+        this.type = type;
+    }
+
+    public String readTypeName() {
+        if (type != null) {
+            return type.getName();
+        } else {
+            return null;
+        }
+    }
+
     public List<ClassEntity> getClassesTeaching() {
         return classesTeaching;
+    }
+
+    public void setClassesTeaching(List<ClassEntity> classesTeaching) {
+        this.classesTeaching = classesTeaching;
+    }
+
+    public void addClassTeaching(ClassEntity classEntity) {
+        classesTeaching.add(classEntity);
+        classEntity.setTeacher(this);
     }
 
     public List<ClassRegistrationEntity> getClassRegistrations() {
         return classRegistrations;
     }
 
-    public TypeGroupEntity getTypeGroup() {
-        return typeGroup;
+    public void setClassRegistrations(List<ClassRegistrationEntity> classRegistrations) {
+        this.classRegistrations = classRegistrations;
     }
 
-    public void setTypeGroup(TypeGroupEntity typeGroup) {
-        this.typeGroup = typeGroup;
-    }
-
-    public String readTypeName() {
-        if (typeGroup != null) {
-            return typeGroup.getName();
-        } else {
-            return null;
-        }
+    public void addClassRegistration(ClassRegistrationEntity classRegistrationEntity) {
+        classRegistrations.add(classRegistrationEntity);
+        classRegistrationEntity.setStudent(this);
     }
 
     @Override
@@ -170,23 +240,14 @@ public class UserEntity {
         }
     }
 
-
-    public void addClassTeaching(ClassEntity classEntity) {
-        classesTeaching.add(classEntity);
-        classEntity.setTeacher(this);
-    }
-
-    public void addClassRegistration(ClassRegistrationEntity classRegistrationEntity) {
-        classRegistrations.add(classRegistrationEntity);
-        classRegistrationEntity.setStudent(this);
-    }
-
     @Override
     public boolean equals(Object obj) {
-        if (!obj.getClass().equals(this.getClass()) || uid == null) {
+        if (!obj.getClass().equals(this.getClass())) {
             return false;
-        } else {
+        } else if (uid != null) {
             return (uid.equals(((UserEntity) obj).uid));
+        } else {
+            return super.equals(obj);
         }
     }
 }

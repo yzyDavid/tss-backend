@@ -15,4 +15,5 @@ public interface UserRepository extends CrudRepository<UserEntity, String> {
      * check exists of a UID
      */
     List<UserEntity> findByName(String name);
+
 }

@@ -4,14 +4,18 @@ import org.jetbrains.annotations.Nls;
 
 import java.util.List;
 
-public class GetUsersByNameResponse {
+public class QueryUsersResponse {
     @Nls
     private final String status;
     private final List<String> uids;
+    private final List<String> names;
+    private final List<String> departments;
 
-    public GetUsersByNameResponse(String status, List<String> uids) {
+    public QueryUsersResponse(String status, List<String> uids, List<String> names, List<String> departments) {
         this.status = status;
         this.uids = uids;
+        this.names = names;
+        this.departments = departments;
     }
 
     public String getStatus() {

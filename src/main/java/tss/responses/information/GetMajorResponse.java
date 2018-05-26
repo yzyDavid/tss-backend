@@ -2,12 +2,12 @@ package tss.responses.information;
 
 import org.jetbrains.annotations.Nls;
 
-public class AddDepartmentResponse {
+public class GetMajorResponse {
     @Nls
-    private final String status;
-    private final String name;
+    final private String status;
+    final private String name;
 
-    public AddDepartmentResponse(String status, String name) {
+    public GetMajorResponse(String status, String name) {
         this.status = status;
         this.name = name;
     }
