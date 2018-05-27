@@ -74,7 +74,7 @@ public class GradeController {
         classRepository.save(classEntity);
         return new ResponseEntity<>(new AddClassResponse("OK"+takesRepository.findAll().toString()), HttpStatus.OK);
     }
-    @GetMapping(path = "/getallclass")
+    @PostMapping(path = "/getallclass")
 //    @Authorization
     public ResponseEntity<GetAllClassResponse> getallclass(@RequestBody GetAllClassRequest request)
     {
@@ -104,7 +104,7 @@ public class GradeController {
         }
         return new ResponseEntity<>(new GetAllClassResponse("OK",courses_name,class_id),HttpStatus.OK);
     }
-    @GetMapping(path = "/getclassstudent")
+    @PostMapping(path = "/getclassstudent")
 //    @Authorization
     public ResponseEntity<GetClassStudentResponse> getallclassstudents(@RequestBody GetClassStudentRequest request)
     {
@@ -241,7 +241,7 @@ public class GradeController {
         }
         return new ResponseEntity<>(new ModifyGradeResponse("no such student in this class"),HttpStatus.BAD_REQUEST);
     }
-    @GetMapping(path = "/getprocessmodify")
+    @PostMapping(path = "/getprocessmodify")
     public ResponseEntity<GetProcessResponse>getprocess(@RequestBody GetProcessRequest request)
     {
         String uid = request.getUid();
@@ -266,29 +266,23 @@ public class GradeController {
         return new ResponseEntity<>(new GetProcessResponse("ok",reasons,scores,uids,cids),HttpStatus.OK);
     }
     @PostMapping(path = "/processmodify")
-    public ResponseEntity<ProcessModifyResponse>processmodify(@RequestBody ProcessModifyRequest request)
-    {
-        for(int i=0;i<request.getProcess().size();i++) {
-            if (request.getProcess().get(i)) {
-
-                Long cid = request.getCids().get(i);
-                Optional<ClassEntity> ret = classRepository.findById(cid);
-                if (!ret.isPresent())
-                    return new ResponseEntity<>(new ProcessModifyResponse("no such class"), HttpStatus.BAD_REQUEST);
-                ClassEntity classEntity = ret.get();
-                for(TakesEntity takesEntity:classEntity.getTakes())
-                {
-                    if(takesEntity.getStudent().getUid().equals(request.getUids().get(i)))
-                    {
-                        takesEntity.setScore(request.getScore().get(i));
-                        break;
-                    }
+    public ResponseEntity<ProcessModifyResponse>processmodify(@RequestBody ProcessModifyRequest request) {
+        if (request.getProcess()) {
+            Long cid = request.getCids();
+            Optional<ClassEntity> ret = classRepository.findById(cid);
+            if (!ret.isPresent())
+                return new ResponseEntity<>(new ProcessModifyResponse("no such class"), HttpStatus.BAD_REQUEST);
+            ClassEntity classEntity = ret.get();
+            for (TakesEntity takesEntity : classEntity.getTakes()) {
+                if (takesEntity.getStudent().getUid().equals(request.getUids())) {
+                    takesEntity.setScore(request.getScore());
+                    break;
                 }
-                classRepository.save(classEntity);
             }
+            classRepository.save(classEntity);
         }
-        modifyRepository.deleteAll();
-        return new ResponseEntity<>(new ProcessModifyResponse("ok"),HttpStatus.OK);
+            return new ResponseEntity<>(new ProcessModifyResponse("ok"), HttpStatus.OK);
+
     }
     @GetMapping(path = "/getstudentclass")
     public ResponseEntity<GetStudentClassResponse>getstudentclass(@RequestBody GetStudentClassRequest request)
