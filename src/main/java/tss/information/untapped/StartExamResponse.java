@@ -8,12 +8,12 @@ public class StartExamResponse {
 
     private final String status;
     private final PaperResponseStruct paperInfo;
-    private final String StartTime;
+    private final String starttime;
 
-    public StartExamResponse(String status, PaperResponseStruct paperInfo, String startTime) {
+    public StartExamResponse(String status, PaperResponseStruct paperInfo, String starttime) {
         this.status = status;
         this.paperInfo = paperInfo;
-        StartTime = startTime;
+        this.starttime = starttime;
     }
 
     public String getStatus() {
@@ -24,7 +24,7 @@ public class StartExamResponse {
         return paperInfo;
     }
 
-    public String getStartTime() {
-        return StartTime;
+    public String getStarttime() {
+        return starttime;
     }
 }

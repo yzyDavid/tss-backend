@@ -2,12 +2,13 @@ package tss.requests.information;
 
 public class DeleteResultRequest {
 
-    private String Pid;
+    private String pid;
 
     public String getPid() {
-        return Pid;
+        return pid;
     }
+
     public void setPid(String pid) {
-        Pid = pid;
+        this.pid = pid;
     }
 }

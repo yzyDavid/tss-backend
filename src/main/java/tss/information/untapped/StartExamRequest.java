@@ -2,14 +2,14 @@ package tss.information.untapped;
 
 public class StartExamRequest {
 
-    private String Pid;
+    private String pid;
 
 
     public String getPid() {
-        return Pid;
+        return pid;
     }
 
     public void setPid(String pid) {
-        Pid = pid;
+        this.pid = pid;
     }
 }

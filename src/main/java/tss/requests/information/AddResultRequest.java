@@ -2,26 +2,31 @@ package tss.requests.information;
 
 public class AddResultRequest {
 
-    private String Pid;
-    private String[] Qid;
-    private String[] Ans;
+    private String pid;
+    private String[] qid;
+    private String[] ans;
 
     public String getPid() {
-        return Pid;
+        return pid;
     }
+
     public void setPid(String pid) {
-        Pid = pid;
+        this.pid = pid;
     }
+
     public String[] getQid() {
-        return Qid;
+        return qid;
     }
+
     public void setQid(String[] qid) {
-        Qid = qid;
+        this.qid = qid;
     }
+
     public String[] getAns() {
-        return Ans;
+        return ans;
     }
+
     public void setAns(String[] ans) {
-        Ans = ans;
+        this.ans = ans;
     }
 }

@@ -5,15 +5,15 @@ import java.util.Date;
 
 @Entity
 @Table(name = "HistoryGrade", indexes = {
-        @Index(name = "StudentID_Index", columnList = "StudentID"),
-        @Index(name = "PaperID_Index", columnList = "PaperID")
+        @Index(name = "StudentID_Index", columnList = "StudentID")
+       // @Index(name = "PaperID_Index", columnList = "PaperID")
 })
 public class HistoryGradeEntity {
     private String hid;
     private UserEntity student;
     private PapersEntity paper;
     private int grade;
-    private Date startTime;
+    private Date starttime;
 
     @Id
     @Column(name = "Historyid", length = 100)
@@ -26,7 +26,7 @@ public class HistoryGradeEntity {
     }
 
     @JoinColumn(name = "StudentID")
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     public UserEntity getStudent() {
         return student;
     }
@@ -36,7 +36,7 @@ public class HistoryGradeEntity {
     }
 
     @JoinColumn(name = "PaperID")
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     public PapersEntity getPaper() {
         return paper;
     }
@@ -56,12 +56,11 @@ public class HistoryGradeEntity {
 
     @Column(name = "StartTime")
     @Temporal(TemporalType.TIMESTAMP)
-    public Date getStartTime() {
-        return startTime;
+    public Date getStarttime() {
+        return starttime;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setStarttime(Date starttime) {
+        this.starttime = starttime;
     }
-
 }

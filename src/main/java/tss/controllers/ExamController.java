@@ -133,7 +133,7 @@ public class ExamController {
         if(exist=ret.isPresent()){
             graderecord = ret.get();
             if(graderecord.getGrade()!=-1){ //还在考试的过程中
-                String starttime= graderecord.getStartTime().toString();
+                String starttime= graderecord.getStarttime().toString();
                 System.out.println("the paper expired");
                 return new ResponseEntity<>(new StartExamResponse("the paper expired", null, starttime),HttpStatus.BAD_REQUEST);
             }
@@ -171,7 +171,7 @@ public class ExamController {
             graderecord.setPaper(paper);
             graderecord.setStudent(user);
             graderecord.setHid(user.getUid()+paper.getPid());
-            graderecord.setStartTime(nowdate);
+            graderecord.setStarttime(nowdate);
 
             historyGradeRepository.save(graderecord);
         }
