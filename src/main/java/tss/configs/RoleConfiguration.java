@@ -45,14 +45,8 @@ public class RoleConfiguration implements CommandLineRunner {
         String ddl_auto = bundle.getString("spring.jpa.hibernate.ddl-auto");
         if (ddl_auto.equals("create")) {
             initRole();
-            generateMajorClass();
-            generateUser();
-        }
-
-        Iterable<DepartmentEntity> departmentEntities = departmentRepository.findAll();
-        for(DepartmentEntity departmentEntity : departmentEntities) {
-            departmentEntity.setName(departmentEntity.getName()+"1");
-            departmentRepository.save(departmentEntity);
+            /*generateMajorClass();
+            generateUser();*/
         }
 
         String uid = bundle.getString("spring.datasource.username");
@@ -73,7 +67,7 @@ public class RoleConfiguration implements CommandLineRunner {
         }
     }
 
-    private void generateMajorClass() {
+    /*private void generateMajorClass() {
         Random rand = new Random(1000);
         int year = 2015;
         short id = 1;
@@ -168,7 +162,7 @@ public class RoleConfiguration implements CommandLineRunner {
         }
 
 
-    }
+    }*/
 
     private void initRole() {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
@@ -196,8 +190,12 @@ public class RoleConfiguration implements CommandLineRunner {
                 String prefix = role.getString("prefix");
                 JSONArray paths = role.getJSONArray("paths");
                 for (int i = 0; i < paths.length(); i++) {
-                    Matcher matcher = pattern.matcher(paths.getString(i));
-                    String uri = String.format(uriFormat, prefix, matcher.replaceAll("*"));
+                    String path = paths.getString(i);
+                    Matcher matcher = pattern.matcher(path);
+                    if(matcher.find()) {
+                        path = path.substring(0, matcher.start());
+                    }
+                    String uri = String.format(uriFormat, prefix, path);
                     AuthorityEntity authority = new AuthorityEntity();
                     authority.setUri(uri);
                     roleEntity.addAuthority(authority);

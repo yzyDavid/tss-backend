@@ -21,6 +21,7 @@ import tss.utils.SessionUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static tss.utils.SecurityUtils.getHashedPasswordByPasswordAndSalt;
 import static tss.utils.SecurityUtils.getSalt;
@@ -54,17 +55,17 @@ public class SessionController {
             return new ResponseEntity<>(new LoginResponse("", "", null, "Password incorrect"), HttpStatus.BAD_REQUEST);
         }
 
-        SessionEntity session = new SessionEntity();
-        session.setUid(login.getUid());
-        session.setToken(SessionUtils.getToken());
-        session.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
-
-        if (sqlSessionRepository.existsByUid(login.getUid())) {
-            // TODO: process with duplicated insert.
-            SessionEntity sessionToRemove = sqlSessionRepository.findByUid(login.getUid());
-            sqlSessionRepository.delete(sessionToRemove);
+        Optional<SessionEntity> ret = sqlSessionRepository.findByUid(login.getUid());
+        SessionEntity session;
+        if(ret.isPresent()) {
+            session = ret.get();
         }
-
+        else {
+            session = new SessionEntity();
+            session.setUid(login.getUid());
+            session.setToken(SessionUtils.getToken());
+        }
+        session.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
         sqlSessionRepository.save(session);
 
         return new ResponseEntity<>(new LoginResponse(login.getUid(), session.getToken(), user.readTypeName(), "OK"), HttpStatus.OK);
@@ -73,12 +74,12 @@ public class SessionController {
     @PostMapping(path = "/logout")
     public ResponseEntity<LogoutResponse> logout(@Autowired HttpServletRequest request) {
         String token = request.getHeader(Config.AUTH_HEADER);
-        SessionEntity session = sqlSessionRepository.findByToken(token);
-        if (session == null) {
+        Optional<SessionEntity> session = sqlSessionRepository.findByToken(token);
+        if (!session.isPresent()) {
             return new ResponseEntity<>(new LogoutResponse("Not logged in", null), HttpStatus.UNAUTHORIZED);
         } else {
-            String uid = session.getUid();
-            sqlSessionRepository.delete(session);
+            String uid = session.get().getUid();
+            sqlSessionRepository.delete(session.get());
             return new ResponseEntity<>(new LogoutResponse("OK", uid), HttpStatus.OK);
         }
     }

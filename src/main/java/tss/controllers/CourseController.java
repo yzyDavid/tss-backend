@@ -58,7 +58,9 @@ public class CourseController {
         course.setName(request.getName());
         course.setCredit(request.getCredit());
         course.setNumLessonsEachWeek(request.getNumLessonsEachWeek());
-        course.setDepartment(dept);
+        if(dept != null) {
+            course.setDepartment(dept);
+        }
         courseRepository.save(course);
 
         return new ResponseEntity<>(new AddCourseResponse("ok", course.getId(), course.getName(), course.getCredit(),
@@ -139,12 +141,16 @@ public class CourseController {
         List<String> cids = new ArrayList<>();
         List<String> names = new ArrayList<>();
         List<String> departments = new ArrayList<>();
-        Optional<DepartmentEntity> department = departmentRepository.findByName(request.getDepartment());
-        if (!department.isPresent()) {
-            return new ResponseEntity<>(new QueryCoursesResponse("Non-exist department", null, null, null), HttpStatus.OK);
+        Short deptId = null;
+        if(request.getDepartment() != null) {
+            Optional<DepartmentEntity> dept = departmentRepository.findByName(request.getDepartment());
+            if (!dept.isPresent()) {
+                return new ResponseEntity<>(new QueryCoursesResponse("Non-exist department", null, null, null), HttpStatus.OK);
+            }
+            deptId = dept.get().getId();
         }
 
-        List<CourseEntity> ret = queryService.queryCourses(request.getCid(), request.getDepartment(), department.get().getId());
+        List<CourseEntity> ret = queryService.queryCourses(request.getCid(), request.getDepartment(), deptId);
         for (CourseEntity course : ret) {
             cids.add(course.getId());
             names.add(course.getName());

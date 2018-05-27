@@ -89,9 +89,9 @@ public class QueryService {
 
     public List<UserEntity> queryUsers(String uid, String name, Short deptId) {
         NameValuePair[] pairs = new NameValuePair[3];
-        pairs[0] = new NameValuePair("uid", uid, Operators.LIKE);
-        pairs[1] = new NameValuePair("name", name, Operators.LIKE);
-        pairs[2] = new NameValuePair("department", deptId, Operators.EQ);
+        pairs[0] = new NameValuePair("user_id", uid, Operators.LIKE);
+        pairs[1] = new NameValuePair("user_name", name, Operators.LIKE);
+        pairs[2] = new NameValuePair("department_id", deptId, Operators.EQ);
         return query(UserEntity.class, pairs);
     }
 
@@ -107,7 +107,7 @@ public class QueryService {
 class RowMapperFactory {
     private Map<Class, RowMapper> factory = new HashMap<>();
 
-    private class EntityRowMapper<T> implements RowMapper<T> {
+    class EntityRowMapper<T> implements RowMapper<T> {
         private Class<T> entityClass;
         private Map<String, String> nameMap = new HashMap<>();
         private Set<String> foreignKeys = new HashSet<>();
@@ -116,7 +116,7 @@ class RowMapperFactory {
             this.entityClass = entityClass;
             Field[] fields = entityClass.getDeclaredFields();
             for(Field field : fields) {
-                if(field.getType().equals(Set.class)) {
+                if(field.getType().equals(Set.class) || field.getType().equals(List.class)) {
                     continue;
                 }
                 String fName = field.getName();

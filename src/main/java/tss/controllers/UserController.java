@@ -62,7 +62,7 @@ public class UserController {
     }
 
     @PutMapping(path = "/add")
- //   @Authorization
+    @Authorization
     public ResponseEntity<AddUserResponse> addUser(@RequestBody AddUserRequest request) {
         String[] uids = request.getUids();
         String[] names = request.getNames();
@@ -116,6 +116,9 @@ public class UserController {
         }
         List<String> fails = new ArrayList<>();
         for (String uid : uids) {
+            if (uid == null) {
+                continue;
+            }
             Optional<UserEntity> ret = userRepository.findById(uid);
             if (ret.isPresent()) {
                 userRepository.delete(ret.get());
@@ -265,23 +268,32 @@ public class UserController {
     @PostMapping(path = "/query")
     @Authorization
     public ResponseEntity<QueryUsersResponse> queryUsers(@RequestBody QueryUsersRequest request) {
-        Optional<DepartmentEntity> dept = departmentRepository.findByName(request.getDepartment());
-        if (!dept.isPresent()) {
-            return new ResponseEntity<>(new QueryUsersResponse("Non-exist department", null, null, null), HttpStatus.BAD_REQUEST);
+        Short departmentId = null;
+        if(request.getDepartment() != null) {
+            Optional<DepartmentEntity> dept = departmentRepository.findByName(request.getDepartment());
+            if (!dept.isPresent()) {
+                return new ResponseEntity<>(new QueryUsersResponse("Non-exist department", null, null, null), HttpStatus.BAD_REQUEST);
+            }
+            departmentId = dept.get().getId();
         }
-        List<UserEntity> ret = queryService.queryUsers(request.getUid(), request.getName(), dept.get().getId());
+        List<UserEntity> ret = queryService.queryUsers(request.getUid(), request.getName(), departmentId);
         List<String> uids = new ArrayList<>();
         List<String> names = new ArrayList<>();
         List<String> depts = new ArrayList<>();
         for (UserEntity user : ret) {
             uids.add(user.getUid());
             names.add(user.getName());
-            depts.add(user.getDepartment().getName());
+            if(user.getDepartment() != null) {
+                depts.add(user.getDepartment().getName());
+            }
+            else {
+                depts.add(null);
+            }
         }
         return new ResponseEntity<>(new QueryUsersResponse("OK", uids, names, depts), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/modifyPhoto")
+    @PostMapping(path = "/modify/photo")
     @Authorization
     public ResponseEntity<ModifyPhotoResponse> modifyPhoto(@CurrentUser UserEntity user,
                                                            @RequestBody ModifyPhotoRequest request) {
@@ -303,7 +315,7 @@ public class UserController {
         return new ResponseEntity<>(new ModifyPhotoResponse("OK"), HttpStatus.CREATED);
     }
 
-    @PostMapping(path = "/getPhoto")
+    @PostMapping(path = "/get/photo")
     @Authorization
     public ResponseEntity<GetPhotoResponse> getPhoto(@CurrentUser UserEntity user,
                                                      @RequestBody GetPhotoRequest request) {

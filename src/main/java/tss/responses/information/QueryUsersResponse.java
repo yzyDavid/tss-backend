@@ -25,4 +25,12 @@ public class QueryUsersResponse {
     public List<String> getUids() {
         return uids;
     }
+
+    public List<String> getDepartments() {
+        return departments;
+    }
+
+    public List<String> getNames() {
+        return names;
+    }
 }

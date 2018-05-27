@@ -70,7 +70,7 @@ public class CourseEntity {
         this.intro = intro;
     }
 
-    @ManyToOne(optional = false)
+    @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "department_id")
     public DepartmentEntity getDepartment() {
         return department;

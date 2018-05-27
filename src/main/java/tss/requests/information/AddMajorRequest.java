@@ -2,7 +2,7 @@ package tss.requests.information;
 
 public class AddMajorRequest {
     private String name;
-    private String major;
+    private String department;
 
     public String getName() {
         return name;
@@ -12,11 +12,11 @@ public class AddMajorRequest {
         this.name = name;
     }
 
-    public String getMajor() {
-        return major;
+    public String getDepartment() {
+        return department;
     }
 
-    public void setMajor(String major) {
-        this.major = major;
+    public void setDepartment(String department) {
+        this.department = department;
     }
 }
