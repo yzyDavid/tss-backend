@@ -10,7 +10,7 @@ import java.util.Set;
         @Index(name = "question_qtype_index", columnList = "question_qtype"),
         @Index(name = "question_qunit_index", columnList = "question_qunit"),
 })
-public class QuestionEntity {
+public class QuestionEntity{
     private String qid;
     private String question;
     private String qanswer;
@@ -20,12 +20,11 @@ public class QuestionEntity {
     private int answerednum;
     private double correct;
 
-    private Set<PaperContainsQuestionEntity> paperquestion = new HashSet<>();
 
     @Id
     @Column(name = "question_qid")
     public String getQid() {
-        return qid;
+        return  qid;
     }
 
     public void setQid(String qid) {
@@ -37,9 +36,7 @@ public class QuestionEntity {
         return question;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
-    }
+    public void setQuestion(String question) { this.question = question; }
 
     @Column(name = "question_qanswer", length = 200)
     public String getQanswer() {
@@ -87,12 +84,6 @@ public class QuestionEntity {
     }
 
 
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "question")
-    public Set<PaperContainsQuestionEntity> getPaperquestion() {
-        return paperquestion;
-    }
 
-    public void setPaperquestion(Set<PaperContainsQuestionEntity> paperquestion) {
-        this.paperquestion = paperquestion;
-    }
+
 }
