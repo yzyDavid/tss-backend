@@ -56,10 +56,12 @@ public class QuestionController {
 
     }
 
+
     @DeleteMapping(path = "/delete")
     public ResponseEntity<DeleteQuestionResponse> deleteQuestion(@RequestBody DeleteQuestionRequest request) {
         String qid = request.getQid();
         if (!questionRepository.existsById(qid)) {
+
             return new ResponseEntity<>(new DeleteQuestionResponse("Question does not exist"), HttpStatus.BAD_REQUEST);
         }
         /*
@@ -101,6 +103,8 @@ public class QuestionController {
 
         String type = request.getDirection();
         List<QuestionEntity> questions = new ArrayList<>();
+
+
         if (type.equals("qid")) {
             questions = questionRepository.findByQid(request.getInfo());
         } else if (type.equals("qunit")) {
@@ -108,6 +112,7 @@ public class QuestionController {
         } else if (type.equals("qtype")) {
             questions = questionRepository.findByQtype(request.getInfo());
         } else if (type.equals("all")) {
+
             Iterable<QuestionEntity> question_find = questionRepository.findAll();
             for (QuestionEntity question : question_find) {
                 questions.add(question);
