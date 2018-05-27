@@ -145,7 +145,12 @@ public class ClassController {
             }
         }
 
-        return new ResponseEntity<>(new GetClassesResponse(classesAll), HttpStatus.OK);
+        List<ClassInfo> classesInfo = new ArrayList<>();
+
+        for (ClassEntity clazz : classesAll) {
+            classesInfo.add(new ClassInfo(clazz));
+        }
+        return new ResponseEntity<>(new GetClassesResponse(classesInfo), HttpStatus.OK);
     }
 
     @GetMapping(path = "/classes/action/search-by-course-no-time/{course_name}")
@@ -164,10 +169,16 @@ public class ClassController {
             classesAll.addAll(course.getClasses());
         }
 
-        return new ResponseEntity<>(new GetClassesResponse(classesAll), HttpStatus.OK);
+        List<ClassInfo> classesInfo = new ArrayList<>();
+
+        for (ClassEntity clazz : classesAll) {
+            classesInfo.add(new ClassInfo(clazz));
+        }
+
+        return new ResponseEntity<>(new GetClassesResponse(classesInfo), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/classes/action/search-by-course-id/{course_id}/{year}/{sem}")
+    @GetMapping(path = "/classes/action/search-by-course-id/{course_id}/{year}/{semester}")
     @ResponseStatus(HttpStatus.OK)
     /*@Authorization*/
     public List<ClassEntity> searchClassById( // @CurrentUser UserEntity user,
@@ -221,7 +232,7 @@ public class ClassController {
         return course.getClasses(); //new ResponseEntity<>(new GetClassesBySearchingNameResponse("OK", classesAll), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/classes/action/search-by-teacher/{teacher_name}/{year}/{sem}")
+    @GetMapping(path = "/classes/action/search-by-teacher/{teacher_name}/{year}/{semester}")
     @ResponseStatus(HttpStatus.OK)
     /*@Authorization*/
     public List<ClassEntity> searchClassByTeacher(// @CurrentUser UserEntity user,
@@ -265,7 +276,7 @@ public class ClassController {
         return classesAll; //new ResponseEntity<>(new GetClassesBySearchingTeacherResponse("OK", classesAll), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/classes/action/search-by-teacher-no-time/{teacher_name}/{year}/{sem}")
+    @GetMapping(path = "/classes/action/search-by-teacher-no-time/{teacher_name}")
     @ResponseStatus(HttpStatus.OK)
     /*@Authorization*/
     public List<ClassEntity> searchClassByTeacherNoTime(// @CurrentUser UserEntity user,
