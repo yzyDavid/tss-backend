@@ -136,20 +136,8 @@ public class ClassController {
         return new GetClassesResponse(classRepository.findByCourse_NameAndYearAndSemester(courseId, year, semester));
     }
 
-    @GetMapping(path = "/classes/action/search-by-course-id-no-time/{course_id}")
-    // @Authorization
-    public ResponseEntity<GetClassesResponse> searchClassByIdNoTime(@PathVariable String course_id) {
-        Optional<CourseEntity> ret = courseRepository.findById(course_id);
-        if (!ret.isPresent()) {
-            return new ResponseEntity<>(new GetClassesResponse(new ArrayList<>()),
-                    HttpStatus.BAD_REQUEST);
-        }
-        CourseEntity course = ret.get();
-        return new ResponseEntity<>(new GetClassesResponse(course.getClasses()), HttpStatus.OK); //new ResponseEntity<>(new GetClassesBySearchingNameResponse("OK", classesAll), HttpStatus.OK);
-    }
-
-    @GetMapping(path = "/classes/action/search-by-teacher/{teacher_name}/{year}/{semester}")
-    // @Authorization
+    @GetMapping("/classes/search/findByCourse_IdAndYearAndSemester")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GetClassesResponse> searchClassByTeacher(@PathVariable String teacher_name,
                                                                    @PathVariable Integer year,
                                                                    @PathVariable Integer semester) {
