@@ -9,14 +9,15 @@ import java.util.Set;
         @Index(name = "major_name_index", columnList = "major_name", unique = true)
 })
 public class MajorEntity {
-    Short id;
-    String name;
-    Integer numYears;
-    Integer credit;
-    Integer creditSelective;
-    Integer creditPublic;
-    DepartmentEntity department;
-    Set<MajorClassEntity> classes = new HashSet<>();
+    private Short id;
+    private String name;
+    private Integer numYears;
+    private Integer credit;
+    private Integer creditSelective;
+    private Integer creditPublic;
+    private DepartmentEntity department;
+    private Set<CourseEntity> setOfCompulsory = new HashSet<>();
+    private Set<CourseEntity> setOfSelective = new HashSet<>();
 
     @Id
     public Short getId() {
@@ -83,13 +84,23 @@ public class MajorEntity {
     }
 
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "major")
-    public Set<MajorClassEntity> getClasses() {
-        return classes;
+    public Set<CourseEntity> getCompulsoryCourses() {
+        return setOfCompulsory;
     }
 
-    public void setClasses(Set<MajorClassEntity> classes) {
-        this.classes = classes;
+    public void setCompulsoryCourses(Set<CourseEntity> courses) {
+        this.setOfCompulsory = courses;
     }
+
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "major")
+    public Set<CourseEntity> getSelectiveCourses() {
+        return setOfSelective;
+    }
+
+    public void setSelectiveCourses(Set<CourseEntity> courses) {
+        this.setOfSelective = courses;
+    }
+
 
     @Override
     public boolean equals(Object obj) {

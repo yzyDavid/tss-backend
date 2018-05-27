@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOG_PATH" value="/Users/yimingqi/Public/TSS_logs"></property>
+    <property name="LOG_PATH" value="/SE_log/2018.log"></property>
     <contextName>TSS</contextName>
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -9,11 +9,10 @@
             <charset>UTF-8</charset>
         </encoder>
     </appender>
+    <!--
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- daily rollover -->
             <fileNamePattern>${LOG_PATH}/%d{dd/MMM/yyyy}.log</fileNamePattern>
-            <!-- keep 30 days' worth of history -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
@@ -24,8 +23,11 @@
             <charset>UTF-8</charset>
         </encoder>
     </appender>
+    -->
     <root level="INFO">
         <appender-ref ref="CONSOLE"></appender-ref>
+        <!--
         <appender-ref ref="FILE"></appender-ref>
+        -->
     </root>
 </configuration>
