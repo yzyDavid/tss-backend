@@ -141,10 +141,10 @@ public class GradeController {
                 double thisrate;
                 Iterable<QuestionEntity> question_find;
                 if(type.equals(GetGradeRequest.QueryType.QTYPE)){
-                    question_find = questionRepository.findByQtype(request.getQType());
+                    question_find = questionRepository.findByQtype(request.getQtype());
                 }
                 else if(type.equals(GetGradeRequest.QueryType.QUNIT)){
-                    question_find = questionRepository.findByQunit(request.getQUnit());
+                    question_find = questionRepository.findByQunit(request.getQunit());
                 }
                 else{
                     System.out.println("Invalid request type");

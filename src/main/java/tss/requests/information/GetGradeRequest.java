@@ -35,17 +35,17 @@ public class GetGradeRequest {
         this.pid = pid;
     }
 
-    public String getQType() {
+    public String getQtype() {
         return qtype;
     }
-    public void setQType(String qType) {
+    public void setQtype(String qType) {
         this.qtype = qType;
     }
 
-    public String getQUnit() {
+    public String getQunit() {
         return qunit;
     }
-    public void setQUnit(String qUnit) {
+    public void setQunit(String qUnit) {
         this.qunit = qUnit;
     }
 }

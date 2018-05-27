@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.*;
 import tss.information.PaperResponseStruct;
@@ -117,6 +118,7 @@ public class ExamController {
 
 
     @PostMapping(path = "/getquestions")
+    @Authorization
     public ResponseEntity<StartExamResponse> StartExam(@CurrentUser UserEntity user, @RequestBody StartExamRequest request){
         PaperResponseStruct paper_return;
         HistoryGradeEntity graderecord=new HistoryGradeEntity();
@@ -180,6 +182,7 @@ public class ExamController {
     }
 
     @PostMapping(path = "/save")
+    @Authorization
     public ResponseEntity<AddResultResponse> SavePaper(@CurrentUser UserEntity user, @RequestBody AddResultRequest request){
         ResultEntity result= new ResultEntity();
         QuestionEntity question;
@@ -211,6 +214,7 @@ public class ExamController {
 
 
     @PostMapping(path = "/submit")
+    @Authorization
     public ResponseEntity<DeleteResultResponse> SubmitPaper(@CurrentUser UserEntity user, @RequestBody DeleteResultRequest request){
 // ret: paper     ret2: result  ret3: Question ret4: historygrade
         PapersEntity paper;
