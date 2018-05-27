@@ -115,14 +115,21 @@ public class ClassController {
 
     @GetMapping("/classes/search/findByCourse_NameAndYearAndSemester")
     @ResponseStatus(HttpStatus.OK)
-    // @Authorization
     public GetClassesResponse searchClassByName(@RequestParam String courseName,
                                                 @RequestParam(required = false) Integer year,
                                                 @RequestParam(required = false) SemesterEnum semester) {
+        List<ClassEntity> classes;
         if (year == null || semester == null) {
-            return new GetClassesResponse(classRepository.findByCourse_Name(courseName));
+            //classes = classRepository.findByCourse_NameLike("%"+courseName+"%");
+            classes = classRepository.findByCourse_Name("%"+courseName+"%");
         }
-        return new GetClassesResponse(classRepository.findByCourse_NameAndYearAndSemester(courseName, year, semester));
+        else classes = classRepository.findByCourse_NameLikeAndYearAndSemester("%"+courseName+"%", year, semester);
+
+        if (classes.isEmpty()) {
+            System.out.println("Empty");
+        }
+
+        return new GetClassesResponse(classes);
     }
 
     @GetMapping("/classes/search/findByCourse_IdAndYearAndSemester")
@@ -130,138 +137,97 @@ public class ClassController {
     public GetClassesResponse searchClassById(@RequestParam String courseId,
                                               @RequestParam(required = false) Integer year,
                                               @RequestParam(required = false) SemesterEnum semester) {
+        List<ClassEntity> classes;
+
         if (year == null || semester == null) {
-            return new GetClassesResponse(classRepository.findByCourse_Name(courseId));
+            classes = classRepository.findByCourse_Id(courseId);
         }
-        return new GetClassesResponse(classRepository.findByCourse_NameAndYearAndSemester(courseId, year, semester));
+        else classes = classRepository.findByCourse_IdAndYearAndSemester(courseId, year, semester);
+        /*
+        if (classes.isEmpty()) {
+            ...
+        }*/
+
+        return new GetClassesResponse(classes);
     }
-/*
+
     @GetMapping("/classes/search/findByTeacher_NameAndYearAndSemester")
     @ResponseStatus(HttpStatus.OK)
-    public GetClassesResponse searchClassByTeacher(@PathVariable String teacher_name,
-                                                   @PathVariable(required = false) Integer year,
-                                                   @PathVariable(required = false) SemesterEnum semester) {
-        SemesterEnum sem;
+    public GetClassesResponse searchClassByTeacher(@RequestParam String teacherName,
+                                                   @RequestParam(required = false) Integer year,
+                                                   @RequestParam(required = false) SemesterEnum semester) {
 
-        if (semester.equals(1)) {
-            sem = SemesterEnum.FIRST;
-        }
-        else if (semester.equals(2)) {
-            sem = SemesterEnum.SECOND;
-        } else
-            return new ResponseEntity<>(new GetClassesResponse(new ArrayList<>()),
-                    HttpStatus.BAD_REQUEST);
-
-        List<UserEntity> ret = userRepository.findByName(teacher_name);
-
-        if (ret.isEmpty()) {
-            return new ResponseEntity<>(new GetClassesResponse(new ArrayList<>()),
-                    HttpStatus.BAD_REQUEST);
-        }
+        List<UserEntity> teachers = userRepository.findByNameLikeAndType_Name("%"+teacherName+"%", "System Administrator");
+        /*
+        if (teachers.isEmpty()) {
+            ...
+        }*/
 
         List<ClassEntity> classesAll = new ArrayList<>();
-        for (UserEntity teacher : ret) {
-            if (!teacher.readTypeName().equals("Teacher")) {
+        for (UserEntity teacher : teachers) {
+            List<ClassEntity> classes = teacher.getClassesTeaching();
+            if (year == null || semester == null) {
+                classesAll.addAll(classes);
                 continue;
             }
-            List<ClassEntity> classes = teacher.getClassesTeaching();
             for (ClassEntity clazz : classes) {
-                if (clazz.getYear().equals(year) && clazz.getSemester().equals(sem)) {
+                if (clazz.getYear().equals(year) && clazz.getSemester().equals(semester)) {
                     classesAll.add(clazz);
                 }
             }
         }
 
-        return new ResponseEntity<>(new GetClassesResponse(classesAll), HttpStatus.OK);
-    }
-*/
-    @GetMapping(path = "/classes/action/search-by-teacher-no-time/{teacher_name}")
-    // @Authorization
-    public ResponseEntity<GetClassesResponse> searchClassByTeacherNoTime(// @CurrentUser UserEntity user,
-                                                                                @PathVariable String teacher_name) {
-        List<UserEntity> ret = userRepository.findByName(teacher_name);
-
-        if (ret.isEmpty()) {
-            return new ResponseEntity<>(new GetClassesResponse(new ArrayList<>()),
-                    HttpStatus.BAD_REQUEST);
-        }
-
-        List<ClassEntity> classesAll = new ArrayList<>();
-        for (UserEntity teacher : ret) {
-            if (!teacher.readTypeName().equals("Teacher")) {
-                continue;
-            }
-            classesAll.addAll(teacher.getClassesTeaching());
-        }
-
-        return new ResponseEntity<>(new GetClassesResponse(classesAll), HttpStatus.OK);
+        return new GetClassesResponse(classesAll);
     }
 
-    @GetMapping(path = "/classes/action/search-both/{course_name}/{teacher_name}/{year}/{semester}")
-    // @Authorization
-    public ResponseEntity<GetClassesResponse> searchClassBoth(// @CurrentUser UserEntity user
-                                             @PathVariable String course_name,
-                                             @PathVariable String teacher_name,
-                                             @PathVariable Integer year,
-                                             @PathVariable Integer semester
-                                          ) {
-        SemesterEnum sem;
-        if (semester.equals(1)) {
-            sem = SemesterEnum.FIRST;
-        }
-        else if (semester.equals(2)) {
-            sem = SemesterEnum.SECOND;
-        } else
-            return new ResponseEntity<>(new GetClassesResponse(new ArrayList<>()),
-                    HttpStatus.BAD_REQUEST);
+    @GetMapping("/classes/search/findByBoth")
+    @ResponseStatus(HttpStatus.OK)
+    public GetClassesResponse searchClassByBoth(@RequestParam String courseName,
+                                                @RequestParam String teacherName,
+                                                @RequestParam(required = false) Integer year,
+                                                @RequestParam(required = false) SemesterEnum semester) {
 
-        List<CourseEntity> ret = courseRepository.findByName(course_name);
-        List<UserEntity> retu = userRepository.findByName(teacher_name);
-
-        if (ret.isEmpty() || retu.isEmpty()) {
-            return new ResponseEntity<>(new GetClassesResponse(new ArrayList<>()),
-                    HttpStatus.BAD_REQUEST);
-        }
-
-        Set<ClassEntity> classesByCourseName = new HashSet<>();
-        Set<ClassEntity> classesByTeacherName = new HashSet<>();
-
-        for (CourseEntity course : ret) {
-            List<ClassEntity> classes = course.getClasses();
-
-            for (ClassEntity clazz : classes) {
-                if (clazz.getYear().equals(year)) {
-                    classesByCourseName.add(clazz);
+        if (year == null || semester == null) {
+            Set<ClassEntity> classesByCourseName = new HashSet<>(classRepository.findByCourse_NameLike(courseName));
+            List<UserEntity> teachers = userRepository.findByName(teacherName);
+            /* if (classes.isEmpty() || teachers.isEmpty()) { ... } */
+            Set<ClassEntity> classesByTeacherName = new HashSet<>();
+            for (UserEntity teacher : teachers) {
+                if (!teacher.readTypeName().equals("Teacher")) {
+                    continue;
                 }
+                classesByTeacherName.addAll(teacher.getClassesTeaching());
             }
+            Set<ClassEntity> res = new HashSet<>();
+            res.clear();
+            res.addAll(classesByCourseName);
+            res.retainAll(classesByTeacherName);
+            return new GetClassesResponse(new ArrayList<>(res));
         }
 
-        for (UserEntity teacher : retu) {
+        Set<ClassEntity> classesByCourseName = new HashSet<>(classRepository.findByCourse_NameLikeAndYearAndSemester(courseName, year, semester));
+        List<UserEntity> teachers = userRepository.findByName(teacherName);
+        Set<ClassEntity> classesByTeacherName = new HashSet<>();
+        for (UserEntity teacher : teachers) {
             if (!teacher.readTypeName().equals("Teacher")) {
                 continue;
             }
             List<ClassEntity> classes = teacher.getClassesTeaching();
-
             for (ClassEntity clazz : classes) {
-                if (clazz.getYear().equals(year) && clazz.getSemester().equals(sem)) {
+                if (clazz.getYear().equals(year) && clazz.getSemester().equals(semester)) {
                     classesByTeacherName.add(clazz);
                 }
             }
         }
-        System.out.println("classesByCourseName" + classesByCourseName.size());
-        System.out.println("classesByTeacherName" + classesByTeacherName.size());
-
         Set<ClassEntity> res = new HashSet<>();
         res.clear();
         res.addAll(classesByCourseName);
         res.retainAll(classesByTeacherName);
 
-        return new ResponseEntity<>(new GetClassesResponse(new ArrayList<>(res)), HttpStatus.OK);
-
+        return new GetClassesResponse(new ArrayList<>(res));
     }
 
-
-    @PutMapping(path = "/classes/action/select/{classId}")
+    @PutMapping(path = "/classes/select")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
     public void registerClass(@CurrentUser UserEntity user,

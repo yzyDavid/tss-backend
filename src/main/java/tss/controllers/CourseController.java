@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.entities.CourseEntity;
 import tss.entities.DepartmentEntity;
+import tss.entities.SemesterEnum;
 import tss.repositories.CourseRepository;
 import tss.repositories.DepartmentRepository;
 import tss.requests.information.*;
@@ -84,7 +85,6 @@ public class CourseController {
         return new ResponseEntity<>(new DeleteCourseResponse("ok", cid, name), HttpStatus.OK);
 
     }
-
 
     @PostMapping(path = "/modify")
     @Authorization
@@ -165,5 +165,10 @@ public class CourseController {
             departments.add(deptName);
         }
         return new ResponseEntity<>(new QueryCoursesResponse("OK", cids, names, departments), HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<GetCoursesResponse> searchCourseByName(@RequestParam String courseName) {
+        return new ResponseEntity<>(new GetCoursesResponse(courseRepository.findByNameLike("%"+courseName+"%")), HttpStatus.OK);
     }
 }
