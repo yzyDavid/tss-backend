@@ -10,12 +10,16 @@ public class GetQuestionResponse {
     public final String status;
     public final List<QuestionEntity> questions;
 
-    public GetQuestionResponse(String status, List<QuestionEntity> questions){
+    public GetQuestionResponse(String status, List<QuestionEntity> questions) {
         this.status = status;
         this.questions = questions;
     }
 
-    public String getStatus() {return status;}
+    public String getStatus() {
+        return status;
+    }
 
-    public List<QuestionEntity> getQuestions() {return questions;}
+    public List<QuestionEntity> getQuestions() {
+        return questions;
+    }
 }

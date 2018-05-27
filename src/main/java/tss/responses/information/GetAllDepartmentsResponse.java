@@ -5,7 +5,8 @@ import org.jetbrains.annotations.Nls;
 import java.util.List;
 
 public class GetAllDepartmentsResponse {
-    @Nls private final String status;
+    @Nls
+    private final String status;
     private final List<String> deptName;
     private final List<Short> deptId;
 

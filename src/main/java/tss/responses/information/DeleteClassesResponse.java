@@ -5,10 +5,11 @@ import org.jetbrains.annotations.Nls;
 import java.util.List;
 
 public class DeleteClassesResponse {
-    @Nls private final String status;
+    @Nls
+    private final String status;
     private final List<Long> failIds;
 
-    public DeleteClassesResponse(String status, List<Long>failIds) {
+    public DeleteClassesResponse(String status, List<Long> failIds) {
         this.status = status;
         this.failIds = failIds;
     }

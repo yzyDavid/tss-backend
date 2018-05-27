@@ -12,7 +12,7 @@ public class RoleEntity {
     private Short id;
     private String name;
     private Set<AuthorityEntity> authorities = new HashSet<>();
-    private TypeGroupEntity typeGroup;
+    private Set<TypeGroupEntity> typeGroups = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -47,27 +47,38 @@ public class RoleEntity {
         authorities.add(authority);
     }
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "group_id")
-    public TypeGroupEntity getTypeGroup() {
-        return typeGroup;
+
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(name = "role_group", joinColumns = {@JoinColumn(name = "role_id")}, inverseJoinColumns = {@JoinColumn(name = "group_id")})
+    public Set<TypeGroupEntity> getTypeGroups() {
+        return typeGroups;
     }
 
-    public void setTypeGroup(TypeGroupEntity typeGroup) {
-        this.typeGroup = typeGroup;
+    public void setTypeGroups(Set<TypeGroupEntity> typeGroups) {
+        this.typeGroups = typeGroups;
+    }
+
+    public void addTypeGroup(TypeGroupEntity typeGroup) {
+        this.typeGroups.add(typeGroup);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        if (name != null) {
+            return name.hashCode();
+        } else {
+            return super.hashCode();
+        }
     }
 
     @Override
     public boolean equals(Object obj) {
         if (!obj.getClass().equals(this.getClass())) {
             return false;
-        } else {
+        } else if (name != null) {
             return (name.equals(((RoleEntity) obj).name));
+        } else {
+            return super.equals(obj);
         }
     }
 }

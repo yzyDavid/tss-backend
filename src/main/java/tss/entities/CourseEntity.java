@@ -1,38 +1,40 @@
 package tss.entities;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Mingqi Yi
  */
 @Entity
-@Table(name = "course", indexes = {
-        @Index(name = "course_name_index", columnList = "course_name")
-})
+@Table(
+        name = "course",
+        indexes = {
+                @Index(name = "course_name_index", columnList = "name")
+        }
+)
 public class CourseEntity {
-    private String cid;
+    private String id;
     private String name;
     private Float credit;
-    private Integer weeklyNum;
-    private String semester;
+    private Integer numLessonsEachWeek;
     private String intro;
+    private MajorEntity major;
     private DepartmentEntity department;
-    private Set<ClassEntity> classes = new HashSet<>();
-    private Set<TeachesEntity> teaches = new HashSet<>();
+    private List<ClassEntity> classes = new ArrayList<>();
 
     @Id
-    @Column(name = "course_id", length = 10)
-    public String getCid() {
-        return cid;
+    @Column(name = "id", length = 10)
+    public String getId() {
+        return id;
     }
 
-    public void setCid(String cid) {
-        this.cid = cid;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    @Column(name = "course_name", nullable = false, length = 30)
+    @Column(name = "name", nullable = false, length = 30)
     public String getName() {
         return name;
     }
@@ -41,7 +43,7 @@ public class CourseEntity {
         this.name = name;
     }
 
-    @Column(name = "course_credit")
+    @Column(name = "credit")
     public Float getCredit() {
         return credit;
     }
@@ -50,25 +52,16 @@ public class CourseEntity {
         this.credit = credit;
     }
 
-    @Column(name = "weekly_number")
-    public Integer getWeeklyNum() {
-        return weeklyNum;
+    @Column(name = "num_lessons_each_week")
+    public Integer getNumLessonsEachWeek() {
+        return numLessonsEachWeek;
     }
 
-    public void setWeeklyNum(Integer weeklyNum) {
-        this.weeklyNum = weeklyNum;
+    public void setNumLessonsEachWeek(Integer numLessonsEachWeek) {
+        this.numLessonsEachWeek = numLessonsEachWeek;
     }
 
-    @Column(name = "course_semester", length = 8)
-    public String getSemester() {
-        return semester;
-    }
-
-    public void setSemester(String semester) {
-        this.semester = semester;
-    }
-
-    @Column(name = "course_intro", length = 200)
+    @Column(name = "intro", length = 200)
     public String getIntro() {
         return intro;
     }
@@ -77,25 +70,7 @@ public class CourseEntity {
         this.intro = intro;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
-    public Set<ClassEntity> getClasses() {
-        return classes;
-    }
-
-    public void setClasses(Set<ClassEntity> classes) {
-        this.classes = classes;
-    }
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
-    public Set<TeachesEntity> getTeaches() {
-        return teaches;
-    }
-
-    public void setTeaches(Set<TeachesEntity> teaches) {
-        this.teaches = teaches;
-    }
-
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(optional = false)
     @JoinColumn(name = "department_id")
     public DepartmentEntity getDepartment() {
         return department;
@@ -105,17 +80,46 @@ public class CourseEntity {
         this.department = department;
     }
 
+    public String readDepartmentName() {
+        if (department != null) {
+            return department.getName();
+        } else {
+            return null;
+        }
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
+    public List<ClassEntity> getClasses() {
+        return classes;
+    }
+
+    public void setClasses(List<ClassEntity> classes) {
+        this.classes = classes;
+    }
+
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "major_id")
+    public MajorEntity getMajor() {
+        return major;
+    }
+
+    public void setMajor(MajorEntity major) {
+        this.major = major;
+    }
+
     @Override
     public int hashCode() {
-        return cid.hashCode();
+        return id.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
         if (!obj.getClass().equals(this.getClass())) {
             return false;
+        } else if (id != null) {
+            return (id.equals(((CourseEntity) obj).id));
         } else {
-            return (cid.equals(((CourseEntity) obj).cid));
+            return super.equals(obj);
         }
     }
 }
