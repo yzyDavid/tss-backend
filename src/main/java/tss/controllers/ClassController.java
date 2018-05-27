@@ -124,9 +124,10 @@ public class ClassController {
         }
         else if (semester.equals(2)) {
             sem = SemesterEnum.SECOND;
-        } else
+        } else {
             return new ResponseEntity<>(new GetClassesResponse(new ArrayList<>()),
                     HttpStatus.BAD_REQUEST);
+        }
 
         List<CourseEntity> ret = courseRepository.findByName(course_name);
         if (ret.isEmpty()) {
@@ -192,8 +193,9 @@ public class ClassController {
         }
         else if (semester.equals(2)) {
             sem = SemesterEnum.SECOND;
-        } else
+        } else {
             return new ArrayList<>();
+        }
             /*return new ResponseEntity<>(new GetClassesBySearchingNameResponse("Invalid semester number", null),
                     HttpStatus.BAD_REQUEST);*/
 
@@ -246,8 +248,9 @@ public class ClassController {
         }
         else if (semester.equals(2)) {
             sem = SemesterEnum.SECOND;
-        } else
+        } else {
             return new ArrayList<>();
+        }
             /*return new ResponseEntity<>(new GetClassesBySearchingTeacherResponse("Invalid semester number", null),
                     HttpStatus.BAD_REQUEST);*/
 
@@ -315,8 +318,9 @@ public class ClassController {
         }
         else if (semester.equals(2)) {
             sem = SemesterEnum.SECOND;
-        } else
+        } else {
             return new ArrayList<>();
+        }
             /*return new ResponseEntity<>(new GetClassesBySearchingBothResponse("Invalid semester number", null),
                     HttpStatus.BAD_REQUEST);*/
 
@@ -356,10 +360,11 @@ public class ClassController {
             }*/
             List<ClassEntity> classes = teacher.getClassesTeaching();
 
-            for (ClassEntity clazz : classes)
+            for (ClassEntity clazz : classes) {
                 if (clazz.getYear().equals(year) && clazz.getSemester().equals(sem)) {
                     classesByTeacherName.add(clazz);
                 }
+            }
         }
         System.out.println("classesByCourseName" + classesByCourseName.size());
         System.out.println("classesByTeacherName" + classesByTeacherName.size());

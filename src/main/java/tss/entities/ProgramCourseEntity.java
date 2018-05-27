@@ -23,8 +23,9 @@ public class ProgramCourseEntity {
     @Column(length = 3)
     public Integer getType() {return type;}
     public void setType (Integer type) {
-        if (type <= COURSE_TYPE_NUM && type >= 0)
+        if (type <= COURSE_TYPE_NUM && type >= 0) {
             this.type = type;
+        }
     }
 
     @ManyToOne

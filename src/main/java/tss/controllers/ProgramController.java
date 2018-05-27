@@ -80,10 +80,11 @@ public class ProgramController {
 
         CourseEntity course = courseRepository.findById(request.getCid()).get();
         ProgramEntity program = programRepository.findByPid(request.getPid()).get();
-        if (course == null)
+        if (course == null) {
             return new ResponseEntity<>(new AddCourseinProgramResponse("no such course"), HttpStatus.FORBIDDEN);
-        else if (program == null)
+        } else if (program == null) {
             return new ResponseEntity<>(new AddCourseinProgramResponse("no such student"), HttpStatus.FORBIDDEN);
+        }
 
         if (programCourseRepository.existsByCourse(course) && programCourseRepository.existsByProgram(program))
         {
