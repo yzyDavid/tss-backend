@@ -47,7 +47,7 @@ public class ClassroomController {
     }
 
     @DeleteMapping("/{classroomId}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeClassroom(@PathVariable int classroomId) {
         ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
                 (ClassroomNotFoundException::new);
@@ -55,8 +55,8 @@ public class ClassroomController {
     }
 
     @PatchMapping("/{classroomId}")
-    @ResponseStatus(HttpStatus.OK)
-    public Classroom updateClassroom(@PathVariable int classroomId, @RequestBody Classroom classroom) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateClassroom(@PathVariable int classroomId, @RequestBody Classroom classroom) {
         ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
                 (ClassroomNotFoundException::new);
         if (classroom.getName() != null) {
@@ -65,16 +65,16 @@ public class ClassroomController {
         if (classroom.getCapacity() != null) {
             classroomEntity.setCapacity(classroom.getCapacity());
         }
-        return new Classroom(classroomRepository.save(classroomEntity));
+        classroomRepository.save(classroomEntity);
     }
 
-    @PutMapping("/{classroomId}/time-slots/{timeSlotTypeName}/clazz")
+    @PutMapping("/{classroomId}/time-slots/{timeSlotType}/clazz")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void insertArrangement(@PathVariable int classroomId, @PathVariable String timeSlotTypeName,
+    public void insertArrangement(@PathVariable int classroomId, @PathVariable TimeSlotTypeEnum timeSlotType,
                                   @RequestParam long classId) {
         ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
                 (ClassroomNotFoundException::new);
-        TimeSlotEntity timeSlotEntity = classroomEntity.getTimeSlotDirectory().get(timeSlotTypeName);
+        TimeSlotEntity timeSlotEntity = classroomEntity.getTimeSlotDirectory().get(timeSlotType);
         if (timeSlotEntity == null) {
             throw new TimeSlotTypeNotFoundException();
         }
@@ -84,12 +84,12 @@ public class ClassroomController {
         timeSlotRepository.save(timeSlotEntity);
     }
 
-    @DeleteMapping("/{classroomId}/time-slots/{timeSlotTypeName}/clazz")
+    @DeleteMapping("/{classroomId}/time-slots/{timeSlotType}/clazz")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeArrangement(@PathVariable int classroomId, @PathVariable String timeSlotTypeName) {
+    public void removeArrangement(@PathVariable int classroomId, @PathVariable TimeSlotTypeEnum timeSlotType) {
         ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
                 (ClassroomNotFoundException::new);
-        TimeSlotEntity timeSlotEntity = classroomEntity.getTimeSlotDirectory().get(timeSlotTypeName);
+        TimeSlotEntity timeSlotEntity = classroomEntity.getTimeSlotDirectory().get(timeSlotType);
         if (timeSlotEntity == null) {
             throw new TimeSlotTypeNotFoundException();
         }
@@ -100,11 +100,11 @@ public class ClassroomController {
 
     @GetMapping("/{classroomId}/schedule")
     @ResponseStatus(HttpStatus.OK)
-    public Map<String, Clazz> getSchedule(@PathVariable int classroomId) {
+    public Map<TimeSlotTypeEnum, Clazz> getSchedule(@PathVariable int classroomId) {
         ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
                 (ClassroomNotFoundException::new);
 
-        Map<String, Clazz> schedule = new HashMap<>(TimeSlotTypeEnum.values().length);
+        Map<TimeSlotTypeEnum, Clazz> schedule = new HashMap<>(TimeSlotTypeEnum.values().length);
         for (TimeSlotEntity timeSlotEntity : classroomEntity.getTimeSlots()) {
             Clazz clazz;
             if (timeSlotEntity.getClazz() == null) {
@@ -112,7 +112,7 @@ public class ClassroomController {
             } else {
                 clazz = new Clazz(timeSlotEntity.getClazz());
             }
-            schedule.put(timeSlotEntity.getTypeName(), clazz);
+            schedule.put(timeSlotEntity.getType(), clazz);
         }
         return schedule;
     }

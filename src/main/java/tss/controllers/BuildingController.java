@@ -52,14 +52,14 @@ public class BuildingController {
     }
 
     @PatchMapping("/{buildingId}")
-    @ResponseStatus(value = HttpStatus.OK)
-    public Building updateBuilding(@PathVariable int buildingId, @RequestBody Building building) {
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void updateBuilding(@PathVariable int buildingId, @RequestBody Building building) {
         BuildingEntity buildingEntity = buildingRepository.findById(buildingId).orElseThrow
                 (BuildingNotFoundException::new);
         if (building.getName() != null) {
             buildingEntity.setName(building.getName());
         }
-        return new Building(buildingRepository.save(buildingEntity));
+        buildingRepository.save(buildingEntity);
     }
 
     @PostMapping("/{buildingId}/classrooms")
@@ -71,7 +71,7 @@ public class BuildingController {
         ClassroomEntity classroomEntity = new ClassroomEntity(classroom.getName(), classroom.getCapacity(), null);
         buildingEntity.addClassroom(classroomEntity);
         for (TimeSlotTypeEnum timeSlotType : TimeSlotTypeEnum.values()) {
-            classroomEntity.addTimeSlot(new TimeSlotEntity(timeSlotType.name(), null, null));
+            classroomEntity.addTimeSlot(new TimeSlotEntity(timeSlotType, null, null));
         }
         return new Classroom(classroomRepository.save(classroomEntity));
     }

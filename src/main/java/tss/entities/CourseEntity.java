@@ -20,6 +20,7 @@ public class CourseEntity {
     private Float credit;
     private Integer numLessonsEachWeek;
     private String intro;
+    private MajorEntity major;
     private DepartmentEntity department;
     private List<ClassEntity> classes = new ArrayList<>();
 
@@ -94,6 +95,16 @@ public class CourseEntity {
 
     public void setClasses(List<ClassEntity> classes) {
         this.classes = classes;
+    }
+
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "major_id")
+    public MajorEntity getMajor() {
+        return major;
+    }
+
+    public void setMajor(MajorEntity major) {
+        this.major = major;
     }
 
     @Override
