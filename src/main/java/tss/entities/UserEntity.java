@@ -50,7 +50,7 @@ public class UserEntity {
     @Column(length = 10)
     private String photo;
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne()
     @JoinColumn(name = "department_id")
     private DepartmentEntity department;
 
