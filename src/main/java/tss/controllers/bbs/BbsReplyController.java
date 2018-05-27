@@ -43,7 +43,8 @@ public class BbsReplyController {
         this.bbsReplyRepository = bbsReplyRepository;
     }
 
-    /* create a new reply to a topic/reply
+    /**
+     *  create a new reply to a topic/reply
      * request: tid, text, quoteIndex
      * permission: user in the section?
      * return: status
@@ -62,23 +63,11 @@ public class BbsReplyController {
 
         BbsTopicEntity topic = ret.get();
 
-//        BbsSectionEntity section = topic.getBelongedSection();
-//        TeachesEntity teaches = section.getTeaches();
+        BbsReplyEntity reply = new BbsReplyEntity();
 
-//        /* list user's teaches, check permission */
-//        boolean permission = false;
-//        Set<TeachesEntity> userTeaches = user.getTeaches();
-//        for(TeachesEntity t : userTeaches){
-//            if(t.getId() == teaches.getId()){
-//                permission = true;
-//                break;
-//            }
-//        }
-//
-//        if(!permission)
-//            return new ResponseEntity<>(new AddBbsReplyResponse("permission error"), HttpStatus.FORBIDDEN);
+        reply.setAuthor(user);
+        reply.setBelongedTopic(topic);
 
-        BbsReplyEntity reply = new BbsReplyEntity(user, topic);
 
         reply.setContent(request.getText());
 
@@ -97,12 +86,14 @@ public class BbsReplyController {
 
         /* need to add the reply number in the topic */
         topic.setReplyNum(topic.getReplyNum() + 1);
+        bbsTopicRepository.save(topic);
 
         return new ResponseEntity<>(new AddBbsReplyResponse("add ok"), HttpStatus.OK);
     }
 
 
-    /* delete a reply by id
+    /**
+     * delete a reply by id
      * request: id
      * permission: author, manager
      * return: id, author name
@@ -130,7 +121,8 @@ public class BbsReplyController {
     }
 
 
-    /* modify a reply content by id
+    /**
+     * modify a reply content by id
      * request: id
      * permission: author
      * return: id, content, time
@@ -163,7 +155,8 @@ public class BbsReplyController {
     }
 
 
-    /* show all information under a certain topic
+    /**
+     * show all information under a certain topic
      * request: topic id, pages to show(10 per page)
      * return: see doc
      * v1.0, done
@@ -180,7 +173,7 @@ public class BbsReplyController {
         BbsTopicEntity topic = ret.get();
 
         String title = topic.getName();
-        String totalPage = String.valueOf(topic.getReplyNum() / 10);
+        String totalPage = String.valueOf(topic.getReplyNum() / 10 + 1);
         String currentPage = request.getPage().toString();
         String postTime = topic.getTime().toString();
         String boardName = topic.getBelongedSection().getName();

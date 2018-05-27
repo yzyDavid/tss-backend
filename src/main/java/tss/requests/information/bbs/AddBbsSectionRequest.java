@@ -1,15 +1,15 @@
 package tss.requests.information.bbs;
 
 public class AddBbsSectionRequest {
-    private long id;
+    private String id;
     private String name;
-    private String tid;
+    private String tname;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -21,11 +21,11 @@ public class AddBbsSectionRequest {
         this.name = name;
     }
 
-    public String getTid() {
-        return tid;
+    public String getTname() {
+        return tname;
     }
 
-    public void setTid(String tid) {
-        this.tid = tid;
+    public void setTname(String tname) {
+        this.tname = tname;
     }
 }

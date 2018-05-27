@@ -17,10 +17,6 @@ public class BbsReplyEntity {
     private String content;
     private Integer quoteIndex;
 
-    public BbsReplyEntity(UserEntity author, BbsTopicEntity belongedTopic) {
-        this.author = author;
-        this.belongedTopic = belongedTopic;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

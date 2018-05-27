@@ -38,36 +38,37 @@ public class BbsTopicController {
         this.bbsTopicRepository = bbsTopicRepository;
     }
 
-    /* create a topic
+    /**
+     * create a topic
      * request: id, name, section id, content
      * permission: anyone login
      * return: id, name, content, time
+     * v1.0, done
      */
     @PostMapping(path = "/add")
     @Authorization
     public ResponseEntity<AddBbsTopicResponse> addBbsTopic(@CurrentUser UserEntity user,
                                                            @RequestBody AddBbsTopicRequest request) {
-        /* every topic bind to a section
+        /*
          * invalid section id error
          */
-        long sectionId = request.getSectionId();
+        long sectionId = Long.valueOf(request.getBoardID());
         Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(sectionId);
         if (!ret.isPresent()) {
-            return new ResponseEntity<>(new AddBbsTopicResponse("invalid section id", -1, null, null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AddBbsTopicResponse(null), HttpStatus.BAD_REQUEST);
         }
 
-        /* anyone login got the permission
-         * bind the author & belongedSectionId
-         */
-        BbsTopicEntity topic = new BbsTopicEntity(user, ret.get());
+        BbsTopicEntity topic = new BbsTopicEntity();
+
+        topic.setAuthor(user);
+        topic.setBelongedSection(ret.get());
 
         /* init id & name & content */
-        long topicId = request.getId();
-        String name = request.getName();
-        String content = request.getContent();
+        String name = request.getTitle();
+        String content = request.getText();
         topic.setContent(content);
         topic.setName(name);
-        topic.setId(topicId);
+
 
         /* init timestamp */
         Date date = new Date();
@@ -75,12 +76,14 @@ public class BbsTopicController {
         mediumDateFormat.format(date);
         topic.setTime(date);
 
-        /* reply num */
+        /* id init auto */
         bbsTopicRepository.save(topic);
-        return new ResponseEntity<>(new AddBbsTopicResponse("ok", topicId, name, content, date), HttpStatus.OK);
+
+        return new ResponseEntity<>(new AddBbsTopicResponse(String.valueOf(topic.getId())), HttpStatus.OK);
     }
 
-    /* delete by id
+    /**
+     * delete by id
      * request: id
      * permission : manager, author
      * response: id, name, author name;
@@ -107,7 +110,8 @@ public class BbsTopicController {
         return new ResponseEntity<>(new DeleteBbsTopicResponse("ok", request.getId(), topicName, authorName), HttpStatus.OK);
     }
 
-    /* modify the topic content
+    /**
+     * modify the topic content
      * request: id, new content
      * permission: author only
      * return: id, name, content, time
@@ -140,7 +144,8 @@ public class BbsTopicController {
         return new ResponseEntity<>(new ModifyTopicContentResponse("ok", topic.getId(), topic.getName(), topic.getContent(), topic.getTime()), HttpStatus.OK);
     }
 
-    /* Look for topic by id
+    /**
+     * Look for topic by id
      * get par: id
      * permission: anyone
      * return: id, name, content, time, author_name, section_name, reply number
@@ -168,7 +173,8 @@ public class BbsTopicController {
                 time, authorName, sectionName, replyNum), HttpStatus.OK);
     }
 
-    /* published topics by current user
+    /**
+     * published topics by current user
      * v1.0, done
      */
     @GetMapping(path = "/published")
@@ -183,7 +189,8 @@ public class BbsTopicController {
 
         String userName = user.getName();
         String currentPage = page;
-        String totalPage = String.valueOf(topics.size() / 20); // +1?
+        /* page + 1 */
+        String totalPage = String.valueOf(topics.size() / 20 + 1);
         List<String> titles = new ArrayList<>();
         List<String> times = new ArrayList<>();
         List<String> topicIDs = new ArrayList<>();
@@ -213,13 +220,13 @@ public class BbsTopicController {
     }
 
 
-    /* show all topics under a certain section
+    /**
+     * show all topics under a certain section
      * public part/ top part
      * v1.0, done
      */
     @PostMapping(path = "/topinfo")
-    public ResponseEntity<GetAllTopicsPublicResponse> getAllTopTopics(@CurrentUser UserEntity user,
-                                                                      @RequestBody GetAllTopicsPublicRequest request) {
+    public ResponseEntity<GetAllTopicsPublicResponse> getAllTopTopics(@RequestBody GetAllTopicsPublicRequest request) {
         /* haven't deal with not found situation */
         Optional<BbsSectionEntity> sret = bbsSectionRepository.findById(Long.valueOf(request.getBoardID()));
         if (!sret.isPresent()) {

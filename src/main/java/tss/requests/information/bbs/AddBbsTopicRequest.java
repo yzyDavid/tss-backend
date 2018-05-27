@@ -1,40 +1,31 @@
 package tss.requests.information.bbs;
 
 public class AddBbsTopicRequest {
-    private long id;
-    private String name;
-    private long sectionId;
-    private String content;
+    private String boardID;
+    private String title;
+    private String text;
 
-    public long getId() {
-        return id;
+    public String getBoardID() {
+        return boardID;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setBoardID(String boardID) {
+        this.boardID = boardID;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public long getSectionId() {
-        return sectionId;
+    public String getText() {
+        return text;
     }
 
-    public void setSectionId(long sectionId) {
-        this.sectionId = sectionId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
+    public void setText(String text) {
+        this.text = text;
     }
 }

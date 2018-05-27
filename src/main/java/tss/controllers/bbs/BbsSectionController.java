@@ -31,38 +31,27 @@ public class BbsSectionController {
         this.bbsSectionRepository = bbsSectionRepository;
     }
 
-    /* create a section
+    /**
+     * create a section
      * request: id, name, teacher id
      * permission : manager
      * return : id, name, teacher name
+     * maybe no use
      */
-    @PutMapping(path = "/add")
-    @Authorization
-    public ResponseEntity<AddBbsSectionResponse> addBbsSection(@CurrentUser UserEntity user,
-                                                               @RequestBody AddBbsSectionRequest request) {
-        /* every section init bind a teacher */
-        /* test the exit of teacher */
-        String teacherID = request.getTid();
-
-        long id = request.getId();
-        String name = request.getName();
-
-        /* permission and duplicated error */
-        // TODO
-
-        /* init the new section */
+    @PostMapping(path = "/add")
+    public ResponseEntity<AddBbsSectionResponse> addBbsSection( @RequestBody AddBbsSectionRequest request) {
         BbsSectionEntity section = new BbsSectionEntity();
-        section.setId(id);
-        section.setName(name);
+        section.setUsrNum(0);
+        section.setName(request.getName());
 
-        /* sum the user number according to the teacher */
 
         bbsSectionRepository.save(section);
-        // FIXME
-        return new ResponseEntity<>(new AddBbsSectionResponse("add ok", id, name, ""), HttpStatus.OK);
+
+        return new ResponseEntity<>(new AddBbsSectionResponse("ok", request.getId(), request.getName(), request.getTname()), HttpStatus.OK);
     }
 
-    /* delete a section with id
+    /**
+     * delete a section with id
      * request: id
      * permission: manager
      * return: id, name
@@ -100,8 +89,9 @@ public class BbsSectionController {
 
         Iterator<BbsSectionEntity> iter = bbsSectionRepository.findAll().iterator();
         while (iter.hasNext()) {
-            Long id = iter.next().getId();
-            String name = iter.next().getName();
+            BbsSectionEntity section = iter.next();
+            Long id = section.getId();
+            String name = section.getName();
             ids.add(id.toString());
             names.add(name);
         }
