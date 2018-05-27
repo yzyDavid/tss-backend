@@ -24,7 +24,7 @@ public class Clazz {
     private Integer numLessonsEachWeek;
     private String courseIntro;
 
-    private List<ClassroomTimeSlotTypePair> arrangements;
+    private List<TimeSlot> arrangements;
     private Integer numLessonsLeft;
 
     public Clazz() {
@@ -49,8 +49,7 @@ public class Clazz {
         arrangements = new ArrayList<>();
         numLessonsLeft = numLessonsEachWeek;
         for (TimeSlotEntity timeSlotEntity : classEntity.getTimeSlots()) {
-            Classroom classroom = new Classroom(timeSlotEntity.getClassroom());
-            arrangements.add(new ClassroomTimeSlotTypePair(classroom, timeSlotEntity.getType()));
+            arrangements.add(new TimeSlot(timeSlotEntity));
             numLessonsLeft -= timeSlotEntity.getType().getSize();
         }
     }
@@ -143,11 +142,11 @@ public class Clazz {
         this.courseIntro = courseIntro;
     }
 
-    public List<ClassroomTimeSlotTypePair> getArrangements() {
+    public List<TimeSlot> getArrangements() {
         return arrangements;
     }
 
-    public void setArrangements(List<ClassroomTimeSlotTypePair> arrangements) {
+    public void setArrangements(List<TimeSlot> arrangements) {
         this.arrangements = arrangements;
     }
 

@@ -79,6 +79,14 @@ public class CourseEntity {
         this.department = department;
     }
 
+    public String readDepartmentName() {
+        if (department != null) {
+            return department.getName();
+        } else {
+            return null;
+        }
+    }
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
     public List<ClassEntity> getClasses() {
         return classes;
@@ -97,8 +105,10 @@ public class CourseEntity {
     public boolean equals(Object obj) {
         if (!obj.getClass().equals(this.getClass())) {
             return false;
-        } else {
+        } else if (id != null) {
             return (id.equals(((CourseEntity) obj).id));
+        } else {
+            return super.equals(obj);
         }
     }
 }

@@ -2,26 +2,17 @@ package tss.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tss.annotations.session.Authorization;
 import tss.entities.*;
 import tss.exceptions.ClazzNotFoundException;
 import tss.exceptions.CourseNotFoundException;
 import tss.exceptions.TeacherNotFoundException;
 import tss.models.Clazz;
 import tss.repositories.*;
-import tss.requests.information.DeleteClassesRequest;
-import tss.requests.information.GetInstructorsRequest;
-import tss.requests.information.ModifyClassRequest;
-import tss.responses.information.DeleteClassesResponse;
-import tss.responses.information.GetInstructorResponse;
-import tss.responses.information.ModifyClassResponse;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author reeve
@@ -47,7 +38,6 @@ public class ClassController {
 
     @PostMapping("/courses/{courseId}/classes")
     @ResponseStatus(HttpStatus.CREATED)
-//    @Authorization
     public Clazz insertClass(@PathVariable String courseId, @RequestBody Clazz clazz) {
 
         CourseEntity courseEntity = courseRepository.findById(courseId).orElseThrow(CourseNotFoundException::new);
@@ -67,76 +57,21 @@ public class ClassController {
         return new Clazz(classEntity);
     }
 
-    @PostMapping(path = "/info")
-    @Authorization
-    public ResponseEntity<ModifyClassResponse> modifyClass(@RequestBody ModifyClassRequest request) {
-        Long cid = request.getCid();
-
-        Optional<ClassEntity> ret = classRepository.findById(cid);
-        if (!ret.isPresent()) {
-            return new ResponseEntity<>(new ModifyClassResponse("can't find the class"), HttpStatus.BAD_REQUEST);
-        }
-        ClassEntity c = ret.get();
-        if (request.getCapacity() != null) {
-            c.setCapacity(request.getCapacity());
-        }
-        if (request.getYear() != null) {
-            c.setYear(request.getYear());
-        }
-        classRepository.save(c);
-        return new ResponseEntity<>(new ModifyClassResponse("OK"), HttpStatus.OK);
-    }
-
-    @DeleteMapping(path = "/delete")
-    @Authorization
-    public ResponseEntity<DeleteClassesResponse> deleteClasses(@RequestBody DeleteClassesRequest request) {
-        List<Long> cids = request.getIds();
-
-        List<Long> failIds = new ArrayList<>();
-        for (Long cid : cids) {
-            if (!classRepository.existsById(cid)) {
-                failIds.add(cid);
-            }
-        }
-        if (!failIds.isEmpty()) {
-            return new ResponseEntity<>(new DeleteClassesResponse("Some Class don't exist", failIds), HttpStatus.BAD_REQUEST);
-        }
-        for (Long cid : cids) {
-            classRepository.deleteById(cid);
-        }
-        return new ResponseEntity<>(new DeleteClassesResponse("OK", failIds), HttpStatus.OK);
-    }
-
-    @GetMapping()
-    @Authorization
-    public List<Clazz> listClasses() {
-        List<Clazz> classes = new ArrayList<>();
-        for (ClassEntity classEntity : classRepository.findAll()) {
-            classes.add(new Clazz(classEntity));
-        }
-        return classes;
-    }
-
-    @GetMapping(path = "/{classId}")
-    @Authorization
+    @GetMapping(path = "/classes/{classId}")
+    @ResponseStatus(HttpStatus.OK)
     public Clazz getClass(@PathVariable long classId) {
         ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
         return new Clazz(classEntity);
     }
 
-    @PostMapping(path = "/getInstructor")
-    @Authorization
-    public ResponseEntity<GetInstructorResponse> getInstructor(@RequestBody GetInstructorsRequest request) {
-        ClassEntity classEntity = classRepository.findById(request.getCid()).orElseThrow(ClazzNotFoundException::new);
-        UserEntity teacherEntity = classEntity.getTeacher();
+    @DeleteMapping(path = "/classes/{classId{")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeClass(@PathVariable long classId) {
 
-        return new ResponseEntity<>(new GetInstructorResponse("ok", teacherEntity.getUid(), teacherEntity.getName()),
-                HttpStatus.OK);
+        ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
+        classRepository.delete(classEntity);
     }
 
-    /**
-     * @author reeve
-     */
     @PutMapping(path = "/auto-arrangement")
     @ResponseStatus(HttpStatus.OK)
     public void autoArrangement() {
@@ -175,6 +110,9 @@ public class ClassController {
     }
 }
 
+/**
+ * Auxiliary class for auto-arrangement of classes.
+ */
 class ClassItem {
     private long classId;
     private int numLeftSectionsOfSizeTwo = 0;

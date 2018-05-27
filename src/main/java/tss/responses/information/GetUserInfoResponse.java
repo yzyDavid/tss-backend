@@ -2,25 +2,32 @@ package tss.responses.information;
 
 import org.jetbrains.annotations.Nls;
 
-public class GetUserResponse {
+public class GetUserInfoResponse {
     private final @Nls
     String status;
     private final String uid;
     private final String name;
-    private final Integer type;
+    private final String gender;
+    private final String type;
     private final String email;
     private final String telephone;
     private final String intro;
+    private final String department;
+    private final String majorClass;
 
-    public GetUserResponse(String status, String uid, String name, int type, String email,
-                           String telephone, String intro) {
+    public GetUserInfoResponse(String status, String uid, String name, String type, String email,
+                               String telephone, String intro, String gender, String department,
+                               String majorClass) {
         this.status = status;
         this.uid = uid;
         this.name = name;
+        this.gender = gender;
         this.type = type;
         this.email = email;
         this.telephone = telephone;
         this.intro = intro;
+        this.department = department;
+        this.majorClass = majorClass;
     }
 
     public String getStatus() {
@@ -35,7 +42,11 @@ public class GetUserResponse {
         return name;
     }
 
-    public Integer getType() {
+    public String getGender() {
+        return gender;
+    }
+
+    public String getType() {
         return type;
     }
 
@@ -49,5 +60,13 @@ public class GetUserResponse {
 
     public String getIntro() {
         return intro;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public String getMajorClass() {
+        return majorClass;
     }
 }
