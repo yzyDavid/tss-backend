@@ -20,6 +20,7 @@ import tss.entities.UserEntity;
 import tss.repositories.ClassRepository;
 import tss.repositories.CourseRepository;
 import tss.requests.information.DownloadExcelRequest;
+import tss.utils.ExportEntityUtils;
 import tss.utils.ExportUtils;
 
 import javax.xml.ws.Response;
@@ -46,18 +47,23 @@ public class ExportExcelController {
     {
 
 
-        ExportUtils<UserEntity> ee = new ExportUtils<>();
-        String[] headerss = {"用户名", "电子邮件", "性别", ""};
+        ExportUtils<ExportEntityUtils> ee = new ExportUtils<>();
+        String[] headerss = {"学号", "姓名", "性别", "学院", "专业班", "电话", "邮件"};
 
         // TODO: Add current user
-        List<ClassEntity> cls = classes.findByCourse_id(courseId);
+        List<ClassEntity> cls = classes.findByCourse_Id(courseId);
         List<UserEntity> students = new ArrayList<>() ;
+        List<ExportEntityUtils> exportentities = new ArrayList<>();
         for (ClassEntity cl : cls)
         {
             List<ClassRegistrationEntity>  crs = cl.getClassRegistrations();
             for (ClassRegistrationEntity cr : crs)
             {
-                students.add(cr.getStudent());
+                ExportEntityUtils exp = new ExportEntityUtils(cr.getStudent().getUid(), cr.getStudent().getName(),
+                        cr.getStudent().getGender(), cr.getStudent().readDepartmentName(), cr.getStudent().readClassName(),
+                cr.getStudent().getTelephone(), cr.getStudent().getEmail());
+                //students.add(cr.getStudent());
+                exportentities.add(exp);
             }
         }
 //
@@ -79,7 +85,7 @@ public class ExportExcelController {
 //        ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
 //        wb.write(outByteStream);
 //        return new ResponseEntity<byte[]>(outByteStream.toByteArray(), headers, HttpStatus.OK);
-        return ee.exportExcel(headerss, students, "students.xls");
+        return ee.exportExcel(headerss, exportentities, "students.xls");
 
 
     }
