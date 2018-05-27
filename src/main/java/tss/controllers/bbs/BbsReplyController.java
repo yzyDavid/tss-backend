@@ -55,7 +55,7 @@ public class BbsReplyController {
     public ResponseEntity<AddBbsReplyResponse> addReply(@CurrentUser UserEntity user,
                                                         @RequestBody AddBbsReplyRequest request) {
         /* permission error & invalid topic id error */
-        long topicId = request.getTid();
+        long topicId = Long.valueOf(request.getTid());
         Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(topicId);
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new AddBbsReplyResponse("no such topic"), HttpStatus.BAD_REQUEST);
@@ -79,7 +79,7 @@ public class BbsReplyController {
         /* set topic last reply time */
         reply.getBelongedTopic().setLastReplyTime(time);
 
-        reply.setQuoteIndex(request.getQuoteIndex());
+        reply.setQuoteIndex(Integer.valueOf(request.getQuoteIndex()));
         reply.setIndex(topic.getReplyNum() + 1);
 
         bbsReplyRepository.save(reply);
