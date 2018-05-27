@@ -135,12 +135,12 @@ public class ClassController {
         }
         return new GetClassesResponse(classRepository.findByCourse_NameAndYearAndSemester(courseId, year, semester));
     }
-
-    @GetMapping("/classes/search/findByCourse_IdAndYearAndSemester")
+/*
+    @GetMapping("/classes/search/findByTeacher_NameAndYearAndSemester")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<GetClassesResponse> searchClassByTeacher(@PathVariable String teacher_name,
-                                                                   @PathVariable Integer year,
-                                                                   @PathVariable Integer semester) {
+    public GetClassesResponse searchClassByTeacher(@PathVariable String teacher_name,
+                                                   @PathVariable(required = false) Integer year,
+                                                   @PathVariable(required = false) SemesterEnum semester) {
         SemesterEnum sem;
 
         if (semester.equals(1)) {
@@ -174,7 +174,7 @@ public class ClassController {
 
         return new ResponseEntity<>(new GetClassesResponse(classesAll), HttpStatus.OK);
     }
-
+*/
     @GetMapping(path = "/classes/action/search-by-teacher-no-time/{teacher_name}")
     // @Authorization
     public ResponseEntity<GetClassesResponse> searchClassByTeacherNoTime(// @CurrentUser UserEntity user,
