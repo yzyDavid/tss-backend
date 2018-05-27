@@ -3,9 +3,13 @@ package tss.interceptors;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-import tss.annotations.session.Authorization;
 import tss.configs.Config;
+
+import tss.entities.SessionEntity;
+import tss.annotations.session.Authorization;
+
 import tss.entities.*;
+
 import tss.repositories.SqlSessionRepository;
 import tss.repositories.UserRepository;
 import tss.services.AuthorizationService;

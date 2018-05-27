@@ -6,14 +6,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
 import tss.annotations.session.Authorization;
 import tss.entities.CourseEntity;
 import tss.entities.DepartmentEntity;
+import tss.entities.SemesterEnum;
 import tss.repositories.CourseRepository;
 import tss.repositories.DepartmentRepository;
 import tss.requests.information.*;
 import tss.responses.information.*;
 import tss.services.QueryService;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,11 +48,13 @@ public class CourseController {
                     null, null, null), HttpStatus.BAD_REQUEST);
         }
         DepartmentEntity dept = null;
+
         if (request.getDepartment() != null) {
             Optional<DepartmentEntity> ret = departmentRepository.findByName(request.getDepartment());
             if (!ret.isPresent()) {
                 return new ResponseEntity<>(new AddCourseResponse("Department doesn't exist", null, null,
                         null, null, request.getDepartment()), HttpStatus.BAD_REQUEST);
+
             }
             dept = ret.get();
         }
@@ -83,7 +88,6 @@ public class CourseController {
 
     }
 
-
     @PostMapping(path = "/modify")
     @Authorization
     public ResponseEntity<ModifyCourseResponse> modifyInfo(@RequestBody ModifyCourseRequest request) {
@@ -95,25 +99,29 @@ public class CourseController {
         }
         CourseEntity course = ret.get();
         DepartmentEntity dept = null;
+
         if (request.getDepartment() != null) {
             Optional<DepartmentEntity> retd = departmentRepository.findByName(request.getDepartment());
             if (!retd.isPresent()) {
                 return new ResponseEntity<>(new ModifyCourseResponse("department doesn't exist", null, null,
                         null, null, request.getDepartment(), null), HttpStatus.BAD_REQUEST);
+
             }
             course.setDepartment(retd.get());
         }
 
-        if (request.getName() != null) {
+        if(request.getName() != null) {
             course.setName(request.getName());
         }
-        if (request.getCredit() != null) {
+        if(request.getCredit() != null) {
             course.setCredit(request.getCredit());
         }
+
         if(request.getNumLessonsEachWeek() != null) {
             course.setNumLessonsEachWeek(request.getNumLessonsEachWeek());
+
         }
-        if (request.getIntro() != null) {
+        if(request.getIntro() != null) {
             course.setIntro(request.getIntro());
         }
         courseRepository.save(course);
@@ -139,6 +147,7 @@ public class CourseController {
     @Authorization
     public ResponseEntity<QueryCoursesResponse> queryCourses(@RequestBody QueryCoursesRequest request) {
         List<String> cids = new ArrayList<>();
+
         List<String> names = new ArrayList<>();
         List<String> departments = new ArrayList<>();
         Short deptId = null;
@@ -162,5 +171,10 @@ public class CourseController {
             departments.add(deptName);
         }
         return new ResponseEntity<>(new QueryCoursesResponse("OK", cids, names, departments), HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<GetCoursesResponse> searchCourseByName(@RequestParam String courseName) {
+        return new ResponseEntity<>(new GetCoursesResponse(courseRepository.findByNameLike("%"+courseName+"%")), HttpStatus.OK);
     }
 }

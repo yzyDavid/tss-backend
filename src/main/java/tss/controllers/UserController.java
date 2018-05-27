@@ -7,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import tss.annotations.session.Authorization;
-import tss.annotations.session.CurrentUser;
 import tss.configs.Config;
 import tss.entities.DepartmentEntity;
 import tss.entities.MajorClassEntity;
@@ -20,7 +18,12 @@ import tss.repositories.TypeGroupRepository;
 import tss.repositories.UserRepository;
 import tss.requests.information.*;
 import tss.responses.information.*;
+
+import tss.annotations.session.Authorization;
+import tss.annotations.session.CurrentUser;
+
 import tss.services.QueryService;
+
 import tss.utils.SecurityUtils;
 
 import java.io.IOException;
@@ -62,7 +65,7 @@ public class UserController {
     }
 
     @PutMapping(path = "/add")
-    @Authorization
+    //   @Authorization
     public ResponseEntity<AddUserResponse> addUser(@RequestBody AddUserRequest request) {
         String[] uids = request.getUids();
         String[] names = request.getNames();
@@ -114,6 +117,7 @@ public class UserController {
         if(uids == null) {
             return new ResponseEntity<>(new DeleteUserResponse("Invalid request", null), HttpStatus.BAD_REQUEST);
         }
+
         List<String> fails = new ArrayList<>();
         for (String uid : uids) {
             if (uid == null) {
@@ -125,6 +129,7 @@ public class UserController {
             } else {
                 fails.add(uid);
             }
+
         }
         String[] ret = new String[fails.size()];
         for (int i = 0; i < fails.size(); i++) {
@@ -137,9 +142,11 @@ public class UserController {
     @Authorization
     public ResponseEntity<ModifyPwdResponse> modifyPwd(@CurrentUser UserEntity user,
                                                        @RequestBody ModifyPwdRequest request) {
+
         String name = user.getName();
         if (!user.getHashedPassword().equals(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getOldPwd(), user.getSalt()))) {
             return new ResponseEntity<>(new ModifyPwdResponse("incorrect password", user.getUid(), name), HttpStatus.UNAUTHORIZED);
+
         }
         user.setHashedPassword(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getNewPwd(), user.getSalt()));
         userRepository.save(user);
@@ -152,11 +159,13 @@ public class UserController {
     public ResponseEntity<BasicResponse> resetPwd(@RequestBody BasicUserRequest request) {
         String uid = request.getUid();
         Optional<UserEntity> ret = userRepository.findById(uid);
+
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new BasicResponse("non-existent uid"), HttpStatus.BAD_REQUEST);
         }
         UserEntity tar = ret.get();
         tar.setHashedPassword(SecurityUtils.getHashedPasswordByPasswordAndSalt(Config.INIT_PWD, tar.getSalt()));
+
         userRepository.save(tar);
 
         return new ResponseEntity<>(new BasicResponse("OK"), HttpStatus.OK);
@@ -185,6 +194,7 @@ public class UserController {
     public ResponseEntity<ModifyUserResponse> modifyInfo(@RequestBody ModifyUserRequest request) {
         String uid = request.getUid();
         Optional<UserEntity> ret = userRepository.findById(uid);
+
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new ModifyUserResponse("Non-existent uid", uid, null, null, null,
                     null, null, null, null, null), HttpStatus.BAD_REQUEST);
@@ -195,6 +205,7 @@ public class UserController {
         }
         if (request.getGender() != null) {
             user.setGender(request.getGender());
+
         }
         if (request.getEmail() != null) {
             user.setEmail(request.getEmail());
@@ -255,9 +266,11 @@ public class UserController {
     public ResponseEntity<GetUserInfoResponse> getInfo(@RequestBody GetUserInfoRequest request) {
         String uid = request.getUid();
         Optional<UserEntity> ret = userRepository.findById(uid);
+
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetUserInfoResponse("Non-existent uid", uid, null, null,
                     null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
+
         }
         UserEntity user = ret.get();
         return new ResponseEntity<>(new GetUserInfoResponse("OK", user.getUid(), user.getName(),
@@ -278,9 +291,11 @@ public class UserController {
         }
         List<UserEntity> ret = queryService.queryUsers(request.getUid(), request.getName(), departmentId);
         List<String> uids = new ArrayList<>();
+
         List<String> names = new ArrayList<>();
         List<String> depts = new ArrayList<>();
         for (UserEntity user : ret) {
+
             uids.add(user.getUid());
             names.add(user.getName());
             if(user.getDepartment() != null) {

@@ -16,10 +16,14 @@ import tss.models.TimeSlotTypeEnum;
 import tss.repositories.ClassRepository;
 import tss.repositories.UserRepository;
 
+
+import java.util.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * @author reeve
@@ -35,6 +39,9 @@ public class TeacherController {
         this.classRepository = classRepository;
     }
 
+
+
+
     @PutMapping("/{userId}/classes-teaching/{classId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void addClassTeaching(@CurrentUser UserEntity user,
@@ -47,6 +54,7 @@ public class TeacherController {
 
         teacherEntity.addClassTeaching(classEntity);
         userRepository.save(teacherEntity);
+
     }
 
     @GetMapping("/{userId}/schedule")

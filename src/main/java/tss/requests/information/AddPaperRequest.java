@@ -10,6 +10,8 @@ public class AddPaperRequest {
     public boolean isauto;
     public String[] qid;
     public String[] score;
+    public String punit;
+    public String pcount;
 
     public String getPid() {
         return pid;
@@ -83,4 +85,11 @@ public class AddPaperRequest {
         this.score = score;
     }
 
+    public String getPunit() {return punit; }
+
+    public void setPunit(String punit) {this.punit = punit;}
+
+    public String getPcount() {return pcount; }
+
+    public void setPcount(String pcount) {this.pcount = pcount; }
 }

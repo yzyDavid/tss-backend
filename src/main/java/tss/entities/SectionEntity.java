@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 /**
  * @author Mingqi Yi
- * <p>
+ *
  * TODO: equals and hashCode method
  */
 @Entity

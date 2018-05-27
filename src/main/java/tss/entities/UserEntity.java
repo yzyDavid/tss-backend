@@ -189,6 +189,7 @@ public class UserEntity {
         this.dataAccessAuths.add(dataAccessAuth);
     }
 
+
     public TypeGroupEntity getType() {
         return type;
     }
@@ -202,6 +203,7 @@ public class UserEntity {
             return type.getName();
         } else {
             return null;
+
         }
     }
 

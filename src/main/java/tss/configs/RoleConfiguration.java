@@ -49,8 +49,10 @@ public class RoleConfiguration implements CommandLineRunner {
             generateUser();*/
         }
 
-        String uid = bundle.getString("spring.datasource.username");
-        String pwd = bundle.getString("spring.datasource.password");
+        /*String uid = bundle.getString("spring.datasource.username");
+        String pwd = bundle.getString("spring.datasource.password");*/
+        String uid = "0000000000";
+        String pwd = Config.INIT_PWD;
         if (!userRepository.existsById(uid)) {
             UserEntity user = new UserEntity();
             user.setUid(uid);

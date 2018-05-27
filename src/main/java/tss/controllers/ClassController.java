@@ -1,5 +1,6 @@
 package tss.controllers;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import tss.exceptions.ClazzNotFoundException;
 import tss.exceptions.CourseNotFoundException;
 import tss.exceptions.TeacherNotFoundException;
 import tss.models.Clazz;
+import tss.models.ClazzList;
 import tss.repositories.*;
 import tss.responses.information.GetClassesResponse;
 
@@ -111,280 +113,127 @@ public class ClassController {
         }
     }
 
-
-    @GetMapping(path = "/classes/action/search-by-course/{course_name}/{year}/{semester}")
-    /*@Authorization*/
-    public ResponseEntity<GetClassesResponse> searchClassByName( // @CurrentUser UserEntity user,
-                                                                 @PathVariable String course_name, @PathVariable Integer year,
-                                                                 @PathVariable Integer semester) {
-        SemesterEnum sem;
-
-        if (semester.equals(1)) {
-            sem = SemesterEnum.FIRST;
-        }
-        else if (semester.equals(2)) {
-            sem = SemesterEnum.SECOND;
-        } else {
-            return new ResponseEntity<>(new GetClassesResponse(new ArrayList<>()),
-                    HttpStatus.BAD_REQUEST);
-        }
-
-        List<CourseEntity> ret = courseRepository.findByName(course_name);
-        if (ret.isEmpty()) {
-            return new ResponseEntity<>(new GetClassesResponse(new ArrayList<>()),
-                    HttpStatus.BAD_REQUEST);
-        }
-
-        List<ClassEntity> classesAll = new ArrayList<>();
-
-        for (CourseEntity course : ret) {
-            List<ClassEntity> classes = course.getClasses();
-            for (ClassEntity clazz : classes) {
-                if (clazz.getYear().equals(year) && clazz.getSemester().equals(sem)) {
-                    classesAll.add(clazz);
-                }
-            }
-        }
-
-        List<ClassInfo> classesInfo = new ArrayList<>();
-
-        for (ClassEntity clazz : classesAll) {
-            classesInfo.add(new ClassInfo(clazz));
-        }
-        return new ResponseEntity<>(new GetClassesResponse(classesInfo), HttpStatus.OK);
-    }
-
-    @GetMapping(path = "/classes/action/search-by-course-no-time/{course_name}")
-    /*@Authorization*/
-    public ResponseEntity<GetClassesResponse> searchClassByNameNoTime( // @CurrentUser UserEntity user,
-                                                     @PathVariable String course_name) {
-        List<CourseEntity> ret = courseRepository.findByName(course_name);
-        if (ret.isEmpty()) {
-            return new ResponseEntity<>(new GetClassesResponse(new ArrayList<>()),
-                    HttpStatus.BAD_REQUEST);
-        }
-
-        List<ClassEntity> classesAll = new ArrayList<>();
-
-        for (CourseEntity course : ret) {
-            classesAll.addAll(course.getClasses());
-        }
-
-        List<ClassInfo> classesInfo = new ArrayList<>();
-
-        for (ClassEntity clazz : classesAll) {
-            classesInfo.add(new ClassInfo(clazz));
-        }
-
-        return new ResponseEntity<>(new GetClassesResponse(classesInfo), HttpStatus.OK);
-    }
-
-    @GetMapping(path = "/classes/action/search-by-course-id/{course_id}/{year}/{semester}")
+    @GetMapping("/classes/search/findByCourse_NameAndYearAndSemester")
     @ResponseStatus(HttpStatus.OK)
-    /*@Authorization*/
-    public List<ClassEntity> searchClassById( // @CurrentUser UserEntity user,
-                                                                               @PathVariable String course_id,
-                                                                               @PathVariable Integer year,
-                                                                               @PathVariable Integer semester) {
-        SemesterEnum sem;
-
-        if (semester.equals(1)) {
-            sem = SemesterEnum.FIRST;
+    public GetClassesResponse searchClassByName(@RequestParam String courseName,
+                                                @RequestParam(required = false) Integer year,
+                                                @RequestParam(required = false) SemesterEnum semester) {
+        List<ClassEntity> classes;
+        if (year == null || semester == null) {
+            //classes = classRepository.findByCourse_NameLike("%"+courseName+"%");
+            classes = classRepository.findByCourse_Name("%"+courseName+"%");
         }
-        else if (semester.equals(2)) {
-            sem = SemesterEnum.SECOND;
-        } else {
-            return new ArrayList<>();
-        }
-            /*return new ResponseEntity<>(new GetClassesBySearchingNameResponse("Invalid semester number", null),
-                    HttpStatus.BAD_REQUEST);*/
+        else classes = classRepository.findByCourse_NameLikeAndYearAndSemester("%"+courseName+"%", year, semester);
 
-        Optional<CourseEntity> ret = courseRepository.findById(course_id);
-        if (!ret.isPresent()) {
-            return new ArrayList<>();
-            /* return new ResponseEntity<>(new GetClassesBySearchingNameResponse("course doesn't exist",null),
-                    HttpStatus.BAD_REQUEST); */
-        }
-        CourseEntity course = ret.get();
-
-        List<ClassEntity> classesAll = new ArrayList<>();
-
-        List<ClassEntity> classes = course.getClasses();
-        for (ClassEntity clazz : classes) {
-            if (clazz.getYear().equals(year) && clazz.getSemester().equals(sem)) {
-                classesAll.add(clazz);
-            }
+        if (classes.isEmpty()) {
+            System.out.println("Empty");
         }
 
-        return classesAll;
+        return new GetClassesResponse(classes);
     }
 
-    @GetMapping(path = "/classes/action/search-by-course-id-no-time/{course_id}")
+    @GetMapping("/classes/search/findByCourse_IdAndYearAndSemester")
     @ResponseStatus(HttpStatus.OK)
-    /*@Authorization*/
-    public List<ClassEntity> searchClassByIdNoTime( // @CurrentUser UserEntity user,
-                                                                              @PathVariable String course_id) {
-        Optional<CourseEntity> ret = courseRepository.findById(course_id);
-        if (!ret.isPresent()) {
-            return new ArrayList<>();
-            /*return new ResponseEntity<>(new GetClassesBySearchingNameResponse("course doesn't exist",null),
-                    HttpStatus.BAD_REQUEST);*/
+    public GetClassesResponse searchClassById(@RequestParam String courseId,
+                                              @RequestParam(required = false) Integer year,
+                                              @RequestParam(required = false) SemesterEnum semester) {
+        List<ClassEntity> classes;
+
+        if (year == null || semester == null) {
+            classes = classRepository.findByCourse_Id(courseId);
         }
-        CourseEntity course = ret.get();
-        return course.getClasses(); //new ResponseEntity<>(new GetClassesBySearchingNameResponse("OK", classesAll), HttpStatus.OK);
+        else classes = classRepository.findByCourse_IdAndYearAndSemester(courseId, year, semester);
+        /*
+        if (classes.isEmpty()) {
+            ...
+        }*/
+
+        return new GetClassesResponse(classes);
     }
 
-    @GetMapping(path = "/classes/action/search-by-teacher/{teacher_name}/{year}/{semester}")
+    @GetMapping("/classes/search/findByTeacher_NameAndYearAndSemester")
     @ResponseStatus(HttpStatus.OK)
-    /*@Authorization*/
-    public List<ClassEntity> searchClassByTeacher(// @CurrentUser UserEntity user,
-                                                                             @PathVariable String teacher_name,
-                                                                             @PathVariable Integer year,
-                                                                             @PathVariable Integer semester) {
-        SemesterEnum sem;
+    public GetClassesResponse searchClassByTeacher(@RequestParam String teacherName,
+                                                   @RequestParam(required = false) Integer year,
+                                                   @RequestParam(required = false) SemesterEnum semester) {
 
-        if (semester.equals(1)) {
-            sem = SemesterEnum.FIRST;
-        }
-        else if (semester.equals(2)) {
-            sem = SemesterEnum.SECOND;
-        } else {
-            return new ArrayList<>();
-        }
-            /*return new ResponseEntity<>(new GetClassesBySearchingTeacherResponse("Invalid semester number", null),
-                    HttpStatus.BAD_REQUEST);*/
-
-        List<UserEntity> ret = userRepository.findByName(teacher_name);
-
-        if (ret.isEmpty()) {
-            return new ArrayList<>();
-            /*
-            return new ResponseEntity<>(new GetClassesBySearchingTeacherResponse("course doesn't exist", null),
-                    HttpStatus.BAD_REQUEST);*/
-        }
+        List<UserEntity> teachers = userRepository.findByNameLikeAndType_Name("%"+teacherName+"%", "System Administrator");
+        /*
+        if (teachers.isEmpty()) {
+            ...
+        }*/
 
         List<ClassEntity> classesAll = new ArrayList<>();
-        for (UserEntity teacher : ret) {
-            if (!teacher.readTypeName().equals("Teacher")) {
-                continue;
-            }
+        for (UserEntity teacher : teachers) {
             List<ClassEntity> classes = teacher.getClassesTeaching();
+            if (year == null || semester == null) {
+                classesAll.addAll(classes);
+                continue;
+            }
             for (ClassEntity clazz : classes) {
-                if (clazz.getYear().equals(year) && clazz.getSemester().equals(sem)) {
+                if (clazz.getYear().equals(year) && clazz.getSemester().equals(semester)) {
                     classesAll.add(clazz);
                 }
             }
         }
 
-        return classesAll; //new ResponseEntity<>(new GetClassesBySearchingTeacherResponse("OK", classesAll), HttpStatus.OK);
+        return new GetClassesResponse(classesAll);
     }
 
-    @GetMapping(path = "/classes/action/search-by-teacher-no-time/{teacher_name}")
+    @GetMapping("/classes/search/findByBoth")
     @ResponseStatus(HttpStatus.OK)
-    /*@Authorization*/
-    public List<ClassEntity> searchClassByTeacherNoTime(// @CurrentUser UserEntity user,
-                                                                                @PathVariable String teacher_name) {
-        List<UserEntity> ret = userRepository.findByName(teacher_name);
+    public GetClassesResponse searchClassByBoth(@RequestParam String courseName,
+                                                @RequestParam String teacherName,
+                                                @RequestParam(required = false) Integer year,
+                                                @RequestParam(required = false) SemesterEnum semester) {
 
-        if (ret.isEmpty()) {
-            return new ArrayList<>();
-            /*return new ResponseEntity<>(new GetClassesBySearchingTeacherResponse("course doesn't exist", null),
-                    HttpStatus.BAD_REQUEST);*/
-        }
-
-        List<ClassEntity> classesAll = new ArrayList<>();
-        for (UserEntity teacher : ret) {
-            if (!teacher.readTypeName().equals("Teacher")) {
-                continue;
+        if (year == null || semester == null) {
+            Set<ClassEntity> classesByCourseName = new HashSet<>(classRepository.findByCourse_NameLike(courseName));
+            List<UserEntity> teachers = userRepository.findByName(teacherName);
+            /* if (classes.isEmpty() || teachers.isEmpty()) { ... } */
+            Set<ClassEntity> classesByTeacherName = new HashSet<>();
+            for (UserEntity teacher : teachers) {
+                if (!teacher.readTypeName().equals("Teacher")) {
+                    continue;
+                }
+                classesByTeacherName.addAll(teacher.getClassesTeaching());
             }
-            classesAll.addAll(teacher.getClassesTeaching());
+            Set<ClassEntity> res = new HashSet<>();
+            res.clear();
+            res.addAll(classesByCourseName);
+            res.retainAll(classesByTeacherName);
+            return new GetClassesResponse(new ArrayList<>(res));
         }
 
-        return classesAll; // new ResponseEntity<>(new GetClassesBySearchingTeacherResponse("OK", classesAll), HttpStatus.OK);
-    }
-
-    @GetMapping(path = "/classes/action/search-both/{course_name}/{teacher_name}/{year}/{semester}")
-    @ResponseStatus(HttpStatus.OK)
-    /*@Authorization*/
-    public List<ClassEntity> searchClassBoth(// @CurrentUser UserEntity user
-                                             @PathVariable String course_name,
-                                             @PathVariable String teacher_name,
-                                             @PathVariable Integer year,
-                                             @PathVariable Integer semester
-                                          ) {
-        SemesterEnum sem;
-        if (semester.equals(1)) {
-            sem = SemesterEnum.FIRST;
-        }
-        else if (semester.equals(2)) {
-            sem = SemesterEnum.SECOND;
-        } else {
-            return new ArrayList<>();
-        }
-            /*return new ResponseEntity<>(new GetClassesBySearchingBothResponse("Invalid semester number", null),
-                    HttpStatus.BAD_REQUEST);*/
-
-        List<CourseEntity> ret = courseRepository.findByName(course_name);
-        if (ret.isEmpty()) {
-            return new ArrayList<>();
-            /*return new ResponseEntity<>(new GetClassesBySearchingBothResponse("course doesn't exist", null),
-                    HttpStatus.BAD_REQUEST);*/
-        }
-
-        List<UserEntity> retu = userRepository.findByName(teacher_name);
-
-        if (retu.isEmpty()) {
-            return new ArrayList<>();
-            /*
-            return new ResponseEntity<>(new GetClassesBySearchingBothResponse("course doesn't exist", null),
-                    HttpStatus.BAD_REQUEST);*/
-        }
-
-        Set<ClassEntity> classesByCourseName = new HashSet<>();
+        Set<ClassEntity> classesByCourseName = new HashSet<>(classRepository.findByCourse_NameLikeAndYearAndSemester(courseName, year, semester));
+        List<UserEntity> teachers = userRepository.findByName(teacherName);
         Set<ClassEntity> classesByTeacherName = new HashSet<>();
-
-        for (CourseEntity course : ret) {
-            List<ClassEntity> classes = course.getClasses();
-
-            for (ClassEntity clazz : classes) {
-                if (clazz.getYear().equals(year)) {
-                    classesByCourseName.add(clazz);
-                }
-            }
-        }
-
-        for (UserEntity teacher : retu) {
-            /*
+        for (UserEntity teacher : teachers) {
             if (!teacher.readTypeName().equals("Teacher")) {
                 continue;
-            }*/
+            }
             List<ClassEntity> classes = teacher.getClassesTeaching();
-
             for (ClassEntity clazz : classes) {
-                if (clazz.getYear().equals(year) && clazz.getSemester().equals(sem)) {
+                if (clazz.getYear().equals(year) && clazz.getSemester().equals(semester)) {
                     classesByTeacherName.add(clazz);
                 }
             }
         }
-        System.out.println("classesByCourseName" + classesByCourseName.size());
-        System.out.println("classesByTeacherName" + classesByTeacherName.size());
-
         Set<ClassEntity> res = new HashSet<>();
         res.clear();
         res.addAll(classesByCourseName);
         res.retainAll(classesByTeacherName);
 
-        return new ArrayList<>(res); // new ResponseEntity<>(new GetClassesBySearchingBothResponse("OK", res), HttpStatus.OK);
-
+        return new GetClassesResponse(new ArrayList<>(res));
     }
 
-
-    @PutMapping(path = "/classes/action/select/{classId}")
+    @PutMapping(path = "/classes/select")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
     public void registerClass(@CurrentUser UserEntity user,
-            @PathVariable long classId) {
+                              @PathVariable long classId) {
         ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
+
 
     }
 

@@ -74,9 +74,11 @@ public class DepartmentController {
     @Authorization
     @Transactional(rollbackFor = {})
     public ResponseEntity<GetDepartmentResponse> getDepartment(@RequestBody GetDepartmentRequest request) {
+
         Optional<DepartmentEntity> ret = departmentRepository.findByName(request.getName());
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetDepartmentResponse("Non-exist department", null, null), HttpStatus.BAD_REQUEST);
+
         }
         DepartmentEntity dept = ret.get();
         List<String> majors = new ArrayList<>();
