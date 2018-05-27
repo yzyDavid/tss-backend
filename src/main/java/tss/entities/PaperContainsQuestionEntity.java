@@ -13,7 +13,7 @@ public class PaperContainsQuestionEntity {
     private String score;
 
     @Id
-    @Column(name = "contains_id", length = 10)
+    @Column(name = "contains_id", length = 100)
     public String getId() {
         return id;
     }

@@ -22,7 +22,7 @@ public class PapersEntity{
     private long answerednum;
     private double average;
     @Id
-    @Column(name = "paper_pid", length = 10)
+    @Column(name = "paper_pid", length = 100)
     public String getPid() {
         return pid;
     }

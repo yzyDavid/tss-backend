@@ -18,7 +18,7 @@ public class ResultEntity {
     private String Ans;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "Resultid", length = 100)
     public String getRid() {
         return Rid;
     }

@@ -16,7 +16,7 @@ public class HistoryGradeEntity {
     private Date startTime;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "Historyid", length = 100)
     public String getHid() {
         return hid;
     }
