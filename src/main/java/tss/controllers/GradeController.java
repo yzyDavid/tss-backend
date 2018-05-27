@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.*;
 import tss.repositories.*;
@@ -66,11 +67,11 @@ public class GradeController {
     }*/
 
     @PostMapping(path = "/search")
+    @Authorization
     public ResponseEntity<GetGradeResponse> GetGrade(@CurrentUser UserEntity user, @RequestBody GetGradeRequest request){
 
         GetGradeRequest.QueryType type = request.getType();
         UserEntity student;
-
 
         if(type.equals(GetGradeRequest.QueryType.SID)){
             List<String> pid = new ArrayList<String>();
@@ -92,10 +93,11 @@ public class GradeController {
                 student = ret.get();
                 records_find =  historyGradeRepository.findByStudent(student);
             }
-
+/*
             if(((List<HistoryGradeEntity>) records_find).isEmpty()){
                 return new ResponseEntity<>(new GetGradeResponse("This student haven't take any exam yet", null, null, null, null), HttpStatus.BAD_REQUEST);
             }
+            */
             int i=0;
             //int size = ((List<HistoryGradeEntity>) records_find).size();
 
