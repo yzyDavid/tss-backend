@@ -65,7 +65,7 @@ public class UserController {
     }
 
     @PutMapping(path = "/add")
- //   @Authorization
+    //   @Authorization
     public ResponseEntity<AddUserResponse> addUser(@RequestBody AddUserRequest request) {
         String[] uids = request.getUids();
         String[] names = request.getNames();
