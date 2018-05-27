@@ -74,7 +74,7 @@ public class GradeController {
         return new ResponseEntity<>(new GetClassStudentResponse("OK",id,name),HttpStatus.OK);
     }
 
-    @GetMapping(path = "/getclassstudentscore")//this is get student score in this semester's class;
+    @PostMapping(path = "/getclassstudentscore")//this is get student score in this semester's class;
 //    @Authorization
     public ResponseEntity<GetClassStudentScoreResponse> getallclassstudentsscore(@RequestBody GetClassStudentScoreRequest request)
     {
