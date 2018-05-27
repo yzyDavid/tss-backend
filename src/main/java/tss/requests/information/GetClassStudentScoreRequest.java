@@ -2,26 +2,32 @@ package tss.requests.information;
 
 public class GetClassStudentScoreRequest {
     private String uid;
-    private Long cid;
+    private String semester;
+    private Integer year;
 
-//    public GetClassStudentScoreRequest(String uid, Long cid) {
-//        this.uid = uid;
-//        this.cid = cid;
-//    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public Long getCid() {
-        return cid;
-    }
 
     public void setUid(String uid) {
         this.uid = uid;
     }
 
-    public void setCid(Long cid) {
-        this.cid = cid;
+    public void setSemester(String semester) {
+        this.semester = semester;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    public String getUid() {
+
+        return uid;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public Integer getYear() {
+        return year;
     }
 }

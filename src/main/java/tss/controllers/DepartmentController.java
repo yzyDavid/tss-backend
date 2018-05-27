@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.entities.DepartmentEntity;
 import tss.entities.MajorEntity;
@@ -51,11 +48,6 @@ public class DepartmentController {
         return new ResponseEntity<>(new AddDepartmentResponse("ok", request.getName()), HttpStatus.CREATED);
     }
 
-<<<<<<< HEAD
-    @PostMapping(path = "/getAll")
-//    @Authorization
-    public ResponseEntity<GetAllDepartmentsResponse> getAllDepartments() {
-=======
     @PutMapping(path = "/delete/dept")
     @Authorization
     public ResponseEntity<DeleteDepartmentResponse> deleteDepartment(@RequestBody DeleteDepartmentRequest request) {
@@ -69,7 +61,6 @@ public class DepartmentController {
     @PostMapping(path = "/get/dept/list")
     @Authorization
     public ResponseEntity<GetDepartmentsResponse> getDepartments() {
->>>>>>> master
         Iterable<DepartmentEntity> departments = departmentRepository.findAll();
         List<String> names = new ArrayList<>();
         for (DepartmentEntity dept : departments) {
@@ -81,9 +72,11 @@ public class DepartmentController {
     @PostMapping(path = "/get/dept/info")
     @Authorization
     public ResponseEntity<GetDepartmentResponse> getDepartment(@RequestBody GetDepartmentRequest request) {
+
         Optional<DepartmentEntity> ret = departmentRepository.findByName(request.getName());
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetDepartmentResponse("Non-exist department", null, null), HttpStatus.BAD_REQUEST);
+
         }
         DepartmentEntity dept = ret.get();
         List<String> majors = new ArrayList<>();

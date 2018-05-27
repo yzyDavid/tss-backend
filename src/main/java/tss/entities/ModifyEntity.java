@@ -5,25 +5,27 @@ import javax.persistence.*;
 @Entity
 @Table(name="ManageScore")
 public class ModifyEntity {
-    private long id;
+    private Long id;
     private String uid;
     private long cid;
     private int score;
     private String reasons;
-    private Boolean status;
+    private Boolean agree;
     private Boolean process;
 
     public ModifyEntity() {
     }
 
+
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -60,15 +62,16 @@ public class ModifyEntity {
         this.reasons = reasons;
     }
 
-    @Column(name="status")
-
-    public Boolean getStatus() {
-        return status;
+    @Column(name="agree")
+    public Boolean getAgree() {
+        return agree;
     }
 
-    public void setStatus(Boolean status) {
-        this.status = status;
+    public void setAgree(Boolean agree) {
+        this.agree = agree;
     }
+
+
     @Column(name="process")
 
     public Boolean getProcess() {

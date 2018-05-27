@@ -1,9 +1,11 @@
 package tss.responses.information;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GetProcessResponse {
     private String status;
+    private List<Long> ids;
     private List<String> reasons;
     private List<Integer> scores;
     private List<String> uids;
@@ -11,10 +13,16 @@ public class GetProcessResponse {
 
     public GetProcessResponse(String status) {
         this.status = status;
+        this.cids=null;
+        this.ids=null;
+        this.scores=null;
+        this.reasons=null;
+        this.uids=null;
     }
 
-    public GetProcessResponse(String status, List<String> reasons, List<Integer> scores, List<String> uids, List<Long> cids) {
+    public GetProcessResponse(String status, List<Long> ids, List<String> reasons, List<Integer> scores, List<String> uids, List<Long> cids) {
         this.status = status;
+        this.ids = ids;
         this.reasons = reasons;
         this.scores = scores;
         this.uids = uids;
@@ -59,5 +67,13 @@ public class GetProcessResponse {
 
     public void setCids(List<Long> cids) {
         this.cids = cids;
+    }
+
+    public List<Long> getIds() {
+        return ids;
+    }
+
+    public void setIds(List<Long> ids) {
+        this.ids = ids;
     }
 }

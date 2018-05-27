@@ -5,52 +5,60 @@ import java.util.List;
 
 public class GetClassStudentScoreResponse {
     private String status;
-    private List<String> students = new ArrayList<>();
-    private List<String> name = new ArrayList<>();
-    private List<Integer> score = new ArrayList<>();
+    private List<String> coursenames;
+    private List<String> courseid;
+    private List<Integer> scores;
+    private List<Long> classids;
 
     public GetClassStudentScoreResponse(String status) {
         this.status = status;
     }
 
-    public GetClassStudentScoreResponse(String status, List<String> students, List<String> name, List<Integer> score) {
+    public GetClassStudentScoreResponse(String status, List<String> coursenames, List<String> courseid, List<Integer> scores, List<Long> classids) {
         this.status = status;
-        this.students = students;
-        this.name = name;
-        this.score = score;
+        this.coursenames = coursenames;
+        this.courseid = courseid;
+        this.scores = scores;
+        this.classids = classids;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public List<String> getCoursenames() {
+        return coursenames;
+    }
+
+    public List<String> getCourseid() {
+        return courseid;
+    }
+
+    public List<Integer> getScores() {
+        return scores;
+    }
+
+    public List<Long> getClassids() {
+        return classids;
     }
 
     public void setStatus(String status) {
         this.status = status;
     }
 
-    public void setStudents(List<String> students) {
-        this.students = students;
+    public void setCoursenames(List<String> coursenames) {
+        this.coursenames = coursenames;
     }
 
-    public void setName(List<String> name) {
-        this.name = name;
+    public void setCourseid(List<String> courseid) {
+        this.courseid = courseid;
     }
 
-    public String getStatus() {
-
-        return status;
+    public void setScores(List<Integer> scores) {
+        this.scores = scores;
     }
 
-    public void setScore(List<Integer> score) {
-        this.score = score;
-    }
-
-    public List<Integer> getScore() {
-
-        return score;
-    }
-
-    public List<String> getStudents() {
-        return students;
-    }
-
-    public List<String> getName() {
-        return name;
+    public void setClassids(List<Long> classids) {
+        this.classids = classids;
     }
 }

@@ -3,10 +3,22 @@ package tss.requests.information;
 import java.util.List;
 
 public class ProcessModifyRequest {
+    private Long id;
     private String uids;
     private Long cids;
     private Integer score;
-    private Boolean process;
+    private String agree;
+
+    public ProcessModifyRequest() {
+    }
+
+    public ProcessModifyRequest(Long id, String uids, Long cids, Integer score, String agree) {
+        this.id = id;
+        this.uids = uids;
+        this.cids = cids;
+        this.score = score;
+        this.agree = agree;
+    }
 
     public String getUids() {
         return uids;
@@ -20,12 +32,20 @@ public class ProcessModifyRequest {
         return score;
     }
 
-    public Boolean getProcess() {
-        return process;
+    public String getAgree() {
+        return agree;
     }
 
     public void setUids(String uids) {
         this.uids = uids;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setCids(Long cids) {
@@ -36,7 +56,7 @@ public class ProcessModifyRequest {
         this.score = score;
     }
 
-    public void setProcess(Boolean process) {
-        this.process = process;
+    public void setAgree(String agree) {
+        this.agree = agree;
     }
 }
