@@ -17,7 +17,7 @@ import java.util.*;
 
 @Controller
 @RequestMapping(path = "/grade")
-public class GradeController {
+public class ScoreController {
 
     private ClassRepository classRepository;
     private ModifyRepository modifyRepository;
@@ -26,7 +26,7 @@ public class GradeController {
     private ClassRegistrationRepository classRegistrationRepository;
 
     @Autowired
-    GradeController(ClassRepository classRepository, ModifyRepository modifyRepository,
+    ScoreController(ClassRepository classRepository, ModifyRepository modifyRepository,
                     UserRepository userRepository,CourseRepository courseRepository,ClassRegistrationRepository classRegistrationRepository)
     {
         this.classRepository=classRepository;
