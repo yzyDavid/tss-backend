@@ -4,12 +4,12 @@ import tss.entities.ClassEntity;
 import tss.entities.ClassroomEntity;
 import tss.entities.TimeSlotEntity;
 
-import javax.swing.text.html.Option;
-
 /**
  * @author reeve
  */
 public class TimeSlot {
+
+    private Long id;
     private String typeName;
     private Long classId;
     private String courseName;
@@ -22,6 +22,7 @@ public class TimeSlot {
     }
 
     public TimeSlot(TimeSlotEntity timeSlotEntity) {
+        id = timeSlotEntity.getId();
         typeName = timeSlotEntity.getType().name();
         ClassEntity classEntity;
         if ((classEntity = timeSlotEntity.getClazz()) != null) {
@@ -33,6 +34,14 @@ public class TimeSlot {
         classroomName = classroomEntity.getName();
         buildingName = classroomEntity.getBuilding().getName();
         campusName = classroomEntity.getBuilding().getCampus().getName();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTypeName() {
