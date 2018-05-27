@@ -121,7 +121,4 @@ public class PapersEntity{
         this.average = average;
     }
 
-
-
-
 }

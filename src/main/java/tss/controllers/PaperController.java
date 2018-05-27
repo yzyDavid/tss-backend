@@ -52,7 +52,7 @@ public class PaperController {
 
         //如果不重复就创建新的paper
         PapersEntity paper = new PapersEntity();
-        Set<PaperContainsQuestionEntity> paperquestions = new HashSet<>();
+        Set<PaperContainsQuestionEntity> paperQuestions = new HashSet<>();
 
 
 
@@ -63,7 +63,8 @@ public class PaperController {
         paper.setEnd(request.getEnd());
         paper.setLast(request.getLast());
 
-      //  paper.setPaperquestion();!!!!
+        paper.setCount(request.getCount());
+
 
         paper.setAnswerednum(0);
         paper.setAverage(0.0);
@@ -90,7 +91,7 @@ public class PaperController {
 
                 contain.setQuestion(question);
 
-                paperquestions.add(contain);
+                paperQuestions.add(contain);
                 paperContainsQuestionRepository.save(contain);
 
             }
@@ -141,7 +142,7 @@ public class PaperController {
                     contain.setQuestion(question);
 
           //          System.out.println("qid:"+question.getQid());
-                    paperquestions.add(contain);
+                    paperQuestions.add(contain);
                     paperContainsQuestionRepository.save(contain);
                 }
                 else{
@@ -152,7 +153,8 @@ public class PaperController {
         }
 
 
-        paper.setPaperquestion(paperquestions);
+        paper.setPaperquestion(paperQuestions);
+
 
         paperRepository.save(paper);
         System.out.println("insert paper"+request.getPid());
@@ -282,9 +284,9 @@ public class PaperController {
                 papers.add(paper_return);
             }
 
-        }
-        else{
-            System.out.println("Invalid direction: "+type);
+        } else {
+            System.out.println("Invalid direction: " + type);
+
             return new ResponseEntity<>(new GetPaperResponse("Invalid direction", papers), HttpStatus.BAD_REQUEST);
         }
 

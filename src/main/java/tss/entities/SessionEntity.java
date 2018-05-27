@@ -9,10 +9,13 @@ import java.sql.Timestamp;
  * TODO: index not auto created.
  */
 @Entity
-@Table(name = "session", indexes = {
-        @Index(name = "uidIndex", columnList = "uid", unique = true),
-        @Index(name = "tokenIndex", columnList = "token", unique = true)
-})
+@Table(
+        name = "session",
+        indexes = {
+                @Index(name = "uidIndex", columnList = "uid", unique = true),
+                @Index(name = "tokenIndex", columnList = "token", unique = true)
+        }
+)
 public class SessionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

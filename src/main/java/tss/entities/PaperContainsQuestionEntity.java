@@ -51,5 +51,4 @@ public class PaperContainsQuestionEntity {
     public void setScore(String score){
         this.score = score;
     }
-
 }

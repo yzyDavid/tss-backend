@@ -1,13 +1,18 @@
 package tss.interceptors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import tss.configs.Config;
+
 import tss.entities.SessionEntity;
 import tss.annotations.session.Authorization;
+
+import tss.entities.*;
+
 import tss.repositories.SqlSessionRepository;
+import tss.repositories.UserRepository;
+import tss.services.AuthorizationService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,10 +24,14 @@ import java.lang.reflect.Method;
 @Component
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
     private final SqlSessionRepository sqlSessionRepository;
+    private final UserRepository userRepository;
+    private final AuthorizationService authorizationService;
 
-    @Autowired
-    public AuthorizationInterceptor(SqlSessionRepository sqlSessionRepository) {
+    public AuthorizationInterceptor(SqlSessionRepository sqlSessionRepository, UserRepository userRepository,
+                                    AuthorizationService authorizationService) {
         this.sqlSessionRepository = sqlSessionRepository;
+        this.userRepository = userRepository;
+        this.authorizationService = authorizationService;
     }
 
     @Override
@@ -31,9 +40,12 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
             return true;
         }
         Method method = ((HandlerMethod) handler).getMethod();
-        String auth = request.getHeader(Config.AUTH_HEADER);
+        if(method.getAnnotation(Authorization.class) == null) {
+            return true;
+        }
 
-        if (auth == null && method.getAnnotation(Authorization.class) != null) {
+        String auth = request.getHeader(Config.AUTH_HEADER);
+        if (auth == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
@@ -42,14 +54,15 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
             SessionEntity session = sqlSessionRepository.findByToken(auth);
             String uid = session.getUid();
             request.setAttribute(Config.CURRENT_UID_ATTRIBUTE, uid);
-        } else {
-            // invalid auth provided.
-            if (method.getAnnotation(Authorization.class) != null) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            if(authorizationService.checkMethodAccessAuthority()) {
+                return true;
+            } else {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return false;
             }
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return false;
         }
-
-        return true;
     }
 }

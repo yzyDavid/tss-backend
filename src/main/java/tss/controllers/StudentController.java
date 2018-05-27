@@ -6,5 +6,5 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping(path = "/student")
 public class StudentController {
-    //Time schedule of student
+    //TODO: Time schedule of student
 }

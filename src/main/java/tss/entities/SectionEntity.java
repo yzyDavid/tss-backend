@@ -10,18 +10,18 @@ import javax.persistence.*;
 @Entity
 @Table(name = "section")
 public class SectionEntity {
-    private long id;
+    private Long id;
     private TimeSlotEntity timeSlot;
     private ClassroomEntity classroom;
     private ClassEntity _class;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -53,5 +53,25 @@ public class SectionEntity {
 
     public void set_class(ClassEntity _class) {
         this._class = _class;
+    }
+
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return super.hashCode();
+        } else {
+            return id.hashCode();
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!obj.getClass().equals(this.getClass())) {
+            return false;
+        } else if (id != null) {
+            return (id.equals(((SectionEntity) obj).id));
+        } else {
+            return super.equals(obj);
+        }
     }
 }

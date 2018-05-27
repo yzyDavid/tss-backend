@@ -112,6 +112,8 @@ public class ResultEntity {
     public void setAns(String ans) {
         Ans = ans;
     }
+<<<<<<< HEAD
 
 */
+
 }

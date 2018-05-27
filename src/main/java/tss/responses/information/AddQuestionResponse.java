@@ -7,13 +7,17 @@ public class AddQuestionResponse {
     final String status;
     private final String qid;
 
-    public AddQuestionResponse(String status, String qid){
+    public AddQuestionResponse(String status, String qid) {
         this.status = status;
         this.qid = qid;
     }
 
-    public String getStatus() {return status;}
+    public String getStatus() {
+        return status;
+    }
 
-    public String getQid() {return qid;}
+    public String getQid() {
+        return qid;
+    }
 
 }

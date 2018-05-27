@@ -6,9 +6,11 @@ public class DeleteQuestionResponse {
     @Nls
     final String status;
 
-    public DeleteQuestionResponse(String status){
+    public DeleteQuestionResponse(String status) {
         this.status = status;
     }
 
-    public String getStatus() {return status;}
+    public String getStatus() {
+        return status;
+    }
 }

@@ -12,6 +12,7 @@ import tss.entities.*;
 import tss.repositories.*;
 import tss.requests.information.GetGradeRequest;
 import tss.responses.information.GetGradeResponse;
+import tss.responses.information.ModifyPaperResponse;
 
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ import java.util.Optional;
 @RequestMapping(path = "testsys_result")
 public class GradeController {
 
-
+    private final UserRepository userRepository;
     private final PaperRepository paperRepository;
     private final QuestionRepository questionRepository;
     //private final PaperContainsQuestionRepository paperContainsQuestionRepository;
@@ -31,10 +32,11 @@ public class GradeController {
    // private final ResultRepository resultRepository;
 
     @Autowired
-    public GradeController(PaperRepository paperRepository, QuestionRepository questionRepository, HistoryGradeRepository historyGradeRepository) {
+    public GradeController(PaperRepository paperRepository, QuestionRepository questionRepository, HistoryGradeRepository historyGradeRepository, UserRepository userRepository) {
         this.paperRepository = paperRepository;
         this.questionRepository = questionRepository;
         this.historyGradeRepository = historyGradeRepository;
+        this.userRepository = userRepository;
     }
 
   /*  @PostMapping(path = "/insert")
@@ -67,7 +69,7 @@ public class GradeController {
     public ResponseEntity<GetGradeResponse> GetGrade(@CurrentUser UserEntity user, @RequestBody GetGradeRequest request){
 
         GetGradeRequest.QueryType type = request.getType();
-
+        UserEntity student;
 
 
         if(type.equals(GetGradeRequest.QueryType.SID)){
@@ -75,10 +77,20 @@ public class GradeController {
             List<String> score = new ArrayList<String>();
             Iterable<HistoryGradeEntity> records_find;
             if(request.getSid()!=null) {
-                records_find =  historyGradeRepository.findByStudent(request.getSid());
+                Optional<UserEntity> ret = userRepository.findById(request.getSid());
+                if(!ret.isPresent()){
+                    return  new ResponseEntity<>(new GetGradeResponse("No such student", null, null, null, null), HttpStatus.BAD_REQUEST);
+                }
+                student = ret.get();
+                records_find =  historyGradeRepository.findByStudent(student);
             }
             else{
-                records_find =  historyGradeRepository.findByStudent(user.getUid());
+                Optional<UserEntity> ret = userRepository.findById(user.getUid());
+                if(!ret.isPresent()){
+                    return  new ResponseEntity<>(new GetGradeResponse("No such student", null, null, null, null), HttpStatus.BAD_REQUEST);
+                }
+                student = ret.get();
+                records_find =  historyGradeRepository.findByStudent(student);
             }
 
             if(((List<HistoryGradeEntity>) records_find).isEmpty()){
