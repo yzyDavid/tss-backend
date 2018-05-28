@@ -38,7 +38,8 @@ public class BbsRetrieveController {
         this.bbsRetrieveRepository = bbsRetrieveRepository;
     }
 
-    /* create a new message, mark as unchecked
+    /**
+     * create a new message, mark as unchecked
      * request: id, r-id, content
      * permission: anyone login
      * return: id, s-id, r-id, content, time
@@ -65,7 +66,10 @@ public class BbsRetrieveController {
         UserEntity sender = user;
         UserEntity receiver = retu.get();
 
-        BbsRetrieveEntity retrieve = new BbsRetrieveEntity(sender, receiver);
+        BbsRetrieveEntity retrieve = new BbsRetrieveEntity();
+        retrieve.setReceiver(receiver);
+        retrieve.setSender(sender);
+
         retrieve.setId(id);
         retrieve.setContent(content);
         retrieve.setChecked(false);
@@ -81,7 +85,8 @@ public class BbsRetrieveController {
     }
 
 
-    /* check current user's retrieves information, not read
+    /**
+     * check current user's retrieves information, not read
      * request: null
      * permission: login
      * return: L - ids, L - contents, L - times
@@ -114,7 +119,8 @@ public class BbsRetrieveController {
         return new ResponseEntity<>(new CheckRetrieveResponse("ok", ids, contents, times), HttpStatus.OK);
     }
 
-    /* read a message with certain id
+    /**
+     * read a message with certain id
      * request body: id
      * permission: mes to him
      * return: id, s-id, r-id, content, time

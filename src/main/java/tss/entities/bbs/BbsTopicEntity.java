@@ -107,12 +107,12 @@ public class BbsTopicEntity {
     }
 
     @Column(name = "topic_isTop")
-    public boolean isTop() {
+    public boolean getIsTop() {
         return isTop;
     }
 
-    public void setTop(boolean top) {
-        isTop = top;
+    public void setIsTop(boolean top) {
+        this.isTop = top;
     }
 
 

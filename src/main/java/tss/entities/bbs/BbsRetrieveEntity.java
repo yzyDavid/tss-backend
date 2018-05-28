@@ -16,10 +16,6 @@ public class BbsRetrieveEntity {
     private Date time;
     private boolean isChecked;
 
-    public BbsRetrieveEntity(UserEntity sender, UserEntity receiver) {
-        this.sender = sender;
-        this.receiver = receiver;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
