@@ -8,14 +8,13 @@ import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.*;
-import tss.exceptions.ClazzNotFoundException;
-import tss.exceptions.CourseNotFoundException;
-import tss.exceptions.TeacherNotFoundException;
+import tss.exceptions.*;
 import tss.models.Clazz;
 import tss.models.ClazzList;
 import tss.repositories.*;
 import tss.responses.information.GetClassesResponse;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -29,15 +28,19 @@ public class ClassController {
     private final UserRepository userRepository;
     private final ClassroomRepository classroomRepository;
     private final TimeSlotRepository timeSlotRepository;
+    private final ClassRegistrationRepository classRegistrationRepository;
 
     @Autowired
-    public ClassController(CourseRepository courseRepository, ClassRepository classRepository, UserRepository
-            userRepository, ClassroomRepository classroomRepository, TimeSlotRepository timeSlotRepository) {
+    public ClassController(CourseRepository courseRepository, ClassRepository classRepository,
+                           UserRepository userRepository, ClassroomRepository classroomRepository,
+                           TimeSlotRepository timeSlotRepository, ClassRegistrationRepository classRegistrationRepository
+                           ) {
         this.courseRepository = courseRepository;
         this.classRepository = classRepository;
         this.userRepository = userRepository;
         this.classroomRepository = classroomRepository;
         this.timeSlotRepository = timeSlotRepository;
+        this.classRegistrationRepository = classRegistrationRepository;
     }
 
     @PostMapping("/courses/{courseId}/classes")
@@ -227,14 +230,47 @@ public class ClassController {
         return new GetClassesResponse(new ArrayList<>(res));
     }
 
-    @PutMapping(path = "/classes/select")
+    @PutMapping(path = "/classes/register")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public void registerClass(@CurrentUser UserEntity user,
-                              @PathVariable long classId) {
-        ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
+    public void registerClass(@RequestParam long classId, @RequestParam String userId) {
+        ClassEntity clazz = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
+        UserEntity user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        /**
+         * TODO: find the program of this user and confirm that the course is in it
+         * CourseEntity course = clazz.getCourse();
+        */
 
+        if (!user.readTypeName().equals("Student")) {
+            throw new UserNotStudentException();
+        }
+        ClassStatusEnum classStatusEnum = ClassStatusEnum.SELECTED;
+        ClassRegistrationEntity classRegistrationEntity =
+                new ClassRegistrationEntity(0, user, clazz, classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
+        classRegistrationRepository.save(classRegistrationEntity);
+        /**
+         *
+         * TODO: the joint between tables
+         */
+    }
 
+    @PutMapping(path = "/classes/confirm")
+    @Authorization
+    @ResponseStatus(HttpStatus.OK)
+    public void confirmClass(@RequestParam long classId, @RequestParam String userId) {
+        ClassRegistrationId id = new ClassRegistrationId(userId, classId);
+        Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findById(id);
+        if (!cr.isPresent()) {
+            throw new ClassNotRegisteredException();
+        }
+        ClassRegistrationEntity classRegistration = cr.get();
+        ClassStatusEnum status = classRegistration.getStatus();
+        if (!status.equals(ClassStatusEnum.SELECTED)) {
+            throw new ClassNotRegisteredException();
+        }
+        classRegistration.setStatus(ClassStatusEnum.CONFIRMED);
+        classRegistration.setConfirmTime(new Timestamp(System.currentTimeMillis()));
+        classRegistrationRepository.save(classRegistration);
     }
 
 

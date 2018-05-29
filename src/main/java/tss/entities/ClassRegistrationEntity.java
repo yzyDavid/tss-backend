@@ -1,6 +1,8 @@
 package tss.entities;
 
 import javax.persistence.*;
+import java.sql.Time;
+import java.sql.Timestamp;
 
 /**
  * @author reeve
@@ -9,7 +11,6 @@ import javax.persistence.*;
 @Table(name = "class_registration")
 public class ClassRegistrationEntity {
 
-    @EmbeddedId
     private ClassRegistrationId id;
 
     @Column(name = "score")
@@ -29,18 +30,27 @@ public class ClassRegistrationEntity {
     @MapsId("classId")
     private ClassEntity clazz;
 
-    @Column
+    @Column(name = "status")
     private ClassStatusEnum status;
+
+    @Column(name = "register_time")
+    private Timestamp selectTime;
+
+    @Column(name = "confirm_time")
+    private Timestamp confirmTime;
 
     public ClassRegistrationEntity() {
     }
 
-    public ClassRegistrationEntity(Integer score, UserEntity student, ClassEntity clazz, ClassStatusEnum status) {
+    public ClassRegistrationEntity(Integer score, UserEntity student, ClassEntity clazz, ClassStatusEnum status,
+                                   Timestamp selectTime, Timestamp confirmTime) {
         this.id = new ClassRegistrationId(student.getUid(), clazz.getId());
         this.score = score;
         this.student = student;
         this.clazz = clazz;
         this.status = status;
+        this.selectTime = selectTime;
+        this.confirmTime = confirmTime;
     }
 
     public ClassStatusEnum getStatus() {
@@ -69,11 +79,30 @@ public class ClassRegistrationEntity {
         this.clazz = clazz;
     }
 
+    @EmbeddedId
+    @AttributeOverrides({
+            @AttributeOverride(name = "studentId", column = @Column(name = "studentId")),
+            @AttributeOverride(name = "classId", column = @Column(name = "classId"))}
+    )
     public ClassRegistrationId getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(ClassRegistrationId id) {
         this.id = id;
+    }
+
+    public Timestamp getSelectTime() {
+        return this.selectTime;
+    }
+    public void setSelectTime(Timestamp selectTime) {
+        this.selectTime = selectTime;
+    }
+
+    public Timestamp getConfirmTime() {
+        return this.confirmTime;
+    }
+    public void setConfirmTime(Timestamp confirmTime) {
+        this.confirmTime = confirmTime;
     }
 }
