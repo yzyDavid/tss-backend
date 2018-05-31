@@ -10,6 +10,7 @@ public class ModifyUserRequest {
     private String intro;
     private String deptName;
     private String type;
+    private Integer year;
 
     public String getUid() {
         return uid;
@@ -81,5 +82,13 @@ public class ModifyUserRequest {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
     }
 };

@@ -24,13 +24,15 @@ public class DepartmentController {
     private final DepartmentRepository departmentRepository;
     private final MajorRepository majorRepository;
     private final MajorClassRepository majorClassRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public DepartmentController(DepartmentRepository departmentRepository, MajorRepository majorRepository,
-                                MajorClassRepository majorClassRepository) {
+                                MajorClassRepository majorClassRepository, UserRepository userRepository) {
         this.departmentRepository = departmentRepository;
         this.majorRepository = majorRepository;
         this.majorClassRepository = majorClassRepository;
+        this.userRepository = userRepository;
     }
 
     @PutMapping(path = "/department/add")
@@ -46,6 +48,31 @@ public class DepartmentController {
         department.setName(request.getName());
         departmentRepository.save(department);
         return new ResponseEntity<>(new AddDepartmentResponse("ok", request.getName()), HttpStatus.CREATED);
+    }
+
+    @PostMapping(path = "/department/add/user")
+    @Authorization
+    @Transactional(rollbackFor = {})
+    public ResponseEntity<AddUsersToDeptResponse> addUsersToDept(@RequestBody AddUsersToDeptRequest request) {
+        Optional<DepartmentEntity> department = departmentRepository.findByName(request.getDepartment());
+        if (!department.isPresent()) {
+            return new ResponseEntity<>(new AddUsersToDeptResponse("Non-exist department", request.getDepartment(), null), HttpStatus.BAD_REQUEST);
+        }
+        DepartmentEntity dept = department.get();
+        List<UserEntity> users = new ArrayList<>();
+        for(String uid : request.getUids()) {
+            Optional<UserEntity> user = userRepository.findById(uid);
+            if(!user.isPresent()) {
+                return new ResponseEntity<>(new AddUsersToDeptResponse("Non-exist user", null, uid), HttpStatus.BAD_REQUEST);
+            }
+            if(user.get().getMajorClass() == null) {
+                users.add(user.get());
+            }
+        }
+        for(UserEntity user : users) {
+            user.setDepartment(dept);
+        }
+        return new ResponseEntity<>(new AddUsersToDeptResponse("Ok", request.getDepartment(), null), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/department/delete")
@@ -200,6 +227,29 @@ public class DepartmentController {
         majorClass.setYear(Calendar.getInstance().get(Calendar.YEAR));
         majorClassRepository.save(majorClass);
         return new ResponseEntity<>(new AddMajorClassResponse("ok", request.getName(), request.getMajor()), HttpStatus.CREATED);
+    }
+
+    @PostMapping(path = "/class/add/user")
+    @Authorization
+    @Transactional(rollbackFor = {})
+    public ResponseEntity<AddUsersToMajorClassResponse> addUsersToMajorClass(@RequestBody AddUsersToMajorClassRequest request) {
+        Optional<MajorClassEntity> majorClass = majorClassRepository.findByName(request.getMajorClass());
+        if (!majorClass.isPresent()) {
+            return new ResponseEntity<>(new AddUsersToMajorClassResponse("Non-exist class", request.getMajorClass(), null), HttpStatus.BAD_REQUEST);
+        }
+        List<UserEntity> users = new ArrayList<>();
+        for(String uid : request.getUids()) {
+            Optional<UserEntity> user = userRepository.findById(uid);
+            if(!user.isPresent()) {
+                return new ResponseEntity<>(new AddUsersToMajorClassResponse("Non-exist user", null, uid), HttpStatus.BAD_REQUEST);
+            }
+        }
+        DepartmentEntity department = majorClass.get().getMajor().getDepartment();
+        for(UserEntity user : users) {
+            user.setMajorClass(majorClass.get());
+            user.setDepartment(department);
+        }
+        return new ResponseEntity<>(new AddUsersToMajorClassResponse("Ok", request.getMajorClass(), null), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/class/delete")
