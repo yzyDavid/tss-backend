@@ -61,6 +61,17 @@ public class ClassController {
         return new Clazz(classEntity);
     }
 
+    @GetMapping("/courses/{courseId}/classes")
+    public List<Clazz> listClasses(@PathVariable String courseId) {
+
+        CourseEntity courseEntity = courseRepository.findById(courseId).orElseThrow(CourseNotFoundException::new);
+        List<Clazz> classes = new ArrayList<>();
+        for (ClassEntity classEntity : courseEntity.getClasses()) {
+            classes.add(new Clazz(classEntity));
+        }
+        return classes;
+    }
+
     @GetMapping("/classes/{classId}")
     @ResponseStatus(HttpStatus.OK)
     public Clazz getClass(@PathVariable long classId) {
