@@ -76,8 +76,8 @@ public class BbsTopicController {
         /* FIXME */
         UserEntity user = new UserEntity();
         user.setHashedPassword("123");
-        user.setName("young");
-        user.setUid("1111");
+        user.setName("joeyyoung");
+        user.setUid("8800");
         user.setSalt("343");
 
         topic.setAuthor(user);
@@ -257,7 +257,7 @@ public class BbsTopicController {
     /**
      * show all topics under a certain section
      * page show, / not top part
-     * v1.0,
+     * v1.0, done
      */
     @PostMapping(path = "/info")
     public ResponseEntity<GetAllNotTopTopicsResponse> getAllNotTopTopics(//@CurrentUser UserEntity user,
@@ -309,5 +309,19 @@ public class BbsTopicController {
 
         return new ResponseEntity<>(new GetAllNotTopTopicsResponse(currentPage, totalPage, topicTitles, topicAuthors, topicTimes, topicReplys, topicIDs, topicLastReplyTimes), HttpStatus.OK);
     }
-    
+
+
+    /**
+     * set a topic to be top
+     * TODO need check permission
+     * v1.0,
+     */
+    @PostMapping(path = "/settop")
+    //@Authorization
+    public ResponseEntity<SetTopicTopResponse> setTopicTop(@CurrentUser UserEntity user,
+                                                           @RequestBody SetTopicTopRequest request){
+
+
+        return new ResponseEntity<>(new SetTopicTopResponse("set top ok"), HttpStatus.OK);
+    }
 }

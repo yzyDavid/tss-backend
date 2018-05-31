@@ -1,5 +1,6 @@
 package tss.controllers.bbs;
 
+import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -51,8 +52,8 @@ public class BbsReplyController {
      * v1.0, done
      */
     @PostMapping(path = "/add")
-    @Authorization
-    public ResponseEntity<AddBbsReplyResponse> addReply(@CurrentUser UserEntity user,
+    //@Authorization
+    public ResponseEntity<AddBbsReplyResponse> addReply(//@CurrentUser UserEntity user,
                                                         @RequestBody AddBbsReplyRequest request) {
         /* permission error & invalid topic id error */
         long topicId = Long.valueOf(request.getTid());
@@ -64,6 +65,13 @@ public class BbsReplyController {
         BbsTopicEntity topic = ret.get();
 
         BbsReplyEntity reply = new BbsReplyEntity();
+
+        // FIXME
+        UserEntity user = new UserEntity();
+        user.setUid("1520");
+        user.setName("xiaoy");
+        user.setSalt("123");
+        user.setHashedPassword("324234");
 
         reply.setAuthor(user);
         reply.setBelongedTopic(topic);
@@ -162,12 +170,12 @@ public class BbsReplyController {
      * v1.0, done
      */
     @PostMapping(path = "/info")
-    @Authorization
-    public ResponseEntity<GetAllReplyResponse> getAllReplyInfo(@CurrentUser UserEntity user,
+    //@Authorization
+    public ResponseEntity<GetAllReplyResponse> getAllReplyInfo(//@CurrentUser UserEntity user,
                                                                @RequestBody GetAllReplyRequest request) {
         Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTid()));
         if (!ret.isPresent()) {
-            return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,null,null,null,null,null), HttpStatus.BAD_REQUEST);
         }
 
         BbsTopicEntity topic = ret.get();
@@ -180,6 +188,14 @@ public class BbsReplyController {
         String boardID = String.valueOf(topic.getBelongedSection().getId());
         String topicID = String.valueOf(topic.getId());
 
+        /* lz information */
+        String lzid = topic.getAuthor().getUid();
+        String lztext = topic.getContent();
+        String lzphoto = topic.getAuthor().getPhoto();
+        String lztime = topic.getTime().toString();
+        String lzname = topic.getAuthor().getName();
+
+
         List<String> ids = new ArrayList<>();
         List<String> texts = new ArrayList<>();
         List<String> quotes = new ArrayList<>();
@@ -189,6 +205,8 @@ public class BbsReplyController {
         List<String> quoteAuthors = new ArrayList<>();
         List<String> quoteTimes = new ArrayList<>();
         List<String> quoteIndexs = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+
 
         /* all replied under the certain topic */
         String page = request.getPage();
@@ -197,6 +215,7 @@ public class BbsReplyController {
 
             /* current index information */
             BbsReplyEntity reply = bbsReplyRepository.findByBelongedTopicAndIndex(topic, index);
+            UserEntity user = reply.getAuthor();
             ids.add(String.valueOf(reply.getId()));
             texts.add(reply.getContent());
             times.add(reply.getTime().toString());
@@ -204,6 +223,7 @@ public class BbsReplyController {
 
             /* current user information */
             photos.add(user.getPhoto());
+            names.add(user.getName());
 
             /* quoted reply information */
             Integer quoteIndex = reply.getQuoteIndex();
@@ -223,9 +243,9 @@ public class BbsReplyController {
         }
 
         if (ids.isEmpty()) {
-            return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null), HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(new GetAllReplyResponse(title, totalPage, currentPage, postTime, boardName, boardID, topicID, ids, texts, quotes, times, photos, indexs, quoteAuthors, quoteTimes, quoteIndexs), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new GetAllReplyResponse(title, totalPage, currentPage, postTime, boardName, boardID, topicID, lzid, lztext,lzphoto,lztime,lzname,ids, texts, quotes, times, photos, indexs, quoteAuthors, quoteTimes, quoteIndexs, names), HttpStatus.OK);
     }
 }

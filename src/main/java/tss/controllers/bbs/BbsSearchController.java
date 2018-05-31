@@ -77,8 +77,8 @@ public class BbsSearchController {
      * v1.0, done
      */
     @PostMapping(path = "/user")
-    @Authorization
-    public ResponseEntity<SearchUserResponse> searchUser(@CurrentUser UserEntity user,
+    //@Authorization
+    public ResponseEntity<SearchUserResponse> searchUser(//@CurrentUser UserEntity user,
                                                          @RequestBody SearchUserRequest request) {
         List<String> userNames = new ArrayList<>();
         List<String> userIDs = new ArrayList<>();
@@ -87,10 +87,10 @@ public class BbsSearchController {
         Iterator<UserEntity> iterator = userRepository.findAll().iterator();
         while (iterator.hasNext()) {
             UserEntity account = iterator.next();
-            if (contentMatch(request.getKey(), account.getName())) {
+            if (request.getKey().equals(account.getName())) {
                 userNames.add(account.getName());
                 userIDs.add(account.getUid());
-                userIDs.add(account.getPhoto());
+                photoURLs.add(account.getPhoto());
             }
         }
         return new ResponseEntity<>(new SearchUserResponse(userNames, userIDs, photoURLs), HttpStatus.OK);
@@ -105,8 +105,8 @@ public class BbsSearchController {
      * v1.0, done
      */
     @PostMapping(path = "/topic")
-    @Authorization
-    public ResponseEntity<SearchInSectionResponse> searchInSection(@CurrentUser UserEntity user,
+    //@Authorization
+    public ResponseEntity<SearchInSectionResponse> searchInSection(//@CurrentUser UserEntity user,
                                                                    @RequestBody SearchInSectionRequest request) {
         String currentPage = request.getPage();
         String totalPage;
@@ -180,7 +180,7 @@ public class BbsSearchController {
             }
         }
 
-        return new ResponseEntity<>(new SearchSectionResponse(boardIDs, boardNames), HttpStatus.OK);
+        return new ResponseEntity<>(new SearchSectionResponse(boardNames, boardIDs), HttpStatus.OK);
     }
 
 
@@ -191,8 +191,8 @@ public class BbsSearchController {
      * v1.0, done
      */
     @PostMapping(path = "/published")
-    @Authorization
-    public ResponseEntity<SearchTopicPublishedByUidResponse> searchTopicPublishedByUid(@CurrentUser UserEntity cuser,
+    //@Authorization
+    public ResponseEntity<SearchTopicPublishedByUidResponse> searchTopicPublishedByUid(//@CurrentUser UserEntity cuser,
                                                                                        @RequestBody SearchTopicPublishedByUidRequest request) {
         Optional<UserEntity> uret = userRepository.findById(request.getUid());
         if (!uret.isPresent()) {
