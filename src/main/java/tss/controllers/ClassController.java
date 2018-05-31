@@ -10,6 +10,7 @@ import tss.entities.*;
 import tss.exceptions.ClazzNotFoundException;
 import tss.exceptions.CourseNotFoundException;
 import tss.exceptions.TeacherNotFoundException;
+import tss.models.ClassArrangementResult;
 import tss.models.Clazz;
 import tss.repositories.*;
 import tss.responses.information.GetClassesResponse;
@@ -75,10 +76,14 @@ public class ClassController {
         classRepository.delete(classEntity);
     }
 
-    @GetMapping("/classes/search/find-by-year-and-semester")
+    @GetMapping("/classes/search/find-by-course-name-containing-and-year-and-semester")
     @ResponseStatus(HttpStatus.OK)
-    public List<Clazz> findClassesByYearAndSemester(@RequestParam int year, @RequestParam SemesterEnum semester) {
-        List<ClassEntity> classEntities = classRepository.findByYearAndSemester(year, semester);
+    public List<Clazz> findClassesByCourseNameContainingAndYearAndSemester(@RequestParam String courseName,
+                                                                           @RequestParam int year,
+                                                                           @RequestParam SemesterEnum semester) {
+
+        List<ClassEntity> classEntities = classRepository.findByCourseNameContainingAndYearAndSemester(courseName,
+                year, semester);
         List<Clazz> classes = new ArrayList<>();
         for (ClassEntity classEntity : classEntities) {
             classes.add(new Clazz(classEntity));
@@ -88,15 +93,24 @@ public class ClassController {
 
     @PutMapping("/auto-arrangement")
     @ResponseStatus(HttpStatus.OK)
-    public void autoArrangement() {
+    public ClassArrangementResult autoArrangement(@RequestParam int year, @RequestParam SemesterEnum semester) {
+
+        for (ClassroomEntity classroomEntity : classroomRepository.findAll()) {
+            for (TimeSlotEntity timeSlotEntity : classroomEntity.getTimeSlots()) {
+                timeSlotEntity.setClazz(null);
+                timeSlotRepository.save(timeSlotEntity);
+            }
+        }
+
         List<ClassItem> classItems = new ArrayList<>();
-        for (ClassEntity classEntity : classRepository.findAll()) {
+        for (ClassEntity classEntity : classRepository.findByYearAndSemester(year, semester)) {
             ClassItem classItem = new ClassItem(classEntity);
             if (!classItem.hasNoLeftSection()) {
                 classItems.add(classItem);
             }
         }
 
+        int count = 0;
         for (ClassroomEntity classroomEntity : classroomRepository.findAll()) {
             if (classItems.size() == 0) {
                 break;
@@ -115,12 +129,19 @@ public class ClassController {
                         if (classItem.hasNoLeftSection()) {
                             Collections.swap(classItems, i, classItems.size());
                             classItems.remove(classItems.size());
+                            count++;
                         }
                         break;
                     }
                 }
             }
         }
+
+        List<Long> pendingClassIds = new ArrayList<>();
+        for (ClassItem classItem : classItems) {
+            pendingClassIds.add(classItem.getClassId());
+        }
+        return new ClassArrangementResult(count, pendingClassIds);
     }
 
     @GetMapping("/classes/search/findByCourse_NameAndYearAndSemester")
