@@ -6,11 +6,11 @@ public class AddMajorResponse {
     @Nls
     final private String status;
     final private String name;
-    final private String major;
+    final private String department;
 
-    public AddMajorResponse(String status, String name, String major) {
+    public AddMajorResponse(String status, String name, String department) {
         this.status = status;
-        this.major = major;
+        this.department = department;
         this.name = name;
     }
 
@@ -22,7 +22,7 @@ public class AddMajorResponse {
         return name;
     }
 
-    public String getMajor() {
-        return major;
+    public String getDepartment() {
+        return department;
     }
 }

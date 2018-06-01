@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetClassesResponse {
-    /* @Nls
-    private final String status;*/
     private final List<ClassInfo> classes;
 
     class ClassInfo {

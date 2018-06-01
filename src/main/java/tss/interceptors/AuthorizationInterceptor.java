@@ -17,6 +17,10 @@ import tss.services.AuthorizationService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Optional;
 
 /**
  * @author yzy
@@ -44,25 +48,34 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
             return true;
         }
 
-        String auth = request.getHeader(Config.AUTH_HEADER);
-        if (auth == null) {
+        if (checkTimestamp(request) && authorizationService.checkMethodAccessAuthority()) {
+            return true;
+        }
+        else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
+    }
 
-        if (sqlSessionRepository.existsByToken(auth)) {
-            SessionEntity session = sqlSessionRepository.findByToken(auth);
-            String uid = session.getUid();
-            request.setAttribute(Config.CURRENT_UID_ATTRIBUTE, uid);
-            if(authorizationService.checkMethodAccessAuthority()) {
-                return true;
-            } else {
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                return false;
+    private boolean checkTimestamp(HttpServletRequest request) {
+        String token = request.getHeader(Config.AUTH_HEADER);
+        if (token != null) {
+            Optional<SessionEntity> ret = sqlSessionRepository.findByToken(token);
+            if(ret.isPresent()) {
+                Date date = new Date();
+                SessionEntity session = ret.get();
+                if(date.getTime() - session.getTimestamp().getTime() < Config.TOKEN_EXPIRE_TIME) {
+                    request.setAttribute(Config.CURRENT_UID_ATTRIBUTE, session.getUid());
+                    session.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+                    sqlSessionRepository.save(session);
+                    return true;
+                }
+                else {
+                    sqlSessionRepository.delete(session);
+                    return false;
+                }
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
         }
+        return false;
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tss.entities.CourseEntity;
 import tss.entities.UserEntity;
 
@@ -87,11 +88,17 @@ public class QueryService {
         return jdbcTemplate.query(sql.toString(), values.toArray(), rowMapperFactory.getRowMapper(entity));
     }
 
-    public List<UserEntity> queryUsers(String uid, String name, Short deptId) {
-        NameValuePair[] pairs = new NameValuePair[3];
-        pairs[0] = new NameValuePair("uid", uid, Operators.LIKE);
-        pairs[1] = new NameValuePair("name", name, Operators.LIKE);
-        pairs[2] = new NameValuePair("department", deptId, Operators.EQ);
+    @Transactional(rollbackFor = {})
+    public List<UserEntity> queryUsers(String uid, String name, Short deptId, Short typeId) {
+        NameValuePair[] pairs = new NameValuePair[4];
+        pairs[0] = new NameValuePair("user_id", uid, Operators.LIKE);
+        pairs[1] = new NameValuePair("user_name", name, Operators.LIKE);
+        pairs[2] = new NameValuePair("department_id", deptId, Operators.EQ);
+        pairs[3] = new NameValuePair("group_id", typeId, Operators.EQ);
+        List<UserEntity> res = query(UserEntity.class, pairs);
+        for(UserEntity user : res) {
+            user.getType();
+        }
         return query(UserEntity.class, pairs);
     }
 
@@ -107,7 +114,7 @@ public class QueryService {
 class RowMapperFactory {
     private Map<Class, RowMapper> factory = new HashMap<>();
 
-    private class EntityRowMapper<T> implements RowMapper<T> {
+    class EntityRowMapper<T> implements RowMapper<T> {
         private Class<T> entityClass;
         private Map<String, String> nameMap = new HashMap<>();
         private Set<String> foreignKeys = new HashSet<>();
@@ -116,7 +123,7 @@ class RowMapperFactory {
             this.entityClass = entityClass;
             Field[] fields = entityClass.getDeclaredFields();
             for(Field field : fields) {
-                if(field.getType().equals(Set.class)) {
+                if(field.getType().equals(Set.class) || field.getType().equals(List.class)) {
                     continue;
                 }
                 String fName = field.getName();

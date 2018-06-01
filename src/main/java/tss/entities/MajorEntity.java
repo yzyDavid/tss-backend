@@ -16,10 +16,12 @@ public class MajorEntity {
     private Integer creditSelective;
     private Integer creditPublic;
     private DepartmentEntity department;
+    private Set<MajorClassEntity> classes = new HashSet<>();
     private Set<CourseEntity> setOfCompulsory = new HashSet<>();
     private Set<CourseEntity> setOfSelective = new HashSet<>();
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Short getId() {
         return id;
     }
@@ -73,7 +75,7 @@ public class MajorEntity {
         this.creditPublic = creditPublic;
     }
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     @JoinColumn(name = "department_id")
     public DepartmentEntity getDepartment() {
         return department;
@@ -84,20 +86,29 @@ public class MajorEntity {
     }
 
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "major")
-    public Set<CourseEntity> getCompulsoryCourses() {
+    public Set<MajorClassEntity> getClasses() {
+        return classes;
+    }
+
+    public void setClasses(Set<MajorClassEntity> classes) {
+        this.classes = classes;
+    }
+
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "major")
+    public Set<CourseEntity> getSetOfCompulsory() {
         return setOfCompulsory;
     }
 
-    public void setCompulsoryCourses(Set<CourseEntity> courses) {
+    public void setSetOfCompulsory(Set<CourseEntity> courses) {
         this.setOfCompulsory = courses;
     }
 
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "major")
-    public Set<CourseEntity> getSelectiveCourses() {
+    public Set<CourseEntity> getSetOfSelective() {
         return setOfSelective;
     }
 
-    public void setSelectiveCourses(Set<CourseEntity> courses) {
+    public void setSetOfSelective(Set<CourseEntity> courses) {
         this.setOfSelective = courses;
     }
 

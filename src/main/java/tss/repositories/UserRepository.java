@@ -16,4 +16,7 @@ public interface UserRepository extends CrudRepository<UserEntity, String> {
      */
     List<UserEntity> findByName(String name);
 
+    List<UserEntity> findByNameAndType_Name(String name, String typeName);
+    List<UserEntity> findByNameLikeAndType_Name(String name, String typeName);
+
 }

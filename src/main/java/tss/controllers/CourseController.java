@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.entities.CourseEntity;
 import tss.entities.DepartmentEntity;
+import tss.entities.SemesterEnum;
 import tss.repositories.CourseRepository;
 import tss.repositories.DepartmentRepository;
 import tss.requests.information.*;
@@ -62,7 +63,9 @@ public class CourseController {
         course.setName(request.getName());
         course.setCredit(request.getCredit());
         course.setNumLessonsEachWeek(request.getNumLessonsEachWeek());
-        course.setDepartment(dept);
+        if(dept != null) {
+            course.setDepartment(dept);
+        }
         courseRepository.save(course);
 
         return new ResponseEntity<>(new AddCourseResponse("ok", course.getId(), course.getName(), course.getCredit(),
@@ -84,7 +87,6 @@ public class CourseController {
         return new ResponseEntity<>(new DeleteCourseResponse("ok", cid, name), HttpStatus.OK);
 
     }
-
 
     @PostMapping(path = "/modify")
     @Authorization
@@ -148,12 +150,16 @@ public class CourseController {
 
         List<String> names = new ArrayList<>();
         List<String> departments = new ArrayList<>();
-        Optional<DepartmentEntity> department = departmentRepository.findByName(request.getDepartment());
-        if (!department.isPresent()) {
-            return new ResponseEntity<>(new QueryCoursesResponse("Non-exist department", null, null, null), HttpStatus.OK);
+        Short deptId = null;
+        if(request.getDepartment() != null) {
+            Optional<DepartmentEntity> dept = departmentRepository.findByName(request.getDepartment());
+            if (!dept.isPresent()) {
+                return new ResponseEntity<>(new QueryCoursesResponse("Non-exist department", null, null, null), HttpStatus.OK);
+            }
+            deptId = dept.get().getId();
         }
 
-        List<CourseEntity> ret = queryService.queryCourses(request.getCid(), request.getDepartment(), department.get().getId());
+        List<CourseEntity> ret = queryService.queryCourses(request.getCid(), request.getDepartment(), deptId);
         for (CourseEntity course : ret) {
             cids.add(course.getId());
             names.add(course.getName());
@@ -165,5 +171,10 @@ public class CourseController {
             departments.add(deptName);
         }
         return new ResponseEntity<>(new QueryCoursesResponse("OK", cids, names, departments), HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<GetCoursesResponse> searchCourseByName(@RequestParam String courseName) {
+        return new ResponseEntity<>(new GetCoursesResponse(courseRepository.findByNameLike("%"+courseName+"%")), HttpStatus.OK);
     }
 }

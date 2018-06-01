@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,8 +66,9 @@ public class UserController {
     }
 
     @PutMapping(path = "/add")
- //   @Authorization
+    //   @Authorization
     public ResponseEntity<AddUserResponse> addUser(@RequestBody AddUserRequest request) {
+        int year = Calendar.getInstance().get(Calendar.YEAR);
         String[] uids = request.getUids();
         String[] names = request.getNames();
         String[] genders = request.getGenders();
@@ -101,6 +103,8 @@ public class UserController {
                 }
                 user.setType(typeGroup.get());
             }
+            user.setGender(genders[i]);
+            user.setYear(year);
         }
 
         for (int i = 0; i < uids.length; i++) {
@@ -120,6 +124,9 @@ public class UserController {
 
         List<String> fails = new ArrayList<>();
         for (String uid : uids) {
+            if (uid == null) {
+                continue;
+            }
             Optional<UserEntity> ret = userRepository.findById(uid);
             if (ret.isPresent()) {
                 userRepository.delete(ret.get());
@@ -213,6 +220,9 @@ public class UserController {
         if (request.getIntro() != null) {
             user.setIntro(request.getIntro());
         }
+        if(request.getYear() != null) {
+            user.setYear(request.getYear());
+        }
 
         if (request.getMajorClass() != null) {
             Optional<MajorClassEntity> majorClass = majorClassRepository.findByName(request.getMajorClass());
@@ -255,7 +265,7 @@ public class UserController {
 
         return new ResponseEntity<>(new GetUserInfoResponse("OK", curUser.getUid(), curUser.getName(),
                 curUser.readTypeName(), curUser.getEmail(), curUser.getTelephone(), curUser.getIntro(),
-                curUser.getGender(), curUser.readDepartmentName(), curUser.readClassName()), HttpStatus.OK);
+                curUser.getGender(), curUser.readDepartmentName(), curUser.readClassName(), curUser.getYear()), HttpStatus.OK);
     }
 
     @PostMapping(path = "/get/info")
@@ -266,37 +276,57 @@ public class UserController {
 
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetUserInfoResponse("Non-existent uid", uid, null, null,
-                    null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
+                    null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
 
         }
         UserEntity user = ret.get();
         return new ResponseEntity<>(new GetUserInfoResponse("OK", user.getUid(), user.getName(),
                 user.readTypeName(), user.getEmail(), user.getTelephone(), user.getIntro(),
-                user.getGender(), user.readDepartmentName(), user.readClassName()), HttpStatus.OK);
+                user.getGender(), user.readDepartmentName(), user.readClassName(), user.getYear()), HttpStatus.OK);
     }
 
     @PostMapping(path = "/query")
     @Authorization
     public ResponseEntity<QueryUsersResponse> queryUsers(@RequestBody QueryUsersRequest request) {
-        Optional<DepartmentEntity> dept = departmentRepository.findByName(request.getDepartment());
-        if (!dept.isPresent()) {
-            return new ResponseEntity<>(new QueryUsersResponse("Non-exist department", null, null, null), HttpStatus.BAD_REQUEST);
+        Short departmentId = null;
+        if(request.getDepartment() != null) {
+            Optional<DepartmentEntity> dept = departmentRepository.findByName(request.getDepartment());
+            if (!dept.isPresent()) {
+                return new ResponseEntity<>(new QueryUsersResponse("Non-exist department", null, null,
+                        null, null, null, null), HttpStatus.BAD_REQUEST);
+            }
+            departmentId = dept.get().getId();
         }
-        List<UserEntity> ret = queryService.queryUsers(request.getUid(), request.getName(), dept.get().getId());
+        Short typeId = null;
+        if(request.getType() != null) {
+            Optional<TypeGroupEntity> type = typeGroupRepository.findByName(request.getName());
+            if (!type.isPresent()) {
+                return new ResponseEntity<>(new QueryUsersResponse("Non-exist type", null, null,
+                        null, null, null, null), HttpStatus.BAD_REQUEST);
+            }
+            typeId = type.get().getId();
+        }
+        List<UserEntity> ret = queryService.queryUsers(request.getUid(), request.getName(), departmentId, typeId);
         List<String> uids = new ArrayList<>();
 
         List<String> names = new ArrayList<>();
         List<String> depts = new ArrayList<>();
+        List<String> genders = new ArrayList<>();
+        List<String> types = new ArrayList<>();
+        List<Integer> years = new ArrayList<>();
         for (UserEntity user : ret) {
-
             uids.add(user.getUid());
             names.add(user.getName());
-            depts.add(user.getDepartment().getName());
+            depts.add(user.readDepartmentName());
+            genders.add(user.getGender());
+            types.add(user.readTypeName());
+            years.add(user.getYear());
+
         }
-        return new ResponseEntity<>(new QueryUsersResponse("OK", uids, names, depts), HttpStatus.OK);
+        return new ResponseEntity<>(new QueryUsersResponse("OK", uids, names, depts, genders, types, years), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/modifyPhoto")
+    @PostMapping(path = "/modify/photo")
     @Authorization
     public ResponseEntity<ModifyPhotoResponse> modifyPhoto(@CurrentUser UserEntity user,
                                                            @RequestBody ModifyPhotoRequest request) {
@@ -318,7 +348,7 @@ public class UserController {
         return new ResponseEntity<>(new ModifyPhotoResponse("OK"), HttpStatus.CREATED);
     }
 
-    @PostMapping(path = "/getPhoto")
+    @PostMapping(path = "/get/photo")
     @Authorization
     public ResponseEntity<GetPhotoResponse> getPhoto(@CurrentUser UserEntity user,
                                                      @RequestBody GetPhotoRequest request) {
