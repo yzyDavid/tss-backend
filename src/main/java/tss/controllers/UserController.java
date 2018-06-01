@@ -5,6 +5,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tss.configs.Config;
@@ -287,6 +288,7 @@ public class UserController {
 
     @PostMapping(path = "/query")
     @Authorization
+    @Transactional(rollbackFor = {})
     public ResponseEntity<QueryUsersResponse> queryUsers(@RequestBody QueryUsersRequest request) {
         Short departmentId = null;
         if(request.getDepartment() != null) {
@@ -315,6 +317,7 @@ public class UserController {
         List<String> types = new ArrayList<>();
         List<Integer> years = new ArrayList<>();
         for (UserEntity user : ret) {
+            user = userRepository.findById(user.getUid()).get();
             uids.add(user.getUid());
             names.add(user.getName());
             depts.add(user.readDepartmentName());
@@ -323,6 +326,7 @@ public class UserController {
             years.add(user.getYear());
 
         }
+
         return new ResponseEntity<>(new QueryUsersResponse("OK", uids, names, depts, genders, types, years), HttpStatus.OK);
     }
 

@@ -96,9 +96,6 @@ public class QueryService {
         pairs[2] = new NameValuePair("department_id", deptId, Operators.EQ);
         pairs[3] = new NameValuePair("group_id", typeId, Operators.EQ);
         List<UserEntity> res = query(UserEntity.class, pairs);
-        for(UserEntity user : res) {
-            user.getType();
-        }
         return query(UserEntity.class, pairs);
     }
 

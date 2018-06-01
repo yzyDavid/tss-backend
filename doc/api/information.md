@@ -14,11 +14,11 @@
 | DELETE |     /user/delete      |                   uids:String[] (required)                   |                status:String<br>uids:String[]                |          批量删除用户，返回所有不存在的用户          |
 |  POST  |   /user/modify/pwd    | oldPassword:String(required)<br>newPassword:String(required) |          status:String<br>uid:String<br>name:String          | 更改当前用户的密码，成功后返回当前用户的用户名和姓名 |
 |  POST  |    /user/reset/pwd    |                     uid:String(required)                     |                        status:String                         |                  重置指定用户的密码                  |
-|  POST  | /user/modify/own/info | email:String(optional)<br> telephone:String(optional)<br> intro:String(optional) | status:String<br> uid:String<br>name:String<br> gender:String<br> majorClass:String<br> type:String<br> department:String<br> email:String<br> telephone:String<br> intro:String<br> |   修改当前用户的基本信息，返回修改后用户的所有信息   |
-|  POST  |   /user/modify/info   | uid:String(required)<br>name:String(optional)<br>gender:String(optimal)<br>majorClass:String(optimal)<br>type:String(optional)<br>department:String(optional)<br>email:String(optional)<br>telephone:String(optional)<br>intro:String(optional) | status:String<br> uid:String<br>name:String<br> gender:String<br> majorClass:String<br> type:String<br> department:String<br> email:String<br> telephone:String<br> intro:String<br> |   修改指定用户的所有信息，返回修改后用户的所有信息   |
-|  POST  |  /user/get/own/info   |                             None                             | status:String<br> uid:String<br>name:String<br> gender:String<br> majorClass:String<br> type:String<br> department:String<br> email:String<br> telephone:String<br> intro:String<br> |                获取当前用户的所有信息                |
-|  POST  |    /user/get/info     |                     uid:String(required)                     | status:String<br> uid:String<br>name:String<br> gender:String<br> majorClass:String<br> type:String<br> department:String<br>email:String<br>telephone:String<br>intro:String<br> |                获取指定用户的所有信息                |
-|  POST  |      /user/query      | uid:String(optional)<br>name:String(optional)<br>department:String(optional) | status:String<br>uids:String[]<br>names:String[]<br>departments:String[] |                     用户模糊查询                     |
+|  POST  | /user/modify/own/info | email:String(optional)<br> telephone:String(optional)<br> intro:String(optional) | status:String<br> uid:String<br>name:String<br> gender:String<br> majorClass:String<br> type:String<br> department:String<br> email:String<br> telephone:String<br> intro:String |   修改当前用户的基本信息，返回修改后用户的所有信息   |
+|  POST  |   /user/modify/info   | uid:String(required)<br>name:String(optional)<br>gender:String(optimal)<br>majorClass:String(optimal)<br>type:String(optional)<br>department:String(optional)<br>email:String(optional)<br>telephone:String(optional)<br>intro:String(optional) | status:String<br> uid:String<br>name:String<br> gender:String<br> majorClass:String<br> type:String<br> department:String<br> email:String<br> telephone:String<br> intro:String |   修改指定用户的所有信息，返回修改后用户的所有信息   |
+|  POST  |  /user/get/own/info   |                             None                             | status:String<br> uid:String<br>name:String<br> gender:String<br> majorClass:String<br> type:String<br> department:String<br> email:String<br> telephone:String<br> intro:String |                获取当前用户的所有信息                |
+|  POST  |    /user/get/info     |                     uid:String(required)                     | status:String<br> uid:String<br>name:String<br> gender:String<br> majorClass:String<br> type:String<br> department:String<br>email:String<br>telephone:String<br>intro:String |                获取指定用户的所有信息                |
+|  POST  |      /user/query      | uid:String(optional)<br>name:String(optional)<br>department:String(optional) | status:String<br>uids:String[]<br>names:String[]<br>departments:String[]<br>genders:String[]<br>types:String[]<br>years:Int[] |                     用户模糊查询                     |
 |  PUT   |  /user/modify/photo   |                    photo:String(required)                    |                        status:String                         |                   当前用户上传照片                   |
 |  GET   |    /user/get/photo    |                             None                             |                status:String<br>photo:String                 |                   当前用户获取照片                   |
 
@@ -66,8 +66,8 @@
 
 ​	需要为所有的用户提供登录和注销接口。注销时需要在请求头中添加token。
 
-|  方法  |       uri       |       请求参数(json)       |                  返回参数(json)                   |   说明   |
-| :----: | :-------------: | :------------------------: | :-----------------------------------------------: | :------: |
-|  Post  | /session/login  | uid:String password:String | status:String uid:String type:String token:String | 用户登录 |
-| Delete | /session/logout |            None            |             status:String uid:String              | 用户注销 |
+|  方法  |       uri       |       请求参数(json)       |                       返回参数(json)                       |   说明   |
+| :----: | :-------------: | :------------------------: | :--------------------------------------------------------: | :------: |
+|  Post  | /session/login  | uid:String password:String | status:String<br>uid:String<br>type:String<br>token:String | 用户登录 |
+| Delete | /session/logout |            None            |                status:String<br>uid:String                 | 用户注销 |
 
