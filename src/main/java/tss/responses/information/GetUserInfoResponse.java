@@ -14,10 +14,11 @@ public class GetUserInfoResponse {
     private final String intro;
     private final String department;
     private final String majorClass;
+    private final Integer year;
 
     public GetUserInfoResponse(String status, String uid, String name, String type, String email,
                                String telephone, String intro, String gender, String department,
-                               String majorClass) {
+                               String majorClass, Integer year) {
         this.status = status;
         this.uid = uid;
         this.name = name;
@@ -28,6 +29,7 @@ public class GetUserInfoResponse {
         this.intro = intro;
         this.department = department;
         this.majorClass = majorClass;
+        this.year = year;
     }
 
     public String getStatus() {
@@ -68,5 +70,9 @@ public class GetUserInfoResponse {
 
     public String getMajorClass() {
         return majorClass;
+    }
+
+    public Integer getYear() {
+        return year;
     }
 }

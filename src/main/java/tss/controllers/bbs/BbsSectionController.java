@@ -100,8 +100,9 @@ public class BbsSectionController {
 
         Iterator<BbsSectionEntity> iter = bbsSectionRepository.findAll().iterator();
         while (iter.hasNext()) {
-            Long id = iter.next().getId();
-            String name = iter.next().getName();
+            BbsSectionEntity section = iter.next();
+            Long id = section.getId();
+            String name = section.getName();
             ids.add(id.toString());
             names.add(name);
         }

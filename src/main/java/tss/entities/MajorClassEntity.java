@@ -18,6 +18,7 @@ public class MajorClassEntity {
     Set<UserEntity> students = new HashSet<>();
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Short getId() {
         return id;
     }
@@ -43,7 +44,7 @@ public class MajorClassEntity {
         this.year = year;
     }
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     @JoinColumn(name = "major_id")
     public MajorEntity getMajor() {
         return major;
