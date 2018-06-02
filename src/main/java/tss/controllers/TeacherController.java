@@ -55,10 +55,10 @@ public class TeacherController {
 
     }
 
-    @GetMapping("/{userId}/schedule")
+    @GetMapping("/{userId}/classes")
     @ResponseStatus(HttpStatus.OK)
-    public List<TimeSlot> getSchedule(@PathVariable String userId, @RequestParam int year,
-                                      @RequestParam SemesterEnum semester) {
+    public List<Clazz> listClassesTeaching(@PathVariable String userId, @RequestParam int year,
+                                              @RequestParam SemesterEnum semester) {
 
         UserEntity teacherEntity = userRepository.findById(userId).orElseThrow(TeacherNotFoundException::new);
         // TODO: commented for testing.
@@ -66,14 +66,12 @@ public class TeacherController {
 //            throw new TeacherNotFoundException();
 //        }
 
-        List<TimeSlot> schedule = new ArrayList<>();
+        List<Clazz> classes = new ArrayList<>();
         for (ClassEntity classEntity : teacherEntity.getClassesTeaching()) {
             if (classEntity.getYear() == year && semester.equals(classEntity.getSemester())) {
-                for (TimeSlotEntity timeSlotEntity : classEntity.getTimeSlots()) {
-                    schedule.add(new TimeSlot(timeSlotEntity));
-                }
+                classes.add(new Clazz(classEntity));
             }
         }
-        return schedule;
+        return classes;
     }
 }

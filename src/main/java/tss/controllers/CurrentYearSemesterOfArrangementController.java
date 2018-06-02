@@ -1,6 +1,7 @@
 package tss.controllers;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tss.entities.ClassroomEntity;
 import tss.entities.CurrentYearSemesterOfArrangementEntity;
@@ -35,6 +36,7 @@ public class CurrentYearSemesterOfArrangementController {
 
     @PutMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional(rollbackFor = Exception.class)
     public void setCurrentYearSemesterOfArrangement(@RequestBody YearSemester yearSemester) {
 
         // Invalidate the old one.
@@ -42,14 +44,12 @@ public class CurrentYearSemesterOfArrangementController {
                 .findByValid(true);
         for (CurrentYearSemesterOfArrangementEntity validYearSemester : validYearSemesters) {
             validYearSemester.setValid(false);
-            currentYearSemesterOfArrangementRepository.save(validYearSemester);
         }
 
         // Clear all existing arrangements of classes.
         for (ClassroomEntity classroomEntity : classroomRepository.findAll()) {
             for (TimeSlotEntity timeSlotEntity : classroomEntity.getTimeSlots()) {
                 timeSlotEntity.setClazz(null);
-                timeSlotRepository.save(timeSlotEntity);
             }
         }
 

@@ -7,7 +7,7 @@ import tss.entities.CurrentYearSemesterOfArrangementEntity;
  * @author reeve
  */
 public class YearSemester {
-    private int year;
+    private Integer year;
     private SemesterEnum semester;
 
     public YearSemester() {
@@ -18,11 +18,11 @@ public class YearSemester {
         this.semester = currentYearSemesterOfArrangementEntity.getSemester();
     }
 
-    public int getYear() {
+    public Integer getYear() {
         return year;
     }
 
-    public void setYear(int year) {
+    public void setYear(Integer year) {
         this.year = year;
     }
 

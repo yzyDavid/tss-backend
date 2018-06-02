@@ -2,6 +2,7 @@ package tss.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
@@ -27,16 +28,14 @@ public class ClassController {
     private final ClassRepository classRepository;
     private final UserRepository userRepository;
     private final ClassroomRepository classroomRepository;
-    private final TimeSlotRepository timeSlotRepository;
 
     @Autowired
     public ClassController(CourseRepository courseRepository, ClassRepository classRepository, UserRepository
-            userRepository, ClassroomRepository classroomRepository, TimeSlotRepository timeSlotRepository) {
+            userRepository, ClassroomRepository classroomRepository) {
         this.courseRepository = courseRepository;
         this.classRepository = classRepository;
         this.userRepository = userRepository;
         this.classroomRepository = classroomRepository;
-        this.timeSlotRepository = timeSlotRepository;
     }
 
     @PostMapping("/courses/{courseId}/classes")
@@ -51,7 +50,6 @@ public class ClassController {
         classEntity.setYear(clazz.getYear());
         classEntity.setSemester(clazz.getSemester());
         classEntity.setCapacity(clazz.getCapacity());
-        classEntity.setNumStudent(clazz.getNumStudent());
         classEntity.setTeacher(userEntity);
         classEntity.setCourse(courseEntity);
 
@@ -103,15 +101,16 @@ public class ClassController {
 
     @PutMapping("/auto-arrangement")
     @ResponseStatus(HttpStatus.OK)
+    @Transactional(rollbackFor = Exception.class)
     public ClassArrangementResult autoArrangement(@RequestParam int year, @RequestParam SemesterEnum semester) {
-
+        // Clear old arrangement records.
         for (ClassroomEntity classroomEntity : classroomRepository.findAll()) {
             for (TimeSlotEntity timeSlotEntity : classroomEntity.getTimeSlots()) {
                 timeSlotEntity.setClazz(null);
-                timeSlotRepository.save(timeSlotEntity);
             }
         }
 
+        // Wrap ClassEntities with ClassItems.
         List<ClassItem> classItems = new ArrayList<>();
         for (ClassEntity classEntity : classRepository.findByYearAndSemester(year, semester)) {
             ClassItem classItem = new ClassItem(classEntity);
@@ -120,25 +119,28 @@ public class ClassController {
             }
         }
 
+        // Auto-arrange.
         int count = 0;
         for (ClassroomEntity classroomEntity : classroomRepository.findAll()) {
             if (classItems.size() == 0) {
                 break;
             }
+
             for (TimeSlotEntity timeSlotEntity : classroomEntity.getTimeSlots()) {
                 if (classItems.size() == 0) {
                     break;
                 }
+
                 final int timeSlotSize = timeSlotEntity.getType().getSize();
                 for (int i = 0; i < classItems.size(); i++) {
                     ClassItem classItem = classItems.get(i);
+
                     if (classItem.getNumLeftSectionsOfSize(timeSlotSize) > 0) {
                         classItem.getClassEntity().addTimeSlot(timeSlotEntity);
-                        timeSlotRepository.save(timeSlotEntity);
                         classItem.setNumLeftSectionsOfSize(timeSlotSize, classItem.getNumLeftSectionsOfSize(timeSlotSize) - 1);
                         if (classItem.hasNoLeftSection()) {
-                            Collections.swap(classItems, i, classItems.size());
-                            classItems.remove(classItems.size());
+                            Collections.swap(classItems, i, classItems.size() - 1);
+                            classItems.remove(classItems.size() - 1);
                             count++;
                         }
                         break;
@@ -147,6 +149,7 @@ public class ClassController {
             }
         }
 
+        // Statics.
         List<Long> pendingClassIds = new ArrayList<>();
         for (ClassItem classItem : classItems) {
             pendingClassIds.add(classItem.getClassId());
@@ -309,6 +312,11 @@ class ClassItem {
                 break;
             case 6:
                 numLeftSectionsOfSizeThree = 2;
+                break;
+            case 7:
+                numLeftSectionsOfSizeTwo = 2;
+                numLeftSectionsOfSizeThree = 1;
+                break;
             default:
         }
         classId = classEntity.getId();
@@ -356,5 +364,15 @@ class ClassItem {
 
     void setClassEntity(ClassEntity classEntity) {
         this.classEntity = classEntity;
+    }
+
+    @Override
+    public String toString() {
+        return "ClassItem{" +
+                "classId=" + classId +
+                ", numLeftSectionsOfSizeTwo=" + numLeftSectionsOfSizeTwo +
+                ", numLeftSectionsOfSizeThree=" + numLeftSectionsOfSizeThree +
+                ", classEntity=" + classEntity +
+                '}';
     }
 }

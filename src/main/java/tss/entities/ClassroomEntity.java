@@ -119,4 +119,16 @@ public class ClassroomEntity {
             return super.equals(obj);
         }
     }
+
+    @Override
+    public String toString() {
+        return "ClassroomEntity{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", capacity=" + capacity +
+                ", building=" + building +
+                ", timeSlots=" + timeSlots +
+                ", timeSlotDirectory=" + timeSlotDirectory +
+                '}';
+    }
 }
