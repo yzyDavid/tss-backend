@@ -137,7 +137,7 @@ public class BbsSearchController {
                         continue;
                     }
                     if (count > Integer.valueOf(currentPage) * 10) {
-                        continue;
+                        break;
                     }
 
                     topicIDs.add(String.valueOf(t.getId()));

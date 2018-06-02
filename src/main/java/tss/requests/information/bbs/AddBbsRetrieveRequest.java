@@ -1,31 +1,31 @@
 package tss.requests.information.bbs;
 
 public class AddBbsRetrieveRequest {
-    private long id;
-    private long receiverdId;
-    private String content;
+    private String destination;
+    private String title;
+    private String text;
 
-    public long getId() {
-        return id;
+    public String getDestination() {
+        return destination;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 
-    public long getReceiverdId() {
-        return receiverdId;
+    public String getTitle() {
+        return title;
     }
 
-    public void setReceiverdId(long receiverdId) {
-        this.receiverdId = receiverdId;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getContent() {
-        return content;
+    public String getText() {
+        return text;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setText(String text) {
+        this.text = text;
     }
 }

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,19 +14,19 @@ import tss.entities.bbs.BbsRetrieveEntity;
 import tss.repositories.UserRepository;
 import tss.repositories.bbs.BbsRetrieveRepository;
 import tss.requests.information.bbs.AddBbsRetrieveRequest;
+import tss.requests.information.bbs.CheckInBoxRequest;
+import tss.requests.information.bbs.CheckOutBoxRequest;
 import tss.requests.information.bbs.ReadBbsRetrieveRequest;
 import tss.responses.information.bbs.AddBbsRetrieveResponse;
-import tss.responses.information.bbs.CheckRetrieveResponse;
+import tss.responses.information.bbs.CheckInBoxResponse;
+import tss.responses.information.bbs.CheckOutBoxResponse;
 import tss.responses.information.bbs.ReadBbsRetrieveResponse;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
-@RequestMapping(path = "/retrieve")
+@RequestMapping(path = "/imessage")
 public class BbsRetrieveController {
     private UserRepository userRepository;
     private BbsRetrieveRepository bbsRetrieveRepository;
@@ -43,36 +42,28 @@ public class BbsRetrieveController {
      * request: id, r-id, content
      * permission: anyone login
      * return: id, s-id, r-id, content, time
+     * v1.0, done
      */
-    @PostMapping(path = "/create")
+    @PostMapping(path = "/send")
     @Authorization
     public ResponseEntity<AddBbsRetrieveResponse> sendRetrieve(@CurrentUser UserEntity user,
                                                                @RequestBody AddBbsRetrieveRequest request) {
-        /* message id exists */
-        long id = request.getId();
-        Optional<BbsRetrieveEntity> ret = bbsRetrieveRepository.findById(id);
-        if (ret.isPresent()) {
-            return new ResponseEntity<>(new AddBbsRetrieveResponse("duplicated message", -1, null, null, null, null), HttpStatus.BAD_REQUEST);
-        }
-
-        /* receiver id invalid */
-        long receiverId = request.getReceiverdId();
-        String content = request.getContent();
-        Optional<UserEntity> retu = userRepository.findById(String.valueOf(receiverId));
-        if (!retu.isPresent()) {
-            return new ResponseEntity<>(new AddBbsRetrieveResponse("no receriver id", -1, null, null, null, null), HttpStatus.BAD_REQUEST);
-        }
-
         UserEntity sender = user;
-        UserEntity receiver = retu.get();
+
+        Optional<UserEntity> retd = userRepository.findById(request.getDestination());
+        if (!retd.isPresent()) {
+            return new ResponseEntity<>(new AddBbsRetrieveResponse("send failed, no such user!"), HttpStatus.BAD_REQUEST);
+        }
+
+        UserEntity receiver = retd.get();
 
         BbsRetrieveEntity retrieve = new BbsRetrieveEntity();
         retrieve.setReceiver(receiver);
         retrieve.setSender(sender);
 
-        retrieve.setId(id);
-        retrieve.setContent(content);
-        retrieve.setChecked(false);
+        retrieve.setTitle(request.getTitle());
+        retrieve.setContent(request.getText());
+        retrieve.setIsChecked(false);
 
         Date time = new Date();
         DateFormat mediumDateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
@@ -81,43 +72,91 @@ public class BbsRetrieveController {
         retrieve.setTime(time);
         bbsRetrieveRepository.save(retrieve);
 
-        return new ResponseEntity<>(new AddBbsRetrieveResponse("ok", id, sender.getUid(), receiver.getUid(), content, time), HttpStatus.OK);
+        return new ResponseEntity<>(new AddBbsRetrieveResponse("send ok!"), HttpStatus.OK);
     }
 
 
     /**
-     * check current user's retrieves information, not read
-     * request: null
+     * check current user's inbox
+     * request: page
      * permission: login
-     * return: L - ids, L - contents, L - times
+     * return: see doc
+     * v1.0, done
      */
-    @GetMapping(path = "/check")
+    @PostMapping(path = "/inbox")
     @Authorization
-    public ResponseEntity<CheckRetrieveResponse> checkUserRetrieve(@CurrentUser UserEntity user) {
-        List<Long> ids = new ArrayList<>();
-        List<String> contents = new ArrayList<>();
-        List<Date> times = new ArrayList<>();
+    public ResponseEntity<CheckInBoxResponse> checkInBox(@CurrentUser UserEntity user,
+                                                         @RequestBody CheckInBoxRequest request) {
+        String currentPage = request.getPage();
 
         List<BbsRetrieveEntity> messages = bbsRetrieveRepository.findByReceiver(user);
-        for (BbsRetrieveEntity mes : messages) {
-            if (mes.isChecked()) {
+
+        String totalPage = String.valueOf(messages.size()/20+1);
+
+        List<String> destinations = new ArrayList<>();
+        List<String> titles = new ArrayList<>();
+        List<String> texts = new ArrayList<>();
+        List<String> times = new ArrayList<>();
+
+        int count = 0;
+        for(BbsRetrieveEntity mess : messages){
+            count++;
+            if (count < (Integer.valueOf(currentPage) - 1) * 10 + 1) {
                 continue;
             }
-            ids.add(mes.getId());
-            contents.add(mes.getContent());
-
-            Date time = mes.getTime();
-            DateFormat mediumDateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
-            mediumDateFormat.format(time);
-            times.add(time);
+            if (count > Integer.valueOf(currentPage) * 10) {
+                break;
+            }
+            destinations.add(mess.getSender().getName());
+            titles.add(mess.getTitle());
+            texts.add(mess.getContent());
+            times.add(mess.getTime().toString());
         }
 
-        if (ids.isEmpty()) {
-            return new ResponseEntity<>(new CheckRetrieveResponse("no message", null, null, null), HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(new CheckRetrieveResponse("ok", ids, contents, times), HttpStatus.OK);
+        return new ResponseEntity<>(new CheckInBoxResponse(currentPage, totalPage, destinations, titles, texts, times), HttpStatus.OK);
     }
+
+
+    /**
+     * check current user's outbox
+     * request: page
+     * permission: login
+     * return: see doc
+     * v1.0, done
+     */
+    @PostMapping(path = "/outbox")
+    @Authorization
+    public ResponseEntity<CheckOutBoxResponse> checkOutBox(@CurrentUser UserEntity user,
+                                                           @RequestBody CheckOutBoxRequest request){
+        String currentPage = request.getPage();
+
+        List<BbsRetrieveEntity> messages = bbsRetrieveRepository.findBySender(user);
+
+        String totalPage = String.valueOf(messages.size()/20+1);
+
+        List<String> destinations = new ArrayList<>();
+        List<String> titles = new ArrayList<>();
+        List<String> texts = new ArrayList<>();
+        List<String> times = new ArrayList<>();
+
+        int count = 0;
+        for(BbsRetrieveEntity mess : messages){
+            count++;
+            if (count < (Integer.valueOf(currentPage) - 1) * 10 + 1) {
+                continue;
+            }
+            if (count > Integer.valueOf(currentPage) * 10) {
+                break;
+            }
+            destinations.add(mess.getReceiver().getName());
+            titles.add(mess.getTitle());
+            texts.add(mess.getContent());
+            times.add(mess.getTime().toString());
+        }
+
+        return new ResponseEntity<>(new CheckOutBoxResponse(currentPage, totalPage, destinations, titles, texts, times), HttpStatus.OK);
+    }
+
 
     /**
      * read a message with certain id
@@ -142,7 +181,7 @@ public class BbsRetrieveController {
             return new ResponseEntity<>(new ReadBbsRetrieveResponse("permission denied", -1, null, null, null, null), HttpStatus.FORBIDDEN);
         }
 
-        mesg.setChecked(true);
+        mesg.setIsChecked(true);
 
         return new ResponseEntity<>(new ReadBbsRetrieveResponse("ok", id, mesg.getSender().getUid(),
                 mesg.getReceiver().getUid(), mesg.getContent(), mesg.getTime()), HttpStatus.OK);

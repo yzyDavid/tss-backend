@@ -14,6 +14,7 @@ public class BbsRetrieveEntity {
     private UserEntity receiver;
     private String content;
     private Date time;
+    private String title;
     private boolean isChecked;
 
 
@@ -46,12 +47,12 @@ public class BbsRetrieveEntity {
     }
 
     @Column(name = "retrieve_check")
-    public boolean isChecked() {
+    public boolean getIsChecked() {
         return isChecked;
     }
 
-    public void setChecked(boolean checked) {
-        isChecked = checked;
+    public void setIsChecked(boolean checked) {
+        this.isChecked = checked;
     }
 
 
@@ -73,5 +74,14 @@ public class BbsRetrieveEntity {
 
     public void setReceiver(UserEntity receiver) {
         this.receiver = receiver;
+    }
+
+    @Column(name = "retrieve_title")
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }
