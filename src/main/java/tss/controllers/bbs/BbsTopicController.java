@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
+import tss.configs.Config;
 import tss.entities.TypeGroupEntity;
 import tss.entities.UserEntity;
 import tss.entities.bbs.BbsSectionEntity;
@@ -111,7 +112,7 @@ public class BbsTopicController {
      * v1.0, done
      * TODO check permission
      */
-    @DeleteMapping(path = "delete")
+    @DeleteMapping(path = "/delete")
     @Authorization
     public ResponseEntity<DeleteBbsTopicResponse> deleteBbsTopic(@CurrentUser UserEntity user,
                                                                  @RequestBody DeleteBbsTopicRequest request) {
@@ -124,6 +125,10 @@ public class BbsTopicController {
         BbsTopicEntity topic = ret.get();
 
         /* only author and manager get the permission */
+        if(!Config.TYPES[1].equals(user.readTypeName())
+                && !user.getUid().equals(topic.getAuthor().getUid())){
+            return new ResponseEntity<>(new DeleteBbsTopicResponse("permission denied"), HttpStatus.BAD_REQUEST);
+        }
 
         bbsTopicRepository.delete(topic);
 
@@ -317,10 +322,23 @@ public class BbsTopicController {
      * v1.0,
      */
     @PostMapping(path = "/settop")
-    //@Authorization
+    @Authorization
     public ResponseEntity<SetTopicTopResponse> setTopicTop(@CurrentUser UserEntity user,
                                                            @RequestBody SetTopicTopRequest request){
+        /* invalid topic id error */
+        Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTopicID()));
+        if (!ret.isPresent()) {
+            return new ResponseEntity<>(new SetTopicTopResponse("no such topic"), HttpStatus.BAD_REQUEST);
+        }
 
+        BbsTopicEntity topic = ret.get();
+
+        if(!Config.TYPES[1].equals(user.readTypeName())){
+            return new ResponseEntity<>(new SetTopicTopResponse("permission denied!"), HttpStatus.BAD_REQUEST);
+        }
+
+        topic.setIsTop(true);
+        bbsTopicRepository.save(topic);
 
         return new ResponseEntity<>(new SetTopicTopResponse("set top ok"), HttpStatus.OK);
     }

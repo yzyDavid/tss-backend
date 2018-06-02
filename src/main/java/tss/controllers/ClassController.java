@@ -121,8 +121,7 @@ public class ClassController {
 
         if (semester.equals(1)) {
             sem = SemesterEnum.FIRST;
-        }
-        else if (semester.equals(2)) {
+        } else if (semester.equals(2)) {
             sem = SemesterEnum.SECOND;
         } else {
             return new ResponseEntity<>(new GetClassesResponse(new ArrayList<>()),
@@ -157,7 +156,7 @@ public class ClassController {
     @GetMapping(path = "/classes/action/search-by-course-no-time/{course_name}")
     /*@Authorization*/
     public ResponseEntity<GetClassesResponse> searchClassByNameNoTime( // @CurrentUser UserEntity user,
-                                                     @PathVariable String course_name) {
+                                                                       @PathVariable String course_name) {
         List<CourseEntity> ret = courseRepository.findByName(course_name);
         if (ret.isEmpty()) {
             return new ResponseEntity<>(new GetClassesResponse(new ArrayList<>()),
@@ -183,15 +182,14 @@ public class ClassController {
     @ResponseStatus(HttpStatus.OK)
     /*@Authorization*/
     public List<ClassEntity> searchClassById( // @CurrentUser UserEntity user,
-                                                                               @PathVariable String course_id,
-                                                                               @PathVariable Integer year,
-                                                                               @PathVariable Integer semester) {
+                                              @PathVariable String course_id,
+                                              @PathVariable Integer year,
+                                              @PathVariable Integer semester) {
         SemesterEnum sem;
 
         if (semester.equals(1)) {
             sem = SemesterEnum.FIRST;
-        }
-        else if (semester.equals(2)) {
+        } else if (semester.equals(2)) {
             sem = SemesterEnum.SECOND;
         } else {
             return new ArrayList<>();
@@ -223,7 +221,7 @@ public class ClassController {
     @ResponseStatus(HttpStatus.OK)
     /*@Authorization*/
     public List<ClassEntity> searchClassByIdNoTime( // @CurrentUser UserEntity user,
-                                                                              @PathVariable String course_id) {
+                                                    @PathVariable String course_id) {
         Optional<CourseEntity> ret = courseRepository.findById(course_id);
         if (!ret.isPresent()) {
             return new ArrayList<>();
@@ -238,15 +236,14 @@ public class ClassController {
     @ResponseStatus(HttpStatus.OK)
     /*@Authorization*/
     public List<ClassEntity> searchClassByTeacher(// @CurrentUser UserEntity user,
-                                                                             @PathVariable String teacher_name,
-                                                                             @PathVariable Integer year,
-                                                                             @PathVariable Integer semester) {
+                                                  @PathVariable String teacher_name,
+                                                  @PathVariable Integer year,
+                                                  @PathVariable Integer semester) {
         SemesterEnum sem;
 
         if (semester.equals(1)) {
             sem = SemesterEnum.FIRST;
-        }
-        else if (semester.equals(2)) {
+        } else if (semester.equals(2)) {
             sem = SemesterEnum.SECOND;
         } else {
             return new ArrayList<>();
@@ -283,7 +280,7 @@ public class ClassController {
     @ResponseStatus(HttpStatus.OK)
     /*@Authorization*/
     public List<ClassEntity> searchClassByTeacherNoTime(// @CurrentUser UserEntity user,
-                                                                                @PathVariable String teacher_name) {
+                                                        @PathVariable String teacher_name) {
         List<UserEntity> ret = userRepository.findByName(teacher_name);
 
         if (ret.isEmpty()) {
@@ -311,12 +308,11 @@ public class ClassController {
                                              @PathVariable String teacher_name,
                                              @PathVariable Integer year,
                                              @PathVariable Integer semester
-                                          ) {
+    ) {
         SemesterEnum sem;
         if (semester.equals(1)) {
             sem = SemesterEnum.FIRST;
-        }
-        else if (semester.equals(2)) {
+        } else if (semester.equals(2)) {
             sem = SemesterEnum.SECOND;
         } else {
             return new ArrayList<>();
@@ -383,7 +379,7 @@ public class ClassController {
     @Authorization
     @ResponseStatus(HttpStatus.OK)
     public void registerClass(@CurrentUser UserEntity user,
-            @PathVariable long classId) {
+                              @PathVariable long classId) {
         ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
 
     }
