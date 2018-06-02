@@ -26,32 +26,32 @@ public class GetCoursesResponse {
             this.name = course.getName();
             this.credit = course.getCredit();
             this.brief = course.getIntro();
-        }
+}
 
-        public void setCid(String cid) {
-            this.cid = cid;
-        }
-        public void setName(String name) {
-            this.name = name;
-        }
-        public void setCredit(Float credit) {
-            this.credit = credit;
-        }
-        public void setBrief(String brief) { this.brief = brief; }
-
-        public String getCid() {
-            return cid;
-        }
-        public String getName() {
-            return name;
-        }
-        public Float getCredit() {
-            return credit;
-        }
-        public String getBrief() {
-            return brief;
-        }
+    public void setCid(String cid) {
+        this.cid = cid;
     }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setCredit(Float credit) {
+        this.credit = credit;
+    }
+    public void setBrief(String brief) { this.brief = brief; }
+
+    public String getCid() {
+        return cid;
+    }
+    public String getName() {
+        return name;
+    }
+    public Float getCredit() {
+        return credit;
+    }
+    public String getBrief() {
+        return brief;
+    }
+}
 
     public GetCoursesResponse(List<CourseEntity> courses) {
         this.courses = new ArrayList<>();

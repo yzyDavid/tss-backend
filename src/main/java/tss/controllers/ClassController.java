@@ -1,5 +1,6 @@
 package tss.controllers;
 
+import org.apache.catalina.User;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,9 @@ import tss.exceptions.*;
 import tss.models.Clazz;
 import tss.models.ClazzList;
 import tss.repositories.*;
+import tss.requests.information.AddClassRegistrationRequest;
+import tss.requests.information.ConfirmClassRequest;
+import tss.requests.information.ModifyClassRegistrationRequest;
 import tss.responses.information.GetClassesResponse;
 
 import java.sql.Timestamp;
@@ -116,9 +120,9 @@ public class ClassController {
         }
     }
 
-    @GetMapping("/classes/search/findByCourse_NameAndYearAndSemester")
+    @GetMapping("/classes/search/findByCourseName")
     @ResponseStatus(HttpStatus.OK)
-    public GetClassesResponse searchClassByName(@RequestParam String courseName,
+    public GetClassesResponse searchClassByName(@RequestParam String name,
                                                 @RequestParam(required = false) Integer year,
                                                 @RequestParam(required = false) SemesterEnum semester) {
         List<ClassEntity> classes;
@@ -135,7 +139,7 @@ public class ClassController {
         return new GetClassesResponse(classes);
     }
 
-    @GetMapping("/classes/search/findByCourse_IdAndYearAndSemester")
+    @GetMapping("/classes/search/findByCourseId")
     @ResponseStatus(HttpStatus.OK)
     public GetClassesResponse searchClassById(@RequestParam String courseId,
                                               @RequestParam(required = false) Integer year,
@@ -154,7 +158,7 @@ public class ClassController {
         return new GetClassesResponse(classes);
     }
 
-    @GetMapping("/classes/search/findByTeacher_NameAndYearAndSemester")
+    @GetMapping("/classes/search/findByTeacher")
     @ResponseStatus(HttpStatus.OK)
     public GetClassesResponse searchClassByTeacher(@RequestParam String teacherName,
                                                    @RequestParam(required = false) Integer year,
@@ -230,13 +234,13 @@ public class ClassController {
         return new GetClassesResponse(new ArrayList<>(res));
     }
 
-    @PutMapping(path = "/classes/register")
+    @PostMapping(path = "/classes/register")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public void registerClass(@RequestParam long classId, @RequestParam String userId) {
+    public void addClassRegistration(@CurrentUser UserEntity user, @RequestBody AddClassRegistrationRequest request) {
+        Long classId = request.getClassId();
         ClassEntity clazz = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
-        UserEntity user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        /**
+        /*
          * TODO: find the program of this user and confirm that the course is in it
          * CourseEntity course = clazz.getCourse();
         */
@@ -248,7 +252,7 @@ public class ClassController {
         ClassRegistrationEntity classRegistrationEntity =
                 new ClassRegistrationEntity(0, user, clazz, classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
         classRegistrationRepository.save(classRegistrationEntity);
-        /**
+        /*
          *
          * TODO: the joint between tables
          */
@@ -257,7 +261,9 @@ public class ClassController {
     @PutMapping(path = "/classes/confirm")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public void confirmClass(@RequestParam long classId, @RequestParam String userId) {
+    public void confirmClass(@CurrentUser UserEntity user, @RequestBody ConfirmClassRequest request) {
+        String userId = request.getUid();
+        Long classId = request.getClassId();
         ClassRegistrationId id = new ClassRegistrationId(userId, classId);
         Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findById(id);
         if (!cr.isPresent()) {
@@ -273,6 +279,28 @@ public class ClassController {
         classRegistrationRepository.save(classRegistration);
     }
 
+    @PutMapping(path = "/classes/finish")
+    @Authorization
+    @ResponseStatus(HttpStatus.OK)
+    public void finishClass(@CurrentUser UserEntity user, @RequestBody ModifyClassRegistrationRequest request) {
+        String userId = request.getUid();
+        Long classId = request.getClassId();
+        ClassRegistrationId id = new ClassRegistrationId(userId, classId);
+        Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findById(id);
+        if (!cr.isPresent()) {
+            throw new ClassNotRegisteredException();
+        }
+        ClassRegistrationEntity classRegistration = cr.get();
+        ClassStatusEnum status = classRegistration.getStatus();
+        if (!status.equals(ClassStatusEnum.SELECTED)) {
+            throw new ClassNotRegisteredException();
+        }
+        classRegistration.setStatus(ClassStatusEnum.FINISHED);
+        classRegistration.setScore(request.getScore());
+        classRegistration.setConfirmTime(new Timestamp(System.currentTimeMillis()));
+        classRegistrationRepository.save(classRegistration);
+
+    }
 
 }
 

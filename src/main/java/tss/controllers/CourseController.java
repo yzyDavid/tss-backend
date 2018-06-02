@@ -171,4 +171,5 @@ public class CourseController {
     public ResponseEntity<GetCoursesResponse> searchCourseByName(@RequestParam String courseName) {
         return new ResponseEntity<>(new GetCoursesResponse(courseRepository.findByNameLike("%"+courseName+"%")), HttpStatus.OK);
     }
+
 }
