@@ -125,8 +125,8 @@ public class BbsTopicController {
         BbsTopicEntity topic = ret.get();
 
         /* only author and manager get the permission */
-        if(!Config.TYPES[1].equals(user.readTypeName())
-                && !user.getUid().equals(topic.getAuthor().getUid())){
+        if (!Config.TYPES[1].equals(user.readTypeName())
+                && !user.getUid().equals(topic.getAuthor().getUid())) {
             return new ResponseEntity<>(new DeleteBbsTopicResponse("permission denied"), HttpStatus.BAD_REQUEST);
         }
 
@@ -324,7 +324,7 @@ public class BbsTopicController {
     @PostMapping(path = "/settop")
     @Authorization
     public ResponseEntity<SetTopicTopResponse> setTopicTop(@CurrentUser UserEntity user,
-                                                           @RequestBody SetTopicTopRequest request){
+                                                           @RequestBody SetTopicTopRequest request) {
         /* invalid topic id error */
         Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTopicID()));
         if (!ret.isPresent()) {
@@ -333,7 +333,7 @@ public class BbsTopicController {
 
         BbsTopicEntity topic = ret.get();
 
-        if(!Config.TYPES[1].equals(user.readTypeName())){
+        if (!Config.TYPES[1].equals(user.readTypeName())) {
             return new ResponseEntity<>(new SetTopicTopResponse("permission denied!"), HttpStatus.BAD_REQUEST);
         }
 
