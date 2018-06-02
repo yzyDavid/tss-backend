@@ -128,9 +128,9 @@ public class ClassController {
         List<ClassEntity> classes;
         if (year == null || semester == null) {
             //classes = classRepository.findByCourse_NameLike("%"+courseName+"%");
-            classes = classRepository.findByCourse_Name("%"+courseName+"%");
+            classes = classRepository.findByCourse_Name("%"+name+"%");
         }
-        else classes = classRepository.findByCourse_NameLikeAndYearAndSemester("%"+courseName+"%", year, semester);
+        else classes = classRepository.findByCourse_NameLikeAndYearAndSemester("%"+name+"%", year, semester);
 
         if (classes.isEmpty()) {
             System.out.println("Empty");
@@ -299,7 +299,27 @@ public class ClassController {
         classRegistration.setScore(request.getScore());
         classRegistration.setConfirmTime(new Timestamp(System.currentTimeMillis()));
         classRegistrationRepository.save(classRegistration);
+    }
 
+    @PutMapping(path = "/classes/fail")
+    @Authorization
+    @ResponseStatus(HttpStatus.OK)
+    public void failClass(@CurrentUser UserEntity user, @RequestBody ConfirmClassRequest request) {
+        String userId = request.getUid();
+        Long classId = request.getClassId();
+        ClassRegistrationId id = new ClassRegistrationId(userId, classId);
+        Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findById(id);
+        if (!cr.isPresent()) {
+            throw new ClassNotRegisteredException();
+        }
+        ClassRegistrationEntity classRegistration = cr.get();
+        ClassStatusEnum status = classRegistration.getStatus();
+        if (!status.equals(ClassStatusEnum.SELECTED)) {
+            throw new ClassNotRegisteredException();
+        }
+        classRegistration.setStatus(ClassStatusEnum.FAILED);
+        classRegistration.setConfirmTime(new Timestamp(System.currentTimeMillis()));
+        classRegistrationRepository.save(classRegistration);
     }
 
 }
