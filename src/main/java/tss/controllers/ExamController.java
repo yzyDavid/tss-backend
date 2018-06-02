@@ -315,7 +315,7 @@ public class ExamController {
             result.setRid(paper.getPid()+user.getUid()+question.getQid());
             resultRepository.save(result);
         }
-
+        System.out.println("Save success.");
         return new ResponseEntity<>(new AddResultResponse("paper saved"), HttpStatus.OK);
     }
 

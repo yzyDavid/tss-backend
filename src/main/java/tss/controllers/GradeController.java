@@ -150,7 +150,7 @@ public class GradeController {
                     rate.add(thisrate);
 
                 }
-                System.out.println(questions.size());
+                System.out.println("pid:"+questions.size());
                 return new ResponseEntity<>(new GetGradeResponse("ok", qid, rate, null,null, null, questions),HttpStatus.OK);
             }
             else {

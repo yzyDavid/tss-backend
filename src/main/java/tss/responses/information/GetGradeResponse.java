@@ -47,5 +47,7 @@ public class GetGradeResponse {
     }
 
     public List<String> getDate() {return date;}
+
+    public List<QuestionEntity> getQuestions() {return questions;}
 }
 
