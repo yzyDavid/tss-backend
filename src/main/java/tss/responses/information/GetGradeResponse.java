@@ -11,13 +11,15 @@ public class GetGradeResponse {
     private final List<Double> rate;
     private final List<String> pid;
     private final List<String> score;
+    private final List<String> date;
 
-    public GetGradeResponse(String status, List<String> qid, List<Double> rate, List<String> pid, List<String> score) {
+    public GetGradeResponse(String status, List<String> qid, List<Double> rate, List<String> pid, List<String> score, List<String> date) {
         this.status = status;
         this.qid = qid;
         this.rate = rate;
         this.pid = pid;
         this.score = score;
+        this.date = date;
     }
 
     public String getStatus() {
@@ -39,4 +41,6 @@ public class GetGradeResponse {
     public List<String> getScore() {
         return score;
     }
+
+    public List<String> getDate() {return date;}
 }

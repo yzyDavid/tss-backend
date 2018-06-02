@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ResultRepository extends CrudRepository<ResultEntity, String> {
 
-   // List<ResultEntity> findByStudent(UserEntity student);
+    List<ResultEntity> findByStudent(UserEntity student);
 
    // List<ResultEntity> findByQuestion(QuestionEntity question);
 

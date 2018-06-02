@@ -149,7 +149,7 @@ public class ExamController {
         exist=ret.isPresent();
         if(exist){      //还要改！！！
             graderecord = ret.get();
-            if(graderecord.getGrade()!=-1){ //还在考试的过程中
+            if(graderecord.getGrade()!=-1){ //已经完成改试卷
                 String starttime= graderecord.getStarttime().toString();
                 System.out.println("the paper expired");
                 return new ResponseEntity<>(new StartExamResponse("the paper expired", request.getPid(), starttime, null),HttpStatus.BAD_REQUEST);
@@ -186,9 +186,45 @@ public class ExamController {
 
                     Calendar nowc = Calendar.getInstance();
                     if(nowc.getTimeInMillis() > alter.getTimeInMillis() || nowc.getTimeInMillis() > ddlc.getTimeInMillis()){    //超过试卷时间或考试已结束
+                        System.out.println("the paper expired");
+                        return new ResponseEntity<>(new StartExamResponse("the paper expired", request.getPid(), starttime, null),HttpStatus.BAD_REQUEST);
+                    }else{      //尚在考试之中
+                        int count2 = 0;
 
-                    }else{
+                        List<PaperContainsQuestionEntity> contain_find = paperContainsQuestionRepository.findByPaper(paper);
+                        List<QuestionExamResponseStruct> questionInfo = new ArrayList<>();
+                        List<ResultEntity> result_find = resultRepository.findByStudent(user);
 
+
+                        QuestionEntity question_temp;
+                        for(PaperContainsQuestionEntity contain:contain_find){
+
+                            question_temp = contain.getQuestion();
+
+                            QuestionExamResponseStruct qreturn = new QuestionExamResponseStruct();
+                            qreturn.setQid(question_temp.getQid());
+                            qreturn.setQtype(question_temp.getQtype());
+                            qreturn.setQuestion(question_temp.getQuestion());
+                            qreturn.setQunit(question_temp.getQunit());
+
+                            // qreturn.setMyanswer(null);
+                            if (result_find.size() != 0) {
+                                for(ResultEntity result:result_find){
+                                    if(result.getQuestion().getQid().equals(question_temp.getQid())){
+                                        qreturn.setMyanswer(result.getAns());
+                                    }
+                                }
+
+                            }
+
+
+
+                            questionInfo.add(qreturn);
+                            count2++;
+                        }
+
+
+                        return new ResponseEntity<>(new StartExamResponse("ok", request.getPid(), starttime, questionInfo), HttpStatus.OK);
                     }
 
 
@@ -224,6 +260,8 @@ public class ExamController {
             qreturn.setQtype(question_temp.getQtype());
             qreturn.setQuestion(question_temp.getQuestion());
             qreturn.setQunit(question_temp.getQunit());
+            qreturn.setMyanswer(null);
+
             questionInfo.add(qreturn);
             count++;
         }
@@ -254,6 +292,7 @@ public class ExamController {
     public ResponseEntity<AddResultResponse> SavePaper(@CurrentUser UserEntity user, @RequestBody AddResultRequest request){
         ResultEntity result= new ResultEntity();
         QuestionEntity question;
+        System.out.println("pid:" + request.getPid());
         Optional<PapersEntity> ret= paperRepository.findById(request.getPid());
         Optional<QuestionEntity> ret2;
         if(!ret.isPresent()){

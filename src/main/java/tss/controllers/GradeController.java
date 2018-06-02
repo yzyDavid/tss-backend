@@ -73,22 +73,23 @@ public class GradeController {
         GetGradeRequest.QueryType type = request.getType();
         UserEntity student;
 
-        if(type.equals(GetGradeRequest.QueryType.SID)){
+        if(type.equals(GetGradeRequest.QueryType.SID)){     //按学号
             List<String> pid = new ArrayList<String>();
             List<String> score = new ArrayList<String>();
+            List<String> dates = new ArrayList<String>();
             Iterable<HistoryGradeEntity> records_find;
-            if(request.getSid()!=null) {
+            if(request.getSid()!=null) {                    //老师查询
                 Optional<UserEntity> ret = userRepository.findById(request.getSid());
                 if(!ret.isPresent()){
-                    return  new ResponseEntity<>(new GetGradeResponse("No such student", null, null, null, null), HttpStatus.BAD_REQUEST);
+                    return  new ResponseEntity<>(new GetGradeResponse("No such student", null, null, null, null, null), HttpStatus.BAD_REQUEST);
                 }
                 student = ret.get();
                 records_find =  historyGradeRepository.findByStudent(student);
             }
-            else{
+            else{               //学生查询
                 Optional<UserEntity> ret = userRepository.findById(user.getUid());
                 if(!ret.isPresent()){
-                    return  new ResponseEntity<>(new GetGradeResponse("No such student", null, null, null, null), HttpStatus.BAD_REQUEST);
+                    return  new ResponseEntity<>(new GetGradeResponse("No such student", null, null, null, null, null), HttpStatus.BAD_REQUEST);
                 }
                 student = ret.get();
                 records_find =  historyGradeRepository.findByStudent(student);
@@ -104,9 +105,10 @@ public class GradeController {
             for(HistoryGradeEntity record : records_find){
                 pid.add(i,record.getPaper().getPid());
                 score.add(i, Integer.toString(record.getGrade()));
+                dates.add(i, record.getStarttime().toString());
                 i++;
             }
-            return  new ResponseEntity<>(new GetGradeResponse("Ok", null, null, pid, score),HttpStatus.OK);
+            return  new ResponseEntity<>(new GetGradeResponse("Ok", null, null, pid, score, dates),HttpStatus.OK);
 
         }
         else{
@@ -117,7 +119,7 @@ public class GradeController {
                 Optional<PapersEntity> ret1 = paperRepository.findById(request.getPid());
                 if(!ret1.isPresent()){
                     System.out.println("No such a paper");
-                    return  new ResponseEntity<>(new GetGradeResponse("No such a paper", null, null, null, null), HttpStatus.BAD_REQUEST);
+                    return  new ResponseEntity<>(new GetGradeResponse("No such a paper", null, null, null, null, null), HttpStatus.BAD_REQUEST);
                 }
                 PapersEntity paper = ret1.get();//已经找到卷子了
 
@@ -134,7 +136,7 @@ public class GradeController {
                     rate.add(i, thisrate);
                     i++;
                 }
-                return new ResponseEntity<>(new GetGradeResponse("ok", qid, rate, null,null),HttpStatus.OK);
+                return new ResponseEntity<>(new GetGradeResponse("ok", qid, rate, null,null, null),HttpStatus.OK);
             }
             else {
                 int i=0;
@@ -148,7 +150,7 @@ public class GradeController {
                 }
                 else{
                     System.out.println("Invalid request type");
-                    return new ResponseEntity<>(new GetGradeResponse("Invalid request type", null, null, null, null), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(new GetGradeResponse("Invalid request type", null, null, null, null, null), HttpStatus.BAD_REQUEST);
                 }
 
                 for(QuestionEntity question : question_find){
@@ -157,7 +159,7 @@ public class GradeController {
                     rate.add(i, thisrate);
                     i++;
                 }
-                return new ResponseEntity<>(new GetGradeResponse("ok", qid, rate, null, null), HttpStatus.OK);
+                return new ResponseEntity<>(new GetGradeResponse("ok", qid, rate, null, null, null), HttpStatus.OK);
             }
         }
 

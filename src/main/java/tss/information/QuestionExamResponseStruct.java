@@ -5,6 +5,7 @@ public class QuestionExamResponseStruct {
     private String question;
     private String qtype;
     private String qunit;
+    private String myanswer;
 
     public String getQid() {
         return  qid;
@@ -39,5 +40,10 @@ public class QuestionExamResponseStruct {
     public void setQunit(String qunit) {
         this.qunit = qunit;
     }
+
+
+    public String getMyanswer() {return  myanswer;}
+
+    public void setMyanswer(String myanswer) {this.myanswer = myanswer; }
 
 }
