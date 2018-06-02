@@ -8,9 +8,17 @@ Program and class selection APIs
 |  PUT   | /program/course | cid:String[] (required)<br>pid:String[] (required)<br>uid:String[] (required)<br>type:Integer[] (required) |                       status:String                       |  在培养方案中添加课程  |
 | DELETE | /program/course |     cid:String[] (required) <br>pid:String[] (required)      | status:String<br>cid:String<br>cname:String<br>uid:String |  在培养方案中删除课程  |
 
-### 2. 地
+### 2. 选课相关
 
-url请求参数举例：如findByboth: /classes/search/findByBoth
+url请求参数举例。如findByboth: 
+
+```
+不需要学期和年份时：/classes/search/findByBoth?courseName=Data%20Structure,teacherName=Root
+需要学期和年份时：
+/classes/search/findByBoth?courseName=Data%20Structure,teacherName=Root,year=2017,semester=FIRST
+```
+
+
 
 | 方法 |                uri                |                     请求参数(json或url)                      |                        返回参数(json)                        |                         说明                         |    身份     |
 | :--: | :-------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :--------------------------------------------------: | :---------: |
@@ -22,6 +30,6 @@ url请求参数举例：如findByboth: /classes/search/findByBoth
 | POST |         /classes/register         |                  **json:**<br>classId: Long                  |                        status:String                         |                         选课                         |    学生     |
 | PUT  |         /classes/confirm          |           **json:**<br>uid:String[] classId: Long            |                        status:String                         |          确认**选上**此课程，uid是学生的id           |   管理员    |
 | PUT  |          /classes/finish          |  **json**:<br>uid:String[]<br> classId: Long score: Integer  |                        status:String                         |            确认完成此课程，uid是学生的id             | 管理员/老师 |
-| PUT  |          /classes/failed          |       **json:**<br>uid: String[]<br>classId: Long<br>        |                        status: String                        |             确认某课已挂，uid是学生的id              | 管理员/老师 |
+| PUT  |          /classes/fail          |       **json:**<br>uid: String[]<br>classId: Long<br>        |                        status: String                        |             确认某课已挂，uid是学生的id              | 管理员/老师 |
 
 ### 3. 选课功能
