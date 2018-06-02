@@ -1,6 +1,7 @@
 package tss.responses.information;
 
 import org.jetbrains.annotations.Nls;
+import tss.entities.QuestionEntity;
 
 import java.util.List;
 
@@ -12,14 +13,17 @@ public class GetGradeResponse {
     private final List<String> pid;
     private final List<String> score;
     private final List<String> date;
+    private final List<QuestionEntity> questions;
 
-    public GetGradeResponse(String status, List<String> qid, List<Double> rate, List<String> pid, List<String> score, List<String> date) {
+
+    public GetGradeResponse(String status, List<String> qid, List<Double> rate, List<String> pid, List<String> score, List<String> date, List<QuestionEntity> questions) {
         this.status = status;
         this.qid = qid;
         this.rate = rate;
         this.pid = pid;
         this.score = score;
         this.date = date;
+        this.questions = questions;
     }
 
     public String getStatus() {

@@ -28,16 +28,17 @@ public class GradeController {
     private final UserRepository userRepository;
     private final PaperRepository paperRepository;
     private final QuestionRepository questionRepository;
-    //private final PaperContainsQuestionRepository paperContainsQuestionRepository;
+    private final PaperContainsQuestionRepository paperContainsQuestionRepository;
     private final HistoryGradeRepository historyGradeRepository;
    // private final ResultRepository resultRepository;
 
     @Autowired
-    public GradeController(PaperRepository paperRepository, QuestionRepository questionRepository, HistoryGradeRepository historyGradeRepository, UserRepository userRepository) {
+    public GradeController(PaperRepository paperRepository, QuestionRepository questionRepository, HistoryGradeRepository historyGradeRepository, UserRepository userRepository, PaperContainsQuestionRepository paperContainsQuestionRepository) {
         this.paperRepository = paperRepository;
         this.questionRepository = questionRepository;
         this.historyGradeRepository = historyGradeRepository;
         this.userRepository = userRepository;
+        this.paperContainsQuestionRepository = paperContainsQuestionRepository;
     }
 
   /*  @PostMapping(path = "/insert")
@@ -81,7 +82,7 @@ public class GradeController {
             if(request.getSid()!=null) {                    //老师查询
                 Optional<UserEntity> ret = userRepository.findById(request.getSid());
                 if(!ret.isPresent()){
-                    return  new ResponseEntity<>(new GetGradeResponse("No such student", null, null, null, null, null), HttpStatus.BAD_REQUEST);
+                    return  new ResponseEntity<>(new GetGradeResponse("No such student", null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
                 }
                 student = ret.get();
                 records_find =  historyGradeRepository.findByStudent(student);
@@ -89,7 +90,7 @@ public class GradeController {
             else{               //学生查询
                 Optional<UserEntity> ret = userRepository.findById(user.getUid());
                 if(!ret.isPresent()){
-                    return  new ResponseEntity<>(new GetGradeResponse("No such student", null, null, null, null, null), HttpStatus.BAD_REQUEST);
+                    return  new ResponseEntity<>(new GetGradeResponse("No such student", null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
                 }
                 student = ret.get();
                 records_find =  historyGradeRepository.findByStudent(student);
@@ -108,21 +109,22 @@ public class GradeController {
                 dates.add(i, record.getStarttime().toString());
                 i++;
             }
-            return  new ResponseEntity<>(new GetGradeResponse("Ok", null, null, pid, score, dates),HttpStatus.OK);
+            return  new ResponseEntity<>(new GetGradeResponse("Ok", null, null, pid, score, dates, null),HttpStatus.OK);
 
         }
         else{
             List<String> qid  = new ArrayList<String>();
             List <Double>rate = new ArrayList<Double>();
+            List<QuestionEntity>questions = new ArrayList<>();
 
             if(type.equals(GetGradeRequest.QueryType.PID)){
                 Optional<PapersEntity> ret1 = paperRepository.findById(request.getPid());
                 if(!ret1.isPresent()){
                     System.out.println("No such a paper");
-                    return  new ResponseEntity<>(new GetGradeResponse("No such a paper", null, null, null, null, null), HttpStatus.BAD_REQUEST);
+                    return  new ResponseEntity<>(new GetGradeResponse("No such a paper", null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
                 }
                 PapersEntity paper = ret1.get();//已经找到卷子了
-
+/*
                 int i=0;
                 double thisrate;
                 PaperContainsQuestionEntity contain;
@@ -132,16 +134,31 @@ public class GradeController {
                     contain = contain_list.next();
                     question = contain.getQuestion();
                     qid.add(i, question.getQid());
-                    thisrate = question.getCorrect()/question.getAnswerednum();
+                    thisrate = (question.getAnswerednum() == 0)? 0 : question.getCorrect()/question.getAnswerednum();
                     rate.add(i, thisrate);
                     i++;
+                }*/
+
+                double thisrate;
+                QuestionEntity question_t;
+                List<PaperContainsQuestionEntity> contain_find = paperContainsQuestionRepository.findByPaper(paper);
+                for(PaperContainsQuestionEntity contain:contain_find){
+                    question_t = contain.getQuestion();
+                    questions.add(question_t);
+                    qid.add(question_t.getQid());
+                    thisrate = (question_t.getAnswerednum() == 0)? 0 : question_t.getCorrect()/question_t.getAnswerednum();
+                    rate.add(thisrate);
+
                 }
-                return new ResponseEntity<>(new GetGradeResponse("ok", qid, rate, null,null, null),HttpStatus.OK);
+                System.out.println(questions.size());
+                return new ResponseEntity<>(new GetGradeResponse("ok", qid, rate, null,null, null, questions),HttpStatus.OK);
             }
             else {
                 int i=0;
                 double thisrate;
                 Iterable<QuestionEntity> question_find;
+                List<QuestionEntity>questionss = new ArrayList<>();
+
                 if(type.equals(GetGradeRequest.QueryType.QTYPE)){
                     question_find = questionRepository.findByQtype(request.getQtype());
                 }
@@ -150,16 +167,17 @@ public class GradeController {
                 }
                 else{
                     System.out.println("Invalid request type");
-                    return new ResponseEntity<>(new GetGradeResponse("Invalid request type", null, null, null, null, null), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<>(new GetGradeResponse("Invalid request type", null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
                 }
 
                 for(QuestionEntity question : question_find){
-                    qid.add(i, question.getQid());
-                    thisrate = question.getCorrect()/question.getAnswerednum();
-                    rate.add(i, thisrate);
-                    i++;
+                    questionss.add(question);
+                    qid.add(question.getQid());
+                    thisrate = (question.getAnswerednum() == 0) ? 0 : question.getCorrect()/question.getAnswerednum();
+                    rate.add(thisrate);
                 }
-                return new ResponseEntity<>(new GetGradeResponse("ok", qid, rate, null, null, null), HttpStatus.OK);
+
+                return new ResponseEntity<>(new GetGradeResponse("ok", qid, rate, null, null, null, questionss), HttpStatus.OK);
             }
         }
 
