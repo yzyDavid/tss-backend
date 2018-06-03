@@ -175,7 +175,7 @@ public class CourseController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<GetCoursesResponse> searchCourseByName(@RequestParam String courseName) {
-        return new ResponseEntity<>(new GetCoursesResponse(courseRepository.findByNameLike("%"+courseName+"%")), HttpStatus.OK);
+    public ResponseEntity<GetCoursesResponse> searchCourseByName(@RequestParam String name) {
+        return new ResponseEntity<>(new GetCoursesResponse(courseRepository.findByNameLike("%"+name+"%")), HttpStatus.OK);
     }
 }
