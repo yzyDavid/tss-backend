@@ -1,17 +1,15 @@
 package tss.controllers;
 
-import org.apache.catalina.User;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.*;
 import tss.exceptions.*;
+import tss.models.ClassArrangementResult;
 import tss.models.Clazz;
-import tss.models.ClazzList;
 import tss.repositories.*;
 import tss.requests.information.AddClassRegistrationRequest;
 import tss.requests.information.ConfirmClassRequest;
@@ -23,6 +21,7 @@ import java.util.*;
 
 /**
  * @author reeve
+ * @author NeverMore2744
  */
 @RestController
 @RequestMapping()
@@ -59,7 +58,6 @@ public class ClassController {
         classEntity.setYear(clazz.getYear());
         classEntity.setSemester(clazz.getSemester());
         classEntity.setCapacity(clazz.getCapacity());
-        classEntity.setNumStudent(clazz.getNumStudent());
         classEntity.setTeacher(userEntity);
         classEntity.setCourse(courseEntity);
 
@@ -68,14 +66,25 @@ public class ClassController {
         return new Clazz(classEntity);
     }
 
-    @GetMapping(path = "/classes/{classId}")
+    @GetMapping("/courses/{courseId}/classes")
+    public List<Clazz> listClasses(@PathVariable String courseId) {
+
+        CourseEntity courseEntity = courseRepository.findById(courseId).orElseThrow(CourseNotFoundException::new);
+        List<Clazz> classes = new ArrayList<>();
+        for (ClassEntity classEntity : courseEntity.getClasses()) {
+            classes.add(new Clazz(classEntity));
+        }
+        return classes;
+    }
+
+    @GetMapping("/classes/{classId}")
     @ResponseStatus(HttpStatus.OK)
     public Clazz getClass(@PathVariable long classId) {
         ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
         return new Clazz(classEntity);
     }
 
-    @DeleteMapping(path = "/classes/{classId}")
+    @DeleteMapping("/classes/{classId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeClass(@PathVariable long classId) {
 
@@ -83,41 +92,77 @@ public class ClassController {
         classRepository.delete(classEntity);
     }
 
-    @PutMapping(path = "/auto-arrangement")
+    @GetMapping("/classes/search/find-by-course-name-containing-and-year-and-semester")
     @ResponseStatus(HttpStatus.OK)
-    public void autoArrangement() {
+    public List<Clazz> findClassesByCourseNameContainingAndYearAndSemester(@RequestParam String courseName,
+                                                                           @RequestParam int year,
+                                                                           @RequestParam SemesterEnum semester) {
+
+        List<ClassEntity> classEntities = classRepository.findByCourseNameContainingAndYearAndSemester(courseName,
+                year, semester);
+        List<Clazz> classes = new ArrayList<>();
+        for (ClassEntity classEntity : classEntities) {
+            classes.add(new Clazz(classEntity));
+        }
+        return classes;
+    }
+
+    @PutMapping("/auto-arrangement")
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional(rollbackFor = Exception.class)
+    public ClassArrangementResult autoArrangement(@RequestParam int year, @RequestParam SemesterEnum semester) {
+        // Clear old arrangement records.
+        for (ClassroomEntity classroomEntity : classroomRepository.findAll()) {
+            for (TimeSlotEntity timeSlotEntity : classroomEntity.getTimeSlots()) {
+                timeSlotEntity.setClazz(null);
+            }
+        }
+
+        // Wrap ClassEntities with ClassItems.
         List<ClassItem> classItems = new ArrayList<>();
-        for (ClassEntity classEntity : classRepository.findAll()) {
+        for (ClassEntity classEntity : classRepository.findByYearAndSemester(year, semester)) {
             ClassItem classItem = new ClassItem(classEntity);
             if (!classItem.hasNoLeftSection()) {
                 classItems.add(classItem);
             }
         }
 
+        // Auto-arrange.
+        int count = 0;
         for (ClassroomEntity classroomEntity : classroomRepository.findAll()) {
             if (classItems.size() == 0) {
                 break;
             }
+
             for (TimeSlotEntity timeSlotEntity : classroomEntity.getTimeSlots()) {
                 if (classItems.size() == 0) {
                     break;
                 }
+
                 final int timeSlotSize = timeSlotEntity.getType().getSize();
                 for (int i = 0; i < classItems.size(); i++) {
                     ClassItem classItem = classItems.get(i);
+
                     if (classItem.getNumLeftSectionsOfSize(timeSlotSize) > 0) {
                         classItem.getClassEntity().addTimeSlot(timeSlotEntity);
-                        timeSlotRepository.save(timeSlotEntity);
                         classItem.setNumLeftSectionsOfSize(timeSlotSize, classItem.getNumLeftSectionsOfSize(timeSlotSize) - 1);
                         if (classItem.hasNoLeftSection()) {
-                            Collections.swap(classItems, i, classItems.size());
-                            classItems.remove(classItems.size());
+                            Collections.swap(classItems, i, classItems.size() - 1);
+                            classItems.remove(classItems.size() - 1);
+                            count++;
                         }
                         break;
                     }
                 }
             }
         }
+
+        // Statics.
+        List<Long> pendingClassIds = new ArrayList<>();
+        for (ClassItem classItem : classItems) {
+            pendingClassIds.add(classItem.getClassId());
+        }
+        return new ClassArrangementResult(count, pendingClassIds);
     }
 
     @GetMapping("/classes/search/findByCourseName")
@@ -148,8 +193,9 @@ public class ClassController {
 
         if (year == null || semester == null) {
             classes = classRepository.findByCourse_Id(courseId);
+        } else {
+            classes = classRepository.findByCourse_IdAndYearAndSemester(courseId, year, semester);
         }
-        else classes = classRepository.findByCourse_IdAndYearAndSemester(courseId, year, semester);
         /*
         if (classes.isEmpty()) {
             ...
@@ -164,7 +210,7 @@ public class ClassController {
                                                    @RequestParam(required = false) Integer year,
                                                    @RequestParam(required = false) SemesterEnum semester) {
 
-        List<UserEntity> teachers = userRepository.findByNameLikeAndType_Name("%"+teacherName+"%", "System Administrator");
+        List<UserEntity> teachers = userRepository.findByNameLikeAndType_Name("%" + teacherName + "%", "System Administrator");
         /*
         if (teachers.isEmpty()) {
             ...
@@ -383,6 +429,11 @@ class ClassItem {
                 break;
             case 6:
                 numLeftSectionsOfSizeThree = 2;
+                break;
+            case 7:
+                numLeftSectionsOfSizeTwo = 2;
+                numLeftSectionsOfSizeThree = 1;
+                break;
             default:
         }
         classId = classEntity.getId();
@@ -430,5 +481,15 @@ class ClassItem {
 
     void setClassEntity(ClassEntity classEntity) {
         this.classEntity = classEntity;
+    }
+
+    @Override
+    public String toString() {
+        return "ClassItem{" +
+                "classId=" + classId +
+                ", numLeftSectionsOfSizeTwo=" + numLeftSectionsOfSizeTwo +
+                ", numLeftSectionsOfSizeThree=" + numLeftSectionsOfSizeThree +
+                ", classEntity=" + classEntity +
+                '}';
     }
 }

@@ -1,8 +1,6 @@
 package tss.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * @author reeve
@@ -87,16 +85,5 @@ public enum TimeSlotTypeEnum {
 
     public int getSize() {
         return end - start + 1;
-    }
-
-    @JsonCreator
-    public static TimeSlotTypeEnum toValue(String name) {
-        return valueOf(name);
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-        return super.toString();
     }
 }
