@@ -147,7 +147,8 @@ public class PaperController {
                 }
                 else{
                     System.out.println("Set is not full! "+i);
-                    break;
+                    return new ResponseEntity<>(new AddPaperResponse("not enough questions!", paper.getPid()), HttpStatus.BAD_REQUEST);
+
                 }
             }
         }
