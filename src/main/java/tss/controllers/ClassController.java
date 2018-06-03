@@ -15,6 +15,7 @@ import tss.requests.information.AddClassRegistrationRequest;
 import tss.requests.information.ConfirmClassRequest;
 import tss.requests.information.ModifyClassRegistrationRequest;
 import tss.responses.information.GetClassesResponse;
+import tss.responses.information.GetSelectedClassesResponse;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -166,6 +167,7 @@ public class ClassController {
     }
 
     @GetMapping("/classes/search/findByCourseName")
+    @Authorization
     @ResponseStatus(HttpStatus.OK)
     public GetClassesResponse searchClassByName(@RequestParam String name,
                                                 @RequestParam(required = false) Integer year,
@@ -185,6 +187,7 @@ public class ClassController {
     }
 
     @GetMapping("/classes/search/findByCourseId")
+    @Authorization
     @ResponseStatus(HttpStatus.OK)
     public GetClassesResponse searchClassById(@RequestParam String courseId,
                                               @RequestParam(required = false) Integer year,
@@ -205,6 +208,7 @@ public class ClassController {
     }
 
     @GetMapping("/classes/search/findByTeacher")
+    @Authorization
     @ResponseStatus(HttpStatus.OK)
     public GetClassesResponse searchClassByTeacher(@RequestParam String teacherName,
                                                    @RequestParam(required = false) Integer year,
@@ -281,13 +285,10 @@ public class ClassController {
     }
 
     @PostMapping(path = "/classes/register")
-    //@Authorization
+    @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public void addClassRegistration(/*@CurrentUser UserEntity user, */@RequestBody AddClassRegistrationRequest request) {
-        // test
-        UserEntity user = userRepository.findById("3150100001").orElseThrow(UserNotFoundException::new);
-
-        Long classId = request.getClassId();
+    public void addClassRegistration(@CurrentUser UserEntity user, @RequestBody AddClassRegistrationRequest request) {
+        long classId = request.getClassId();
         System.out.print(classId);
         ClassEntity clazz = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
         /*
@@ -299,8 +300,9 @@ public class ClassController {
             throw new UserNotStudentException();
         }
         ClassStatusEnum classStatusEnum = ClassStatusEnum.SELECTED;
+        String crid = user.getUid()+"CR"+classId;
         ClassRegistrationEntity classRegistrationEntity =
-                new ClassRegistrationEntity(0, user, clazz, user.getUid()+"CR"+classId.toString(),
+                new ClassRegistrationEntity(0, user, clazz, crid,
                         classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
                 //new ClassRegistrationEntity(0, user, clazz, classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
         classRegistrationRepository.save(classRegistrationEntity);
@@ -311,9 +313,9 @@ public class ClassController {
     }
 
     @PutMapping(path = "/classes/confirm")
-    //@Authorization
+    @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public void confirmClass(@CurrentUser UserEntity user, @RequestBody ConfirmClassRequest request) {
+    public void confirmClass(@RequestBody ConfirmClassRequest request) {
         String userId = request.getUid();
         Long classId = request.getClassId();
         Optional<ClassEntity> clazz = classRepository.findById(classId);
@@ -325,8 +327,9 @@ public class ClassController {
             throw new UserNotStudentException();
         }
 
-        ClassRegistrationId id = new ClassRegistrationId(student.get(), clazz.get());
-        Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findById(id);
+        //ClassRegistrationId id = new ClassRegistrationId(student.get(), clazz.get());
+        String id = userId + "CR" + classId.toString();
+        Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findByCrid(id);
         if (!cr.isPresent()) {
             throw new ClassNotRegisteredException();
         }
@@ -341,9 +344,9 @@ public class ClassController {
     }
 
     @PutMapping(path = "/classes/finish")
-    //@Authorization
+    @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public void finishClass(@CurrentUser UserEntity user, @RequestBody ModifyClassRegistrationRequest request) {
+    public void finishClass(@RequestBody ModifyClassRegistrationRequest request) {
         String userId = request.getUid();
         Long classId = request.getClassId();
         Optional<ClassEntity> clazz = classRepository.findById(classId);
@@ -355,8 +358,9 @@ public class ClassController {
             throw new UserNotStudentException();
         }
 
-        ClassRegistrationId id = new ClassRegistrationId(student.get(), clazz.get());
-        Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findById(id);
+        //ClassRegistrationId id = new ClassRegistrationId(student.get(), clazz.get());
+        String id = userId + "CR" + classId.toString();
+        Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findByCrid(id);
         if (!cr.isPresent()) {
             throw new ClassNotRegisteredException();
         }
@@ -372,9 +376,9 @@ public class ClassController {
     }
 
     @PutMapping(path = "/classes/fail")
-    //@Authorization
+    @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public void failClass(@CurrentUser UserEntity user, @RequestBody ConfirmClassRequest request) {
+    public void failClass(@RequestBody ConfirmClassRequest request) {
         String userId = request.getUid();
         Long classId = request.getClassId();
         Optional<ClassEntity> clazz = classRepository.findById(classId);
@@ -386,8 +390,9 @@ public class ClassController {
             throw new UserNotStudentException();
         }
 
-        ClassRegistrationId id = new ClassRegistrationId(student.get(), clazz.get());
-        Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findById(id);
+        //ClassRegistrationId id = new ClassRegistrationId(student.get(), clazz.get());
+        String id = userId + "CR" + classId.toString();
+        Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findByCrid(id);
         if (!cr.isPresent()) {
             throw new ClassNotRegisteredException();
         }
@@ -399,6 +404,24 @@ public class ClassController {
         classRegistration.setStatus(ClassStatusEnum.FAILED);
         classRegistration.setConfirmTime(new Timestamp(System.currentTimeMillis()));
         classRegistrationRepository.save(classRegistration);
+    }
+
+    // semester = "FIRST" / "SECOND"
+    @GetMapping(path = "/get_selected/{year}/{semester}")
+    @Authorization
+    public GetSelectedClassesResponse getClassesTable(
+            @CurrentUser UserEntity user,
+            @RequestParam Integer year,
+            @RequestParam SemesterEnum semester) {
+
+        List<ClassEntity> classesSelected = new ArrayList<>();
+        List<ClassRegistrationEntity> classesRegistered = classRegistrationRepository.findByStudent(user);
+
+        for (ClassRegistrationEntity cr : classesRegistered) {
+            classesSelected.add(cr.getClazz());
+        }
+
+        return new GetSelectedClassesResponse(classesSelected);
     }
 
 }

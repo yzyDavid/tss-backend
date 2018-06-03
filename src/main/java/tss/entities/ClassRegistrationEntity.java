@@ -34,7 +34,7 @@ public class ClassRegistrationEntity {
     @JoinColumn(name = "class_id")
     private ClassEntity clazz;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private ClassStatusEnum status;
 
     @Column(name = "register_time")
@@ -52,6 +52,8 @@ public class ClassRegistrationEntity {
         this.crid = crid; //= new ClassRegistrationId(student, clazz);
         this.score = score;
         this.status = status;
+        this.student = student;
+        this.clazz = clazz;
         this.selectTime = selectTime;
         this.confirmTime = confirmTime;
     }

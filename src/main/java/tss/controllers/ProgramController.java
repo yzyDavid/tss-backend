@@ -8,10 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
-import tss.entities.CourseEntity;
-import tss.entities.ProgramCourseEntity;
-import tss.entities.ProgramEntity;
-import tss.entities.UserEntity;
+import tss.entities.*;
 import tss.repositories.CourseRepository;
 import tss.repositories.ProgramCourseRepository;
 import tss.repositories.ProgramRepository;
@@ -19,9 +16,7 @@ import tss.repositories.UserRepository;
 import tss.requests.information.*;
 import tss.responses.information.*;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 @RequestMapping(path = "program")
@@ -141,4 +136,26 @@ public class ProgramController {
 
         return new ResponseEntity<>(new DeleteCourseinProgramResponse("ok", cid, cname,pid), HttpStatus.OK);
     }
+/*
+    @GetMapping("/status")
+    @Authorization
+    public ResponseEntity<GetProgramCoursesResponse> getProgramCourses(@CurrentUser UserEntity user) {
+        String uid = user.getUid();
+        MajorEntity major = user.getMajorClass().getMajor();
+        Set<CourseEntity> coursesCompulsory = major.getSetOfCompulsory();
+        Set<CourseEntity> coursesSelective = major.getSetOfSelective();
+        Set<CourseEntity> coursesPublic = major.getSetOfPublic();
+
+        List<CourseEntity> courses_final = new ArrayList<>();
+        List<Integer> courses_type = new ArrayList<>();
+        List<Integer> courses_status = new ArrayList<>();
+
+        for (CourseEntity course : coursesCompulsory) {
+
+        }
+
+        return new ResponseEntity<>(new GetProgramCoursesResponse(courses_final, courses_type), HttpStatus.OK);
+    }
+    */
+
 }

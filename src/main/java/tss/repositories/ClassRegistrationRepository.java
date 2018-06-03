@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import tss.entities.ClassRegistrationEntity;
 import tss.entities.ClassRegistrationId;
+import tss.entities.UserEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,5 +13,6 @@ import java.util.Optional;
  * @author reeve
  */
 public interface ClassRegistrationRepository extends JpaRepository<ClassRegistrationEntity, ClassRegistrationId> {
-    public Optional<ClassRegistrationEntity> findById(ClassRegistrationId id);
+    public Optional<ClassRegistrationEntity> findByCrid(String crid);
+    public List<ClassRegistrationEntity> findByStudent(UserEntity student);
 }

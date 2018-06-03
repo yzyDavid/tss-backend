@@ -19,6 +19,7 @@ public class MajorEntity {
     private Set<MajorClassEntity> classes = new HashSet<>();
     private Set<CourseEntity> setOfCompulsory = new HashSet<>();
     private Set<CourseEntity> setOfSelective = new HashSet<>();
+    private Set<CourseEntity> setOfPublic = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -112,6 +113,14 @@ public class MajorEntity {
         this.setOfSelective = courses;
     }
 
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "major")
+    public Set<CourseEntity> getSetOfPublic() {
+        return setOfPublic;
+    }
+
+    public void setSetOfPublic(Set<CourseEntity> setOfPublic) {
+        this.setOfPublic = setOfPublic;
+    }
 
     @Override
     public boolean equals(Object obj) {
