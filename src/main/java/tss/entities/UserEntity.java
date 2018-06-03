@@ -72,7 +72,6 @@ public class UserEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", orphanRemoval = true)
     private List<ClassRegistrationEntity> classRegistrations = new ArrayList<>();
 
-
     public String getGender() {
         return gender;
     }

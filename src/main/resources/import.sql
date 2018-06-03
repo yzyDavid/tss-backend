@@ -10,7 +10,6 @@ insert into classroom (id, capacity, name, building_id) values (1, 120, '101', 1
 insert into time_slot (id, type, classroom_id, class_id) values (1, 'MON_1_2', 1, 10001);
 insert into major_class(id, class_name, year) values (1, '计算机科学与技术1515', 4);
 insert into major_class(id, class_name, year) values (2, '计算机科学与技术1516', 4);
-insert into class_registration(clazz_id, student_user_id) values (10001, '3150100000');
-insert into class_registration(clazz_id, student_user_id) values (10001, '3150100001');
-insert into user(user_id, email, gender, user_name, telephone, department_id, class_id) values ('3150100000', 'zzz@zju.edu.cn', 'boy', '测试1', '13888888888', 0, 1);
-insert into user(user_id, email, gender, user_name, telephone, department_id, class_id) values ('3150100001', 'yyy@zju.edu.cn', 'boy', '测试2', '13999999999', 0, 2);
+insert into user(user_id, email, gender, user_name, telephone, department_id, class_id, group_id) values ('3150100000', 'zzz@zju.edu.cn', 'boy', '测试1', '13888888888', 0, 1, 2);
+insert into user(user_id, email, gender, user_name, telephone, department_id, class_id, group_id) values ('3150100001', 'yyy@zju.edu.cn', 'boy', '测试2', '13999999999', 0, 2, 4);
+insert into user(user_id, email, gender, user_name, telephone, department_id, class_id, group_id) values ('3150100005', 'ydy@zju.edu.cn', 'boy', '测试2', '13994239999', 0, 2, 3);

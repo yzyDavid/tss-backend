@@ -1,5 +1,7 @@
 package tss.entities;
 
+import org.apache.catalina.User;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,50 +12,53 @@ import java.util.Objects;
 @Embeddable
 public class ClassRegistrationId implements Serializable {
 
-    @Column(name = "student_id")
-    private String studentId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "student_id")
+    private UserEntity student;
 
-    @Column(name = "class_id")
-    private Long classId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "class_id")
+    private ClassEntity clazz;
 
     public ClassRegistrationId() {
+        super();
     }
 
-    public ClassRegistrationId(String studentId, Long classId) {
-        this.studentId = studentId;
-        this.classId = classId;
+    public ClassRegistrationId(UserEntity student, ClassEntity clazz) {
+        this.student = student;
+        this.clazz = clazz;
     }
 
-    public String getStudentId() {
-        return studentId;
+    @Column(name = "student_id", nullable = false)
+    public UserEntity getStudent() {
+        return student;
     }
 
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
+    public void setStudent(UserEntity student) {
+        this.student = student;
     }
 
-    public Long getClassId() {
-        return classId;
+    @Column(name = "class_id", nullable = false)
+    public ClassEntity getClazz() {
+        return clazz;
     }
 
-    public void setClassId(Long classId) {
-        this.classId = classId;
+    public void setClazz(ClassEntity clazz) {
+        this.clazz = clazz;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (!(o instanceof ClassRegistrationId)) return false;
         ClassRegistrationId that = (ClassRegistrationId) o;
-        return Objects.equals(studentId, that.studentId) && Objects.equals(classId, that.classId);
+        return Objects.equals(getStudent(), that.getStudent()) &&
+                Objects.equals(getClazz(), that.getClazz());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(studentId, classId);
+
+        return Objects.hash(getStudent(), getClazz());
     }
 }
