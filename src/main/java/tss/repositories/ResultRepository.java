@@ -12,8 +12,8 @@ public interface ResultRepository extends CrudRepository<ResultEntity, String> {
 
     List<ResultEntity> findByStudent(UserEntity student);
 
-    List<ResultEntity> findByQuestion(QuestionEntity question);
+   // List<ResultEntity> findByQuestion(QuestionEntity question);
 
-    List<ResultEntity> findByPaper(PapersEntity paper);
+   // List<ResultEntity> findByPaper(PapersEntity paper);
 
 }

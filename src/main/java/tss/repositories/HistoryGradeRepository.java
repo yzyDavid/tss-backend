@@ -12,6 +12,6 @@ public interface HistoryGradeRepository extends CrudRepository<HistoryGradeEntit
 
     List<HistoryGradeEntity> findByStudent(UserEntity student);
 
-    List<HistoryGradeEntity> findByPaper(PapersEntity paper);
+    //List<HistoryGradeEntity> findByPaper(PapersEntity paper);
 
 }
