@@ -174,8 +174,8 @@ public class CourseController {
         return new ResponseEntity<>(new QueryCoursesResponse("OK", cids, names, departments), HttpStatus.OK);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<GetCoursesResponse> searchCourseByName(@RequestParam String name) {
-        return new ResponseEntity<>(new GetCoursesResponse(courseRepository.findByNameLike("%"+name+"%")), HttpStatus.OK);
+    @PostMapping("/search")
+    public ResponseEntity<GetCoursesResponse> searchCourseByName(@RequestBody BasicStringRequest request) {
+        return new ResponseEntity<>(new GetCoursesResponse(courseRepository.findByNameLike("%"+request.getContent()+"%")), HttpStatus.OK);
     }
 }
