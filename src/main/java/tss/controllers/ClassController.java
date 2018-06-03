@@ -14,9 +14,11 @@ import tss.repositories.*;
 import tss.requests.information.AddClassRegistrationRequest;
 import tss.requests.information.ConfirmClassRequest;
 import tss.requests.information.ModifyClassRegistrationRequest;
+import tss.responses.information.BasicResponse;
 import tss.responses.information.GetClassesResponse;
 import tss.responses.information.GetSelectedClassesResponse;
 
+import javax.persistence.Basic;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -238,6 +240,7 @@ public class ClassController {
     }
 
     @GetMapping("/classes/search/findByBoth")
+    @Authorization
     @ResponseStatus(HttpStatus.OK)
     public GetClassesResponse searchClassByBoth(@RequestParam String courseName,
                                                 @RequestParam String teacherName,
@@ -287,7 +290,7 @@ public class ClassController {
     @PostMapping(path = "/classes/register")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public void addClassRegistration(@CurrentUser UserEntity user, @RequestBody AddClassRegistrationRequest request) {
+    public BasicResponse addClassRegistration(@CurrentUser UserEntity user, @RequestBody AddClassRegistrationRequest request) {
         long classId = request.getClassId();
         System.out.print(classId);
         ClassEntity clazz = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
@@ -306,16 +309,14 @@ public class ClassController {
                         classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
                 //new ClassRegistrationEntity(0, user, clazz, classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
         classRegistrationRepository.save(classRegistrationEntity);
-        /*
-         *
-         * TODO: the joint between tables
-         */
+
+        return new BasicResponse("Class registered successfully!");
     }
 
     @PutMapping(path = "/classes/confirm")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public void confirmClass(@RequestBody ConfirmClassRequest request) {
+    public BasicResponse confirmClass(@RequestBody ConfirmClassRequest request) {
         String userId = request.getUid();
         Long classId = request.getClassId();
         Optional<ClassEntity> clazz = classRepository.findById(classId);
@@ -341,12 +342,14 @@ public class ClassController {
         classRegistration.setStatus(ClassStatusEnum.CONFIRMED);
         classRegistration.setConfirmTime(new Timestamp(System.currentTimeMillis()));
         classRegistrationRepository.save(classRegistration);
+
+        return new BasicResponse("Class confirmed");
     }
 
     @PutMapping(path = "/classes/finish")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public void finishClass(@RequestBody ModifyClassRegistrationRequest request) {
+    public BasicResponse finishClass(@RequestBody ModifyClassRegistrationRequest request) {
         String userId = request.getUid();
         Long classId = request.getClassId();
         Optional<ClassEntity> clazz = classRepository.findById(classId);
@@ -373,12 +376,14 @@ public class ClassController {
         classRegistration.setScore(request.getScore());
         classRegistration.setConfirmTime(new Timestamp(System.currentTimeMillis()));
         classRegistrationRepository.save(classRegistration);
+
+        return new BasicResponse("Class finished.");
     }
 
     @PutMapping(path = "/classes/fail")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public void failClass(@RequestBody ConfirmClassRequest request) {
+    public BasicResponse failClass(@RequestBody ConfirmClassRequest request) {
         String userId = request.getUid();
         Long classId = request.getClassId();
         Optional<ClassEntity> clazz = classRepository.findById(classId);
@@ -404,23 +409,28 @@ public class ClassController {
         classRegistration.setStatus(ClassStatusEnum.FAILED);
         classRegistration.setConfirmTime(new Timestamp(System.currentTimeMillis()));
         classRegistrationRepository.save(classRegistration);
+
+        return new BasicResponse("Class failed.");
     }
 
     // semester = "FIRST" / "SECOND"
-    @GetMapping(path = "/get_selected/{year}/{semester}")
+    @GetMapping(path = "/classes/get_selected/{year}/{semester}")
     @Authorization
+    @ResponseStatus(HttpStatus.OK)
     public GetSelectedClassesResponse getClassesTable(
             @CurrentUser UserEntity user,
-            @RequestParam Integer year,
-            @RequestParam SemesterEnum semester) {
+            @PathVariable Integer year,
+            @PathVariable SemesterEnum semester) {
 
         List<ClassEntity> classesSelected = new ArrayList<>();
         List<ClassRegistrationEntity> classesRegistered = classRegistrationRepository.findByStudent(user);
 
         for (ClassRegistrationEntity cr : classesRegistered) {
-            classesSelected.add(cr.getClazz());
+            ClassEntity clazz = cr.getClazz();
+            if (!clazz.getYear().equals(year) || !clazz.getSemester().equals(semester))
+                continue;
+            classesSelected.add(clazz);
         }
-
         return new GetSelectedClassesResponse(classesSelected);
     }
 

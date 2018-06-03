@@ -2,11 +2,12 @@ Program and class selection APIs
 
 ### 1. 培养方案制定功能
 
-|  方法  |       uri       |                        请求参数(json)                        |                      返回参数(json)                       |          说明          |
-| :----: | :-------------: | :----------------------------------------------------------: | :-------------------------------------------------------: | :--------------------: |
-|  PUT   |       ???       |                   uid:String[] (required)                    |                      status: String                       | 为某个用户添加培养方案 |
-|  PUT   | /program/course | cid:String[] (required)<br>pid:String[] (required)<br>uid:String[] (required)<br>type:Integer[] (required) |                       status:String                       |  在培养方案中添加课程  |
-| DELETE | /program/course |     cid:String[] (required) <br>pid:String[] (required)      | status:String<br>cid:String<br>cname:String<br>uid:String |  在培养方案中删除课程  |
+|  方法  |           uri           |                        请求参数(json)                        |                      返回参数(json)                       |          说明          |
+| :----: | :---------------------: | :----------------------------------------------------------: | :-------------------------------------------------------: | :--------------------: |
+|  PUT   |           ???           |                   uid:String[] (required)                    |                      status: String                       | 为某个用户添加培养方案 |
+|  PUT   |     /program/course     | cid:String[] (required)<br>pid:String[] (required)<br>uid:String[] (required)<br>type:Integer[] (required) |                       status:String                       |  在培养方案中添加课程  |
+| DELETE |     /program/course     |     cid:String[] (required) <br>pid:String[] (required)      | status:String<br>cid:String<br>cname:String<br>uid:String |  在培养方案中删除课程  |
+|  GET   | /program/show_selection |                              无                              |                        List{<br>}                         |                        |
 
 ### 2. 选课相关
 
@@ -32,4 +33,13 @@ url请求参数举例。如findByboth:
 | PUT  |          /classes/finish          |  **json**:<br>uid:String[]<br> classId: Long score: Integer  |                        status:String                         |            确认完成此课程，uid是学生的id             | 管理员/老师 |
 | PUT  |          /classes/fail          |       **json:**<br>uid: String[]<br>classId: Long<br>        |                        status: String                        |             确认某课已挂，uid是学生的id              | 管理员/老师 |
 
-### 3. 选课功能
+### 3. 选课结果
+
+| 方法 |                   uri                   | 请求参数(json) |                        返回参数(json)                        |     说明     |
+| :--: | :-------------------------------------: | :------------: | :----------------------------------------------------------: | :----------: |
+| GET  | /classes/get_selected/{year}/{semester} |       -        | List{<br>courseId:String<br>courseName:String<br>credit:Float<br>timeSlot:String<br>teacher:String<br>classroom:String<br>} | 查看选课结果 |
+|      |                                         |                |                                                              |              |
+|      |                                         |                |                                                              |              |
+|      |                                         |                |                                                              |              |
+
+### 

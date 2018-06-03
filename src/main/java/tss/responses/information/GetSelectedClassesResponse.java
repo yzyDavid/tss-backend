@@ -84,6 +84,7 @@ public class GetSelectedClassesResponse {
             teacher = clazz.getTeacher().getName();
             timeSlot = "";
             classroom = "";
+            credit = clazz.getCourse().getCredit();
             List<TimeSlotEntity> ts = clazz.getTimeSlots();
             Integer size = ts.size();
             for (TimeSlotEntity t : ts) {
