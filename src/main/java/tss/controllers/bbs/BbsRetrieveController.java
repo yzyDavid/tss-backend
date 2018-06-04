@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import sun.util.resources.ga.LocaleNames_ga;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.UserEntity;
@@ -170,32 +171,29 @@ public class BbsRetrieveController {
 
 
     /**
-     * read a message with certain id
-     * request body: id
-     * permission: mes to him
-     * return: id, s-id, r-id, content, time
+     * confirm a message to be read
+     * with certain id
+     * v1.0, done
      */
     @PostMapping(path = "/read")
-    @Authorization
-    public ResponseEntity<ReadBbsRetrieveResponse> readRetrieveById(@CurrentUser UserEntity user,
+    //@Authorization
+    public ResponseEntity<ReadBbsRetrieveResponse> readRetrieveById(//@CurrentUser UserEntity user,
                                                                     @RequestBody ReadBbsRetrieveRequest request) {
         /* invalid id */
-        long id = request.getId();
-        Optional<BbsRetrieveEntity> ret = bbsRetrieveRepository.findById(id);
+        Optional<BbsRetrieveEntity> ret = bbsRetrieveRepository.findById(Long.valueOf(request.getLetterId()));
         if (!ret.isPresent()) {
-            return new ResponseEntity<>(new ReadBbsRetrieveResponse("no such mesg", -1, null, null, null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ReadBbsRetrieveResponse("no such mesg"), HttpStatus.BAD_REQUEST);
         }
 
-        BbsRetrieveEntity mesg = ret.get();
-        /* permission denied */
-        if (!user.getUid().equals(mesg.getReceiver().getUid())) {
-            return new ResponseEntity<>(new ReadBbsRetrieveResponse("permission denied", -1, null, null, null, null), HttpStatus.FORBIDDEN);
-        }
+        BbsRetrieveEntity msg = ret.get();
 
-        mesg.setIsChecked(true);
+        msg.setIsChecked(true);
 
-        return new ResponseEntity<>(new ReadBbsRetrieveResponse("ok", id, mesg.getSender().getUid(),
-                mesg.getReceiver().getUid(), mesg.getContent(), mesg.getTime()), HttpStatus.OK);
+        bbsRetrieveRepository.save(msg);
+
+        return new ResponseEntity<>(new ReadBbsRetrieveResponse("confirm succuess!"), HttpStatus.OK);
     }
 
+
+    //@PostMapping(path = "")
 }

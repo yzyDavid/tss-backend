@@ -2,13 +2,11 @@ package tss.responses.information.bbs;
 
 import org.jetbrains.annotations.Nls;
 
-import java.util.Date;
-
-public class ReadBbsRetrieveResponse {
+public class ConfirmReplyReadResponse {
     @Nls
     private final String status;
 
-    public ReadBbsRetrieveResponse(String status) {
+    public ConfirmReplyReadResponse(String status) {
         this.status = status;
     }
 

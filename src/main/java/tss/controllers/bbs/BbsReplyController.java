@@ -4,10 +4,7 @@ import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.UserEntity;
@@ -16,20 +13,12 @@ import tss.entities.bbs.BbsTopicEntity;
 import tss.repositories.UserRepository;
 import tss.repositories.bbs.BbsReplyRepository;
 import tss.repositories.bbs.BbsTopicRepository;
-import tss.requests.information.bbs.AddBbsReplyRequest;
-import tss.requests.information.bbs.DeleteBbsReplyRequest;
-import tss.requests.information.bbs.GetAllReplyRequest;
-import tss.requests.information.bbs.ModifyReplyContentRequest;
-import tss.responses.information.bbs.AddBbsReplyResponse;
-import tss.responses.information.bbs.DeleteBbsReplyResponse;
-import tss.responses.information.bbs.GetAllReplyResponse;
-import tss.responses.information.bbs.ModifyReplyContentResponse;
+import tss.requests.information.bbs.*;
+import tss.responses.information.bbs.*;
 
+import javax.persistence.Column;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 @RequestMapping(path = "/reply")
@@ -68,10 +57,10 @@ public class BbsReplyController {
 
         // FIXME
         UserEntity user = new UserEntity();
-        user.setUid("1520");
-        user.setName("xiaoy");
-        user.setSalt("123");
-        user.setHashedPassword("324234");
+        user.setUid("9669");
+        user.setName("kobe");
+        user.setSalt("12");
+        user.setHashedPassword("601");
 
         reply.setAuthor(user);
         reply.setBelongedTopic(topic);
@@ -90,10 +79,30 @@ public class BbsReplyController {
         reply.setQuoteIndex(Integer.valueOf(request.getQuoteIndex()));
         reply.setIndex(topic.getReplyNum() + 1);
 
+        String quoteIndex = request.getQuoteIndex();
+
+        /* if quoted, the one quoted, unread ++
+         * wait to be confirm
+         */
+        if(Integer.valueOf(quoteIndex) != 0){
+            /* do to the quoted one, unread ++ */
+            BbsReplyEntity quoted = bbsReplyRepository.findByBelongedTopicAndIndex(topic, Integer.valueOf(quoteIndex));
+            quoted.setUnread(quoted.getUnread()+1);
+            bbsReplyRepository.save(quoted);
+
+            /* this reply unread */
+            reply.setStatus(0);
+        }else{
+            reply.setStatus(-1);
+        }
+
+        /* the new reply has not been quoted */
+        reply.setUnread(0);
         bbsReplyRepository.save(reply);
 
         /* need to add the reply number in the topic */
         topic.setReplyNum(topic.getReplyNum() + 1);
+
         bbsTopicRepository.save(topic);
 
         return new ResponseEntity<>(new AddBbsReplyResponse("add ok"), HttpStatus.OK);
@@ -247,5 +256,41 @@ public class BbsReplyController {
         }
 
         return new ResponseEntity<>(new GetAllReplyResponse(title, totalPage, currentPage, postTime, boardName, boardID, topicID, lzid, lztext,lzphoto,lztime,lzname,ids, texts, quotes, times, photos, indexs, quoteAuthors, quoteTimes, quoteIndexs, names), HttpStatus.OK);
+    }
+
+
+    /**
+     * confirm a reply to be read
+     * - the reply itself, change the status
+     * - the quoted one, decrease the unread
+     * v1.0, done
+     */
+    @PostMapping(path = "/confirm")
+    //@Authorization
+    public ResponseEntity<ConfirmReplyReadResponse> confirmReplyRead(//@CurrentUser UserEntity user,
+                                                                     @RequestBody ConfirmReplyReadRequest request){
+        Integer index = Integer.valueOf(request.getReplyPos());
+        BbsTopicEntity topic = bbsTopicRepository.findById(Long.valueOf(request.getTopicID())).get();
+
+        BbsReplyEntity reply = bbsReplyRepository.findByBelongedTopicAndIndex(topic, index);
+        reply.setStatus(1);
+
+        BbsReplyEntity quoted = bbsReplyRepository.findByBelongedTopicAndIndex(topic, reply.getQuoteIndex());
+        quoted.setUnread(quoted.getUnread()-1);
+        bbsReplyRepository.save(quoted);
+        bbsReplyRepository.save(reply)`;
+
+        return new ResponseEntity<>(new ConfirmReplyReadResponse("confirm ok!"), HttpStatus.OK);
+    }
+
+
+    /**
+     * show unread
+     * v1.0, done
+     */
+    @GetMapping(path = "/unread")
+    @Authorization
+    public ResponseEntity<CountUnreadResponse> countUnread(@CurrentUser UserEntity user){
+        
     }
 }

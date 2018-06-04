@@ -342,4 +342,31 @@ public class BbsTopicController {
 
         return new ResponseEntity<>(new SetTopicTopResponse("set top ok"), HttpStatus.OK);
     }
+
+
+    @PostMapping(path = "/setntop")
+    //@Authorization
+    public ResponseEntity<SetTopicNotTopResponse> setTopicNotTop(//@CurrentUser UserEntity user,
+                                                                 @RequestBody SetTopicNotTopRequest request) {
+        /* invalid topic id error */
+        Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTopicID()));
+        if (!ret.isPresent()) {
+            return new ResponseEntity<>(new SetTopicNotTopResponse("no such topic"), HttpStatus.BAD_REQUEST);
+        }
+
+        BbsTopicEntity topic = ret.get();
+
+//        if (!Config.TYPES[1].equals(user.readTypeName())) {
+//            return new ResponseEntity<>(new SetTopicTopResponse("permission denied!"), HttpStatus.BAD_REQUEST);
+//        }
+
+        if (topic.getIsTop()) {
+            return new ResponseEntity<>(new SetTopicNotTopResponse("the topic is not top"), HttpStatus.BAD_REQUEST);
+        }
+
+        topic.setIsTop(false);
+        bbsTopicRepository.save(topic);
+
+        return new ResponseEntity<>(new SetTopicNotTopResponse("cancel top ok"), HttpStatus.OK);
+    }
 }
