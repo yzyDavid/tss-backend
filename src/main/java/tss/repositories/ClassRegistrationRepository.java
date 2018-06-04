@@ -11,8 +11,12 @@ import java.util.Optional;
  * @author reeve
  */
 public interface ClassRegistrationRepository extends JpaRepository<ClassRegistrationEntity, ClassRegistrationId> {
-    public Optional<ClassRegistrationEntity> findByCrid(String crid);
-    public List<ClassRegistrationEntity> findByStudent(UserEntity student);
-    public List<ClassRegistrationEntity> findByStudentAndClazz(UserEntity student, ClassEntity clazz);
-    public Optional<ClassRegistrationEntity> findByStudentAndClazz_Course(UserEntity student, CourseEntity course);
+    boolean existsByCrid(String crid);
+
+    boolean existsByStudentAndClazz_Course(UserEntity student, CourseEntity course);
+
+    Optional<ClassRegistrationEntity> findByCrid(String crid);
+    List<ClassRegistrationEntity> findByStudent(UserEntity student);
+    List<ClassRegistrationEntity> findByStudentAndClazz(UserEntity student, ClassEntity clazz);
+    Optional<ClassRegistrationEntity> findByStudentAndClazz_Course(UserEntity student, CourseEntity course);
 }

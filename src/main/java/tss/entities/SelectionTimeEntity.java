@@ -6,73 +6,75 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "selection_time")
 public class SelectionTimeEntity {
-    private int stid;
-    private Timestamp startTime;
-    private Timestamp endTime;
-    private boolean regiPerm; // registrationPermissive
-    private boolean dismPerm; // dismissPermissive
-    private boolean lowCrePerm; // lowCreditRegistrationPermissive
-    private boolean compPerm; // complementPermissive
+    private int id;
+    private Timestamp start;
+    private Timestamp end;
+    private boolean register; // registrationPermissive
+    private boolean drop; // dropPerm
+    //private boolean lowcredit; // lowCreditRegistrationPermissive
+    private boolean complement; // complementPermissive
+
+
 
     @Id
-    @Column(name = "stid")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     public int getId() {
-        return stid;
-    }
-    public void setId(int stid) {
-        this.stid = stid;
+        return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+
     @Column(name = "start_time", nullable = false)
-    public Timestamp getStartTime() {
-        return startTime;
+    public Timestamp getStart() {
+        return start;
     }
-    public void setStartTime(Timestamp startTime) {
-        this.startTime = startTime;
+
+    public void setStart(Timestamp start) {
+        this.start = start;
     }
+
 
 
     @Column(name = "end_time", nullable = false)
-    public Timestamp getEndTime() {
-        return endTime;
+    public Timestamp getEnd() {
+        return end;
     }
-    public void setEndTime(Timestamp endTime) {
-        this.endTime = endTime;
+
+    public void setEnd(Timestamp end) {
+        this.end = end;
     }
 
 
-    @Column(name = "regi_perm", nullable = false)
-    public boolean getRegiPerm() {
-        return regiPerm;
+    @Column(name = "drop", nullable = false)
+    public boolean isDrop() {
+        return drop;
     }
-    public void setRegiPerm(boolean regiPerm) {
-        this.regiPerm = regiPerm;
+
+    public void setDrop(boolean drop) {
+        this.drop = drop;
     }
 
 
-    @Column(name = "dism_perm", nullable = false)
-    public boolean getDismPerm() {
-        return dismPerm;
-    }
-    public void setDismPerm(boolean dismPerm) {
-        this.dismPerm = dismPerm;
+    @Column(name = "register", nullable = false)
+    public boolean isRegister() {
+        return register;
     }
 
-    @Column(name = "low_cre_perm", nullable = false)
-    public boolean getLowCrePerm() {
-        return lowCrePerm;
-    }
-    public void setLowCrePerm(boolean lowCrePerm) {
-        this.lowCrePerm = lowCrePerm;
+    public void setRegister(boolean register) {
+        this.register = register;
     }
 
-    @Column(name = "comp_perm", nullable = false)
-    public boolean getCompPerm() {
-        return compPerm;
-    }
-    public void setCompPerm(boolean compPerm) {
-        this.compPerm = compPerm;
+
+    @Column(name = "complement", nullable = false)
+    public boolean isComplement() {
+        return complement;
     }
 
+    public void setComplement(boolean complement) {
+        this.complement = complement;
+    }
 }

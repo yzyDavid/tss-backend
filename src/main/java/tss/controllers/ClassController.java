@@ -27,13 +27,15 @@ import java.util.*;
 
 /**
  * @author reeve
- * @author NeverMore2744
+ * @author NeverMore2744 - ljh
  */
 @RestController
 @RequestMapping()
 public class ClassController {
     private final CourseRepository courseRepository;
     private final ClassRepository classRepository;
+    private final ProgramRepository programRepository;
+    private final ProgramCourseRepository programCourseRepository;
     private final UserRepository userRepository;
     private final ClassroomRepository classroomRepository;
     private final TimeSlotRepository timeSlotRepository;
@@ -41,11 +43,14 @@ public class ClassController {
 
     @Autowired
     public ClassController(CourseRepository courseRepository, ClassRepository classRepository,
+                           ProgramRepository programRepository, ProgramCourseRepository programCourseRepository,
                            UserRepository userRepository, ClassroomRepository classroomRepository,
-                           TimeSlotRepository timeSlotRepository, ClassRegistrationRepository classRegistrationRepository
-                           ) {
+                           TimeSlotRepository timeSlotRepository,
+                           ClassRegistrationRepository classRegistrationRepository) {
         this.courseRepository = courseRepository;
         this.classRepository = classRepository;
+        this.programRepository = programRepository;
+        this.programCourseRepository = programCourseRepository;
         this.userRepository = userRepository;
         this.classroomRepository = classroomRepository;
         this.timeSlotRepository = timeSlotRepository;
@@ -328,22 +333,37 @@ public class ClassController {
     @ResponseStatus(HttpStatus.OK)
     public BasicResponse addClassRegistration(@CurrentUser UserEntity user, @RequestBody AddClassRegistrationRequest request) {
         long classId = request.getClassId();
+        // Error 1: The class doesn't exist
         ClassEntity clazz = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
-        //
-        // TODO: find the program of this user and confirm that the course is in it
-        // CourseEntity course = clazz.getCourse();
-        //
 
-        if (!user.readTypeName().equals("Student")) {
+        // Error 2: The user is not a student
+        if (!user.readTypeName().equals("Student")) {  // The operator is not a student
             throw new UserNotStudentException();
         }
         ClassStatusEnum classStatusEnum = ClassStatusEnum.SELECTED;
         String crid = user.getUid()+"CR"+classId;
+
+        // Error 3: The class has been registered
+        if (classRegistrationRepository.existsByStudentAndClazz_Course(user, clazz.getCourse())) {
+            throw new ClassRegisteredException();
+        }
+
+        // Error 4: The program doesn't exist
+        ProgramEntity programEntity = programRepository.findByPid(user.getUid()).orElseThrow(ProgramNotFoundException::new);
+
+        CourseEntity courseEntity = clazz.getCourse();
+
+        // Error 5: The program_course doesn't exist
+        if (!programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity)) {
+            throw new CourseNotFoundInProgramException();
+        }
+
         ClassRegistrationEntity classRegistrationEntity =
                 new ClassRegistrationEntity(0, user, clazz, crid,
                         classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
                 //new ClassRegistrationEntity(0, user, clazz, classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
 
+        // Error 6: Classroom is full of students
         if (clazz.getNumStudent() >= clazz.getCapacity())
             throw new ClassFullException();
         clazz.setNumStudent(clazz.getNumStudent() + 1);
@@ -391,28 +411,33 @@ public class ClassController {
     @Authorization
     @ResponseStatus(HttpStatus.OK)
     public BasicResponse finishClass(@RequestBody ModifyClassRegistrationRequest request) {
-        String userId = request.getUid();
+        String studentId = request.getUid();
         Long classId = request.getClassId();
-        Optional<ClassEntity> clazz = classRepository.findById(classId);
-        if (!clazz.isPresent()) {
-            throw new ClazzNotFoundException();
-        }
-        Optional<UserEntity> student = userRepository.findById(userId);
-        if (!student.isPresent() || !student.get().readTypeName().equals("Student")) {
+
+        // Error 1: Class not found
+        ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
+
+        // Error 2: Student not found
+        UserEntity student = userRepository.findById(studentId).orElseThrow(UserNotFoundException::new);
+
+        // Error 3: User not a student
+        if (!student.readTypeName().equals("Student")) {
             throw new UserNotStudentException();
         }
 
-        //ClassRegistrationId id = new ClassRegistrationId(student.get(), clazz.get());
-        String id = userId + "CR" + classId.toString();
-        Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findByCrid(id);
-        if (!cr.isPresent()) {
-            throw new ClassNotRegisteredException();
-        }
-        ClassRegistrationEntity classRegistration = cr.get();
+        // Error 4: Class not registered
+        String id = studentId + "CR" + classId.toString();
+        ClassRegistrationEntity classRegistration = classRegistrationRepository.findByCrid(id).orElseThrow(ClassNotRegisteredException::new);
+
+        // Error 5: Status errors
         ClassStatusEnum status = classRegistration.getStatus();
         if (!status.equals(ClassStatusEnum.SELECTED)) {
-            throw new ClassNotRegisteredException();
+            if (status.equals(ClassStatusEnum.FINISHED))
+                throw new ClassFinishedException();
+            else if (status.equals(ClassStatusEnum.FAILED))
+                throw new ClassFailedException();
         }
+
         classRegistration.setStatus(ClassStatusEnum.FINISHED);
         classRegistration.setScore(request.getScore());
         classRegistration.setConfirmTime(new Timestamp(System.currentTimeMillis()));
@@ -424,29 +449,33 @@ public class ClassController {
     @PutMapping(path = "/classes/fail")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public BasicResponse failClass(@RequestBody ConfirmClassRequest request) {
-        String userId = request.getUid();
+    public BasicResponse failClass(@RequestBody ConfirmClassRequest request) {        String studentId = request.getUid();
         Long classId = request.getClassId();
-        Optional<ClassEntity> clazz = classRepository.findById(classId);
-        if (!clazz.isPresent()) {
-            throw new ClazzNotFoundException();
-        }
-        Optional<UserEntity> student = userRepository.findById(userId);
-        if (!student.isPresent() || !student.get().readTypeName().equals("Student")) {
+
+        // Error 1: Class not found
+        ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
+
+        // Error 2: Student not found
+        UserEntity student = userRepository.findById(studentId).orElseThrow(UserNotFoundException::new);
+
+        // Error 3: User not a student
+        if (!student.readTypeName().equals("Student")) {
             throw new UserNotStudentException();
         }
 
-        //ClassRegistrationId id = new ClassRegistrationId(student.get(), clazz.get());
-        String id = userId + "CR" + classId.toString();
-        Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findByCrid(id);
-        if (!cr.isPresent()) {
-            throw new ClassNotRegisteredException();
-        }
-        ClassRegistrationEntity classRegistration = cr.get();
+        // Error 4: Class not registered
+        String id = studentId + "CR" + classId.toString();
+        ClassRegistrationEntity classRegistration = classRegistrationRepository.findByCrid(id).orElseThrow(ClassNotRegisteredException::new);
+
+        // Error 5: Status errors
         ClassStatusEnum status = classRegistration.getStatus();
         if (!status.equals(ClassStatusEnum.SELECTED)) {
-            throw new ClassNotRegisteredException();
+            if (status.equals(ClassStatusEnum.FINISHED))
+                throw new ClassFinishedException();
+            else if (status.equals(ClassStatusEnum.FAILED))
+                return new BasicResponse("Class failed.");
         }
+
         classRegistration.setStatus(ClassStatusEnum.FAILED);
         classRegistration.setConfirmTime(new Timestamp(System.currentTimeMillis()));
         classRegistrationRepository.save(classRegistration);
@@ -461,28 +490,27 @@ public class ClassController {
         String userId = user.getUid();
         Long classId = request.getClassId();
 
-        Optional<ClassEntity> Oclazz = classRepository.findById(classId);
+        // Error 1: Class not found
+        ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
 
+        // Error 2: User not a student
         if (!user.readTypeName().equals("Student")) {
             throw new UserNotStudentException();
         }
 
-        if (!Oclazz.isPresent()) {
-            throw new ClazzNotFoundException();
-        }
-
+        // Error 3: Class not registered
         String Id = userId + "CR" + classId.toString();
+        ClassRegistrationEntity cr = classRegistrationRepository.findByCrid(Id).orElseThrow(ClassNotRegisteredException::new);
 
-        Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findByCrid(Id);
-        if (!cr.isPresent()) {
-            throw new ClassNotRegisteredException();
+        // Error 4: Status errors
+        ClassStatusEnum status = cr.getStatus();
+        if (status.equals(ClassStatusEnum.FINISHED)) {
+            throw new ClassFinishedNotForDroppingException();
         }
-        classRegistrationRepository.delete(cr.get());
 
-        ClassEntity clazz = Oclazz.get();
-        clazz.setNumStudent(clazz.getNumStudent()-1);
-        classRepository.save(clazz);
-
+        classRegistrationRepository.delete(cr);
+        classEntity.setNumStudent(classEntity.getNumStudent()-1);
+        classRepository.save(classEntity);
 
         return new BasicResponse("Class dropped.");
     }
@@ -508,8 +536,56 @@ public class ClassController {
         return new GetSelectedClassesResponse(classesSelected);
     }
 
+    @PostMapping(path = "/classes/admin_register")
+    @Authorization
+    @ResponseStatus(HttpStatus.OK)
+    public BasicResponse adminRegisterClass(@CurrentUser UserEntity user, @RequestBody ConfirmClassRequest request) {
+        String studentId = request.getUid();
+        long classId = request.getClassId();
+        // Error 1: The class doesn't exist
+        ClassEntity clazz = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
 
+        // Error 2: No admin or no student
+        if (!user.readTypeName().equals("Teaching Administrator") && !user.readTypeName().equals("System Administrator")) {
+            throw new UserNotAdminException();
+        }
+        UserEntity student = userRepository.findByUid(studentId).orElseThrow(UserNotFoundException::new);
+        if (!student.readTypeName().equals("Student")) {
+            throw new UserNotStudentException();
+        }
 
+        // Error 3: The class has been registered
+        String crid = user.getUid()+"CR"+classId;
+        if (classRegistrationRepository.existsByStudentAndClazz_Course(student, clazz.getCourse())) {
+            throw new ClassRegisteredException();
+        }
+
+        // Error 4: The program doesn't exist
+        ProgramEntity programEntity = programRepository.findByPid(user.getUid()).orElseThrow(ProgramNotFoundException::new);
+
+        CourseEntity courseEntity = clazz.getCourse();
+
+        // Error 5: The program_course doesn't exist
+        if (!programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity)) {
+            throw new CourseNotFoundInProgramException();
+        }
+
+        ClassStatusEnum classStatusEnum = ClassStatusEnum.SELECTED;
+        ClassRegistrationEntity classRegistrationEntity =
+                new ClassRegistrationEntity(0, user, clazz, crid,
+                        classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
+        //new ClassRegistrationEntity(0, user, clazz, classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
+
+        // Error 6: Classroom is full of students
+        if (clazz.getNumStudent() >= clazz.getCapacity())
+            throw new ClassFullException();
+        clazz.setNumStudent(clazz.getNumStudent() + 1);
+        classRepository.save(clazz);
+
+        classRegistrationRepository.save(classRegistrationEntity);
+
+        return new BasicResponse("Class registered by admin successfully!");
+    }
 }
 
 /**

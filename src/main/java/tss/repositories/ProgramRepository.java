@@ -13,6 +13,8 @@ import java.util.Optional;
  */
 
 public interface ProgramRepository extends CrudRepository<ProgramEntity, Short> {
+    boolean existsByPid(String pid);
+
     List<ProgramEntity> findByStudents(UserEntity student);
     Optional<ProgramEntity> findByPid(String pid);
 }
