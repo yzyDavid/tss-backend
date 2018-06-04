@@ -112,9 +112,9 @@ public class BbsTopicController {
      * v1.0, done
      * TODO check permission
      */
-    @DeleteMapping(path = "/delete")
-    @Authorization
-    public ResponseEntity<DeleteBbsTopicResponse> deleteBbsTopic(@CurrentUser UserEntity user,
+    @PostMapping(path = "/delete")
+    //@Authorization
+    public ResponseEntity<DeleteBbsTopicResponse> deleteBbsTopic(//@CurrentUser UserEntity user,
                                                                  @RequestBody DeleteBbsTopicRequest request) {
         /* invalid topic id error */
         Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTopicID()));
@@ -125,10 +125,10 @@ public class BbsTopicController {
         BbsTopicEntity topic = ret.get();
 
         /* only author and manager get the permission */
-        if (!Config.TYPES[1].equals(user.readTypeName())
-                && !user.getUid().equals(topic.getAuthor().getUid())) {
-            return new ResponseEntity<>(new DeleteBbsTopicResponse("permission denied"), HttpStatus.BAD_REQUEST);
-        }
+//        if (!Config.TYPES[1].equals(user.readTypeName())
+//                && !user.getUid().equals(topic.getAuthor().getUid())) {
+//            return new ResponseEntity<>(new DeleteBbsTopicResponse("permission denied"), HttpStatus.BAD_REQUEST);
+//        }
 
         bbsTopicRepository.delete(topic);
 
@@ -322,8 +322,8 @@ public class BbsTopicController {
      * v1.0,
      */
     @PostMapping(path = "/settop")
-    @Authorization
-    public ResponseEntity<SetTopicTopResponse> setTopicTop(@CurrentUser UserEntity user,
+    //@Authorization
+    public ResponseEntity<SetTopicTopResponse> setTopicTop(//@CurrentUser UserEntity user,
                                                            @RequestBody SetTopicTopRequest request) {
         /* invalid topic id error */
         Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTopicID()));
@@ -333,9 +333,9 @@ public class BbsTopicController {
 
         BbsTopicEntity topic = ret.get();
 
-        if (!Config.TYPES[1].equals(user.readTypeName())) {
-            return new ResponseEntity<>(new SetTopicTopResponse("permission denied!"), HttpStatus.BAD_REQUEST);
-        }
+//        if (!Config.TYPES[1].equals(user.readTypeName())) {
+//            return new ResponseEntity<>(new SetTopicTopResponse("permission denied!"), HttpStatus.BAD_REQUEST);
+//        }
 
         topic.setIsTop(true);
         bbsTopicRepository.save(topic);

@@ -113,8 +113,8 @@ public class BbsSectionController {
      * v1.0, done
      */
     @PostMapping(path = "/addnotice")
-    @Authorization
-    public ResponseEntity<AddSectionNoticeResponse> addSectionNotice(@CurrentUser UserEntity user,
+    //@Authorization
+    public ResponseEntity<AddSectionNoticeResponse> addSectionNotice(//@CurrentUser UserEntity user,
                                                                      @RequestBody AddSectionNoticeRequest request) {
         Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(Long.valueOf(request.getBoardID()));
         if (!ret.isPresent()) {
@@ -122,9 +122,9 @@ public class BbsSectionController {
         }
 
         /* check permission, only manager can do*/
-        if (!Config.TYPES[1].equals(user.readTypeName())) {
-            return new ResponseEntity<>(new AddSectionNoticeResponse("permission denied"), HttpStatus.FORBIDDEN);
-        }
+//        if (!Config.TYPES[1].equals(user.readTypeName())) {
+//            return new ResponseEntity<>(new AddSectionNoticeResponse("permission denied"), HttpStatus.FORBIDDEN);
+//        }
 
         BbsSectionEntity section = ret.get();
         section.setNotice(request.getBoardText());

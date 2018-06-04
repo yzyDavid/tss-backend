@@ -45,10 +45,16 @@ public class BbsRetrieveController {
      * v1.0, done
      */
     @PostMapping(path = "/send")
-    @Authorization
-    public ResponseEntity<AddBbsRetrieveResponse> sendRetrieve(@CurrentUser UserEntity user,
+    //@Authorization
+    public ResponseEntity<AddBbsRetrieveResponse> sendRetrieve(//@CurrentUser UserEntity user,
                                                                @RequestBody AddBbsRetrieveRequest request) {
-        UserEntity sender = user;
+        //UserEntity sender = user;
+        UserEntity sender = new UserEntity();
+        sender.setUid("0101");
+        sender.setName("Iamsender");
+        sender.setHashedPassword("324");
+        sender.setSalt("32");
+
 
         Optional<UserEntity> retd = userRepository.findById(request.getDestination());
         if (!retd.isPresent()) {
@@ -56,6 +62,7 @@ public class BbsRetrieveController {
         }
 
         UserEntity receiver = retd.get();
+
 
         BbsRetrieveEntity retrieve = new BbsRetrieveEntity();
         retrieve.setReceiver(receiver);
@@ -84,10 +91,12 @@ public class BbsRetrieveController {
      * v1.0, done
      */
     @PostMapping(path = "/inbox")
-    @Authorization
-    public ResponseEntity<CheckInBoxResponse> checkInBox(@CurrentUser UserEntity user,
+    //@Authorization
+    public ResponseEntity<CheckInBoxResponse> checkInBox(//@CurrentUser UserEntity user,
                                                          @RequestBody CheckInBoxRequest request) {
         String currentPage = request.getPage();
+
+        UserEntity user = userRepository.findById("2242").get();
 
         List<BbsRetrieveEntity> messages = bbsRetrieveRepository.findByReceiver(user);
 
@@ -125,10 +134,12 @@ public class BbsRetrieveController {
      * v1.0, done
      */
     @PostMapping(path = "/outbox")
-    @Authorization
-    public ResponseEntity<CheckOutBoxResponse> checkOutBox(@CurrentUser UserEntity user,
+    //@Authorization
+    public ResponseEntity<CheckOutBoxResponse> checkOutBox(//@CurrentUser UserEntity user,
                                                            @RequestBody CheckOutBoxRequest request){
         String currentPage = request.getPage();
+
+        UserEntity user = userRepository.findById("0101").get();
 
         List<BbsRetrieveEntity> messages = bbsRetrieveRepository.findBySender(user);
 
