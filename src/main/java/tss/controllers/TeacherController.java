@@ -6,6 +6,7 @@ import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.configs.Config;
 import tss.entities.ClassEntity;
+import tss.entities.SemesterEnum;
 import tss.entities.TimeSlotEntity;
 import tss.entities.UserEntity;
 import tss.exceptions.ClazzNotFoundException;
@@ -16,10 +17,14 @@ import tss.models.TimeSlotTypeEnum;
 import tss.repositories.ClassRepository;
 import tss.repositories.UserRepository;
 
+
+import java.util.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * @author reeve
@@ -47,23 +52,26 @@ public class TeacherController {
 
         teacherEntity.addClassTeaching(classEntity);
         userRepository.save(teacherEntity);
+
     }
 
-    @GetMapping("/{userId}/schedule")
+    @GetMapping("/{userId}/classes")
     @ResponseStatus(HttpStatus.OK)
-    public List<TimeSlot> getSchedule(@PathVariable String userId) {
+    public List<Clazz> listClassesTeaching(@PathVariable String userId, @RequestParam int year,
+                                              @RequestParam SemesterEnum semester) {
+
         UserEntity teacherEntity = userRepository.findById(userId).orElseThrow(TeacherNotFoundException::new);
+        // TODO: commented for testing.
 //        if (!Config.TYPES[2].equals(teacherEntity.readTypeName())) {
 //            throw new TeacherNotFoundException();
 //        }
 
-        List<TimeSlot> schedule = new ArrayList<>(TimeSlotTypeEnum.values().length);
+        List<Clazz> classes = new ArrayList<>();
         for (ClassEntity classEntity : teacherEntity.getClassesTeaching()) {
-            Clazz clazz = new Clazz(classEntity);
-            for (TimeSlotEntity timeSlotEntity : classEntity.getTimeSlots()) {
-                schedule.add(new TimeSlot(timeSlotEntity));
+            if (classEntity.getYear() == year && semester.equals(classEntity.getSemester())) {
+                classes.add(new Clazz(classEntity));
             }
         }
-        return schedule;
+        return classes;
     }
 }

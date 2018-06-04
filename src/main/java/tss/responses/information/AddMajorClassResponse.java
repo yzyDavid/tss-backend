@@ -6,12 +6,12 @@ public class AddMajorClassResponse {
     @Nls
     final private String status;
     final private String name;
-    final private String department;
+    final private String major;
 
-    public AddMajorClassResponse(String status, String name, String department) {
+    public AddMajorClassResponse(String status, String name, String major) {
         this.status = status;
         this.name = name;
-        this.department = department;
+        this.major = major;
     }
 
     public String getStatus() {
@@ -22,7 +22,7 @@ public class AddMajorClassResponse {
         return name;
     }
 
-    public String getDepartment() {
-        return department;
+    public String getMajor() {
+        return major;
     }
 }

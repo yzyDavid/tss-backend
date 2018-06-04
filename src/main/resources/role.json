@@ -4,9 +4,10 @@
     "paths": [
       "add",
       "delete",
-      "reset-pwd",
-      "modify-all",
-      "name"
+      "reset/pwd",
+      "modify/info",
+      "get/info",
+      "query"
     ],
     "belong2": [
       0
@@ -18,7 +19,8 @@
       "add",
       "delete",
       "modify",
-      "name"
+      "query",
+      "get/info"
     ],
     "belong2": [
       0,
@@ -28,9 +30,19 @@
   "department_administrator": {
     "prefix": "dept",
     "paths": [
-      "add",
-      "delete",
-      "modify"
+      "department/add",
+      "department/delete",
+      "department/get/info",
+      "department/get/list",
+      "department/modify",
+      "major/add",
+      "major/delete",
+      "major/get/info",
+      "major/modify",
+      "class/add",
+      "class/delete",
+      "class/get/info",
+      "class/modify"
     ],
     "belong2": [
       0,

@@ -7,7 +7,7 @@ import java.util.Set;
 @Entity
 @Table(name = "paper")
 
-public class PapersEntity {
+public class PapersEntity{
     private String pid;
     private String begin;
     private String end;
@@ -16,14 +16,13 @@ public class PapersEntity {
     private String papername;
     private boolean isauto;
 
-    private Set<PaperContainsQuestionEntity> paperquestion = new HashSet<>();
-
-
     private long answerednum;
     private double average;
 
+    private Set<PaperContainsQuestionEntity> paperquestion = new HashSet<>();
+
     @Id
-    @Column(name = "paper_pid", length = 10)
+    @Column(name = "paper_pid", length = 100)
     public String getPid() {
         return pid;
     }
@@ -34,13 +33,9 @@ public class PapersEntity {
 
 
     @Column(name = "paper_begin")
-    public String getBegin() {
-        return begin;
-    }
+    public String getBegin() { return begin; }
 
-    public void setBegin(String begin) {
-        this.begin = begin;
-    }
+    public void setBegin(String begin) { this.begin = begin;}
 
     @Column(name = "paper_end")
     public String getEnd() {
@@ -52,40 +47,27 @@ public class PapersEntity {
     }
 
     @Column(name = "paper_last")
-    public String getLast() {
-        return last;
-    }
+    public String getLast(){return last;}
 
-    public void setLast(String last) {
-        this.last = last;
-    }
+    public void setLast(String last){this.last = last;}
 
     @Column(name = "paper_count")
-    public String getCount() {
-        return count;
+    public  String getCount(){
+        return  count;
     }
 
-    public void setCount(String count) {
+    public void setCount(String count){
         this.count = count;
     }
 
     @Column(name = "paper_papername")
-    public String getPapername() {
-        return papername;
-    }
+    public String getPapername(){return papername;}
 
-    public void setPapername(String papername) {
-        this.papername = papername;
-    }
+    public void setPapername(String papername){this.papername = papername;}
 
     @Column(name = "paper_isauto")
-    public boolean getIsauto() {
-        return isauto;
-    }
-
-    public void setIsauto(boolean isauto) {
-        this.isauto = isauto;
-    }
+    public boolean getIsauto(){return isauto;}
+    public void setIsauto(boolean isauto){this.isauto = isauto;}
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paper")
     public Set<PaperContainsQuestionEntity> getPaperquestion() {
@@ -96,6 +78,31 @@ public class PapersEntity {
         this.paperquestion = paperquestion;
     }
 
+
+
+
+    /*
+        //@OneToMany(cascade = CascadeType.ALL, mappedBy = "paper")
+        @Column(name = "paper_questionnum")
+        public Set<String> getQuestionnum() {
+            return questionnum;
+        }
+
+        public void setQuestionnum(Set<String> questionnum) {
+            this.questionnum = questionnum;
+        }
+
+       // @OneToMany(cascade = CascadeType.ALL, mappedBy = "paper")
+        @Column(name = "paper_questionscore")
+        public Set<String> getQuestionscore() {
+            return questionscore;
+        }
+
+        public void setQuestionscore(Set<String> questionscore) {
+            this.questionscore = questionscore;
+        }
+
+    */
     @Column(name = "paper_answerednum")
     public long getAnswerednum() {
         return answerednum;
@@ -113,4 +120,5 @@ public class PapersEntity {
     public void setAverage(double average) {
         this.average = average;
     }
+
 }

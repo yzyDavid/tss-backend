@@ -44,13 +44,15 @@ public class UserEntity {
 
     private String intro;
 
+    private Integer year;
+
     /**
      * fileName
      */
     @Column(length = 10)
     private String photo;
 
-    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne()
     @JoinColumn(name = "department_id")
     private DepartmentEntity department;
 
@@ -95,6 +97,14 @@ public class UserEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
     }
 
     public String getHashedPassword() {
@@ -189,6 +199,7 @@ public class UserEntity {
         this.dataAccessAuths.add(dataAccessAuth);
     }
 
+
     public TypeGroupEntity getType() {
         return type;
     }
@@ -202,6 +213,7 @@ public class UserEntity {
             return type.getName();
         } else {
             return null;
+
         }
     }
 

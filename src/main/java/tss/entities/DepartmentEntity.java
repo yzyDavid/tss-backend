@@ -72,8 +72,6 @@ public class DepartmentEntity {
         } else {
             return super.hashCode();
         }
-
-
     }
 
     @Override
