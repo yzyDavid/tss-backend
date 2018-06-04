@@ -5,18 +5,18 @@ import java.util.Date;
 
 @Entity
 @Table(name = "HistoryGrade", indexes = {
-        @Index(name = "StudentID_Index", columnList = "StudentID"),
-        @Index(name = "PaperID_Index", columnList = "PaperID")
+        @Index(name = "StudentID_Index", columnList = "StudentID")
+       // @Index(name = "PaperID_Index", columnList = "PaperID")
 })
 public class HistoryGradeEntity {
     private String hid;
-    private UserEntity sid;
-    private PapersEntity pid;
-    private double grade;
-    private Date startTime;
+    private UserEntity student;
+    private PapersEntity paper;
+    private int grade;
+    private Date starttime;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "Historyid", length = 100)
     public String getHid() {
         return hid;
     }
@@ -26,41 +26,41 @@ public class HistoryGradeEntity {
     }
 
     @JoinColumn(name = "StudentID")
-    @ManyToOne
-    public UserEntity getSid() {
-        return sid;
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
+    public UserEntity getStudent() {
+        return student;
     }
 
-    public void setSid(UserEntity sid) {
-        this.sid = sid;
+    public void setStudent(UserEntity student) {
+        this.student = student;
     }
 
     @JoinColumn(name = "PaperID")
-    @ManyToOne
-    public PapersEntity getPid() {
-        return pid;
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
+    public PapersEntity getPaper() {
+        return paper;
     }
 
-    public void setPid(PapersEntity pid) {
-        this.pid = pid;
+    public void setPaper(PapersEntity paper) {
+        this.paper = paper;
     }
 
     @Column(name = "Grade")
-    public double getGrade() {
+    public int getGrade() {
         return grade;
     }
 
-    public void setGrade(double grade) {
+    public void setGrade(int grade) {
         this.grade = grade;
     }
 
     @Column(name = "StartTime")
     @Temporal(TemporalType.TIMESTAMP)
-    public Date getStartTime() {
-        return startTime;
+    public Date getStarttime() {
+        return starttime;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setStarttime(Date starttime) {
+        this.starttime = starttime;
     }
 }

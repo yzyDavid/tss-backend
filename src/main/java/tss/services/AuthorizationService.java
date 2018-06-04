@@ -84,7 +84,7 @@ public class AuthorizationService {
         authorityRepository.save(authority);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = {})
     public boolean checkMethodAccessAuthority() {
         String uid = (String)request.getAttribute(Config.CURRENT_UID_ATTRIBUTE);
         String uri = request.getRequestURI();
@@ -105,7 +105,7 @@ public class AuthorizationService {
         return false;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = {})
     public boolean checkDataAccessAuthority(String uri) {
         String uid = (String)request.getAttribute(Config.CURRENT_UID_ATTRIBUTE);
         Optional<UserEntity> user = userRepository.findById(uid);

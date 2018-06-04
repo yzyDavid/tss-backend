@@ -8,17 +8,17 @@ public class ModifyCourseResponse {
     final String cid;
     final String name;
     private final Float credit;
-    private final Integer weeklyNum;
+    private final Integer numLessonsEachWeek;
     private final String department;
     private final String intro;
 
     public ModifyCourseResponse(String status, String cid, String name, Float credit,
-                                Integer weeklyNum, String department, String intro) {
+                                Integer numLessonsEachWeek, String department, String intro) {
         this.status = status;
         this.cid = cid;
         this.name = name;
         this.credit = credit;
-        this.weeklyNum = weeklyNum;
+        this.numLessonsEachWeek = numLessonsEachWeek;
         this.department = department;
         this.intro = intro;
     }
@@ -39,10 +39,9 @@ public class ModifyCourseResponse {
         return department;
     }
 
-    public Integer getWeeklyNum() {
-        return weeklyNum;
+    public Integer getNumLessonsEachWeek() {
+        return numLessonsEachWeek;
     }
-
 
     public Float getCredit() {
         return credit;

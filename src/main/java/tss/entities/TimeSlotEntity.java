@@ -85,4 +85,14 @@ public class TimeSlotEntity {
             return super.equals(obj);
         }
     }
+
+    @Override
+    public String toString() {
+        return "TimeSlotEntity{" +
+                "id=" + id +
+                ", type=" + type +
+                ", classroom=" + classroom +
+                ", clazz=" + clazz +
+                '}';
+    }
 }

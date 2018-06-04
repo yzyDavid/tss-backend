@@ -11,12 +11,15 @@ import tss.exceptions.ClazzNotFoundException;
 import tss.exceptions.TimeSlotTypeNotFoundException;
 import tss.models.Classroom;
 import tss.models.Clazz;
+import tss.models.TimeSlot;
 import tss.models.TimeSlotTypeEnum;
 import tss.repositories.ClassRepository;
 import tss.repositories.ClassroomRepository;
 import tss.repositories.TimeSlotRepository;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -98,21 +101,15 @@ public class ClassroomController {
         timeSlotRepository.save(timeSlotEntity);
     }
 
-    @GetMapping("/{classroomId}/schedule")
+    @GetMapping("/{classroomId}/time-slots")
     @ResponseStatus(HttpStatus.OK)
-    public Map<TimeSlotTypeEnum, Clazz> getSchedule(@PathVariable int classroomId) {
+    public List<TimeSlot> listTimeSlots(@PathVariable int classroomId) {
         ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
                 (ClassroomNotFoundException::new);
 
-        Map<TimeSlotTypeEnum, Clazz> schedule = new HashMap<>(TimeSlotTypeEnum.values().length);
+        List<TimeSlot> schedule = new ArrayList<>();
         for (TimeSlotEntity timeSlotEntity : classroomEntity.getTimeSlots()) {
-            Clazz clazz;
-            if (timeSlotEntity.getClazz() == null) {
-                clazz = null;
-            } else {
-                clazz = new Clazz(timeSlotEntity.getClazz());
-            }
-            schedule.put(timeSlotEntity.getType(), clazz);
+            schedule.add(new TimeSlot(timeSlotEntity));
         }
         return schedule;
     }

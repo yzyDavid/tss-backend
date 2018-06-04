@@ -12,7 +12,14 @@ public class ClassRegistrationEntity {
     @EmbeddedId
     private ClassRegistrationId id;
 
+    @Column(name = "score")
     private Integer score;
+    public Integer getScore() {
+        return score;
+    }
+    public void setScore(Integer score) {
+        this.score = score;
+    }
 
     @ManyToOne(optional = false)
     @MapsId("studentId")
@@ -22,22 +29,26 @@ public class ClassRegistrationEntity {
     @MapsId("classId")
     private ClassEntity clazz;
 
+    @Column
+    private ClassStatusEnum status;
+
     public ClassRegistrationEntity() {
     }
 
-    public ClassRegistrationEntity(Integer score, UserEntity student, ClassEntity clazz) {
+    public ClassRegistrationEntity(Integer score, UserEntity student, ClassEntity clazz, ClassStatusEnum status) {
         this.id = new ClassRegistrationId(student.getUid(), clazz.getId());
         this.score = score;
         this.student = student;
         this.clazz = clazz;
+        this.status = status;
     }
 
-    public Integer getScore() {
-        return score;
+    public ClassStatusEnum getStatus() {
+        return status;
     }
 
-    public void setScore(Integer score) {
-        this.score = score;
+    public void setStatus(ClassStatusEnum classStatusEnum) {
+        status = classStatusEnum;
     }
 
     public UserEntity getStudent() {
@@ -56,5 +67,13 @@ public class ClassRegistrationEntity {
     public void setClazz(ClassEntity clazz) {
         id.setClassId(clazz.getId());
         this.clazz = clazz;
+    }
+
+    public ClassRegistrationId getId() {
+        return id;
+    }
+
+    public void setId(ClassRegistrationId id) {
+        this.id = id;
     }
 }

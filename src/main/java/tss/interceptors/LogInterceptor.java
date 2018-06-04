@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.net.InetAddress;
 
 @Aspect
@@ -18,6 +19,8 @@ import java.net.InetAddress;
 public class LogInterceptor {
     @Autowired
     private HttpServletRequest request;
+    @Autowired
+    private HttpServletResponse response;
     private ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
 
     @Pointcut("execution(* tss.controllers..*.*(..))")
@@ -36,11 +39,10 @@ public class LogInterceptor {
 
     @AfterReturning(value = "controllerLog()", returning = "ret")
     private void afterReturningLog(JoinPoint joinPoint, Object ret) {
-        String httpStatus = ((ResponseEntity) ret).getStatusCode().toString();
         Logger logger = loggerFactory.getLogger(joinPoint.getTarget().getClass().toString());
         long duration = System.currentTimeMillis() - (long) request.getAttribute("startTime");
         logger.info("\"{} {} {}\" {} {}ms", request.getMethod(), request.getRequestURI(), request.getProtocol(),
-                httpStatus, duration);
+                response.getStatus(), duration);
     }
 
     @AfterThrowing(value = "controllerLog()", throwing = "exception")
