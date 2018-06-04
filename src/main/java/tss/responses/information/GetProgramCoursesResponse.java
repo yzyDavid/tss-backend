@@ -12,13 +12,15 @@ public class GetProgramCoursesResponse {
         private String courseId;  // courseId
         private String courseName;
         private Float credit;
-        private Integer type;
+        private CourseTypeEnum type;
+        private ClassStatusEnum status;
 
-        public CourseInfo(String courseId, String courseName, Float credit, Integer type) {
+        public CourseInfo(String courseId, String courseName, Float credit, CourseTypeEnum type, ClassStatusEnum status) {
             this.courseId = courseId;
             this.courseName = courseName;
             this.credit = credit;
             this.type = type;
+            this.status = status;
         }
 
         public String getCourseId() {
@@ -45,18 +47,27 @@ public class GetProgramCoursesResponse {
             this.credit = credit;
         }
 
-        public Integer getType() {
+        public CourseTypeEnum getType() {
             return type;
         }
 
-        public void setType(Integer type) {
+        public void setType(CourseTypeEnum type) {
             this.type = type;
         }
 
-        CourseInfo(CourseEntity course, Integer type) {
+        public ClassStatusEnum getStatus() {
+            return status;
+        }
+
+        public void setStatus(ClassStatusEnum status) {
+            this.status = status;
+        }
+
+        CourseInfo(CourseEntity course, CourseTypeEnum type, ClassStatusEnum status) {
             courseId = course.getId();
             courseName = course.getName();
             credit = course.getCredit();
+            this.status = status;
             this.type = type;
         }
     }
@@ -69,10 +80,10 @@ public class GetProgramCoursesResponse {
         this.courses = courses;
     }
 
-    public GetProgramCoursesResponse(List<CourseEntity> courses, List<Integer> types) {
+    public GetProgramCoursesResponse(List<CourseEntity> courses, List<CourseTypeEnum> types, List<ClassStatusEnum> status) {
         this.courses = new ArrayList<>();
         for (int i=0; i<courses.size(); i++) {
-            this.courses.add(new CourseInfo(courses.get(i), types.get(i)));
+            this.courses.add(new CourseInfo(courses.get(i), types.get(i), status.get(i)));
         }
     }
 

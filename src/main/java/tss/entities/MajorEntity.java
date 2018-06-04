@@ -95,7 +95,10 @@ public class MajorEntity {
         this.classes = classes;
     }
 
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "major")
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "major_compulsory",
+            joinColumns = {@JoinColumn(name = "major_id")},
+            inverseJoinColumns = {@JoinColumn(name = "course_id")})
     public Set<CourseEntity> getSetOfCompulsory() {
         return setOfCompulsory;
     }
@@ -104,7 +107,10 @@ public class MajorEntity {
         this.setOfCompulsory = courses;
     }
 
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "major")
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "major_selective",
+            joinColumns = {@JoinColumn(name = "major_id")},
+            inverseJoinColumns = {@JoinColumn(name = "course_id")})
     public Set<CourseEntity> getSetOfSelective() {
         return setOfSelective;
     }
@@ -113,7 +119,10 @@ public class MajorEntity {
         this.setOfSelective = courses;
     }
 
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "major")
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "major_public",
+            joinColumns = {@JoinColumn(name = "major_id")},
+            inverseJoinColumns = {@JoinColumn(name = "course_id")})
     public Set<CourseEntity> getSetOfPublic() {
         return setOfPublic;
     }

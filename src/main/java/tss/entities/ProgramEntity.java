@@ -45,7 +45,6 @@ public class ProgramEntity {
     public Set<UserEntity> getStudents() { return students ;}
 
     public void setStudents(Set<UserEntity> students) {
-
         this.students = students;
     }
 

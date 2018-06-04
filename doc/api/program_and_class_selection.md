@@ -9,7 +9,7 @@ Program and class selection APIs
 | DELETE |     /program/course     |     cid:String[] (required) <br>pid:String[] (required)      | status:String<br>cid:String<br>cname:String<br>uid:String |  在培养方案中删除课程  |
 |  GET   | /program/show_selection |                              无                              |                        List{<br>}                         |                        |
 
-### 2. 选课相关
+### 2. 选课相关（学生）
 
 url请求参数举例。如findByboth: 
 
@@ -21,19 +21,21 @@ url请求参数举例。如findByboth:
 
 
 
-| 方法 |                uri                |                     请求参数(json或url)                      |                        返回参数(json)                        |                         说明                         |    身份     |
-| :--: | :-------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :--------------------------------------------------: | :---------: |
-| GET  | /classes/search/ findByCourseName | **url:**<br>name<br>year(not required)<br>semester(not required) | List {<br>id: Long<br> year: Integer<br> semester: enum<br> capacity: Integer<br> numStudent: Integer<br>courseId: String<br>courseName: String<br>teacherName: String<br>timeSlot: String<br>classroom: String<br>} |     按课程名称搜索 semester="FIRST" or "SECOND"      |    学生     |
-| GET  |  /classes/search/ findByCourseId  | **url:** id<br>year(not required)<br> semester(not required) |                             同上                             |      按课程ID搜索 semester="FIRST" or "SECOND"       |    学生     |
-| GET  |  /classes/search/ findByTeacher   | **url:** name<br> year(not required)<br> semester(not required) |                             同上                             |     按老师名称搜索 semester="FIRST" or "SECOND"      |    学生     |
-| GET  |    /classes/search/ findByBoth    | **url**: <br>courseName<br> teacherName<br> year(not required)<br> semester(not required) |                             同上                             | 按课程名称和老师一起搜索semester="FIRST" or "SECOND" |    学生     |
-| GET  |          /course/search           |                       **url**:<br>name                       | List:{<br>cid: String<br>name:String<br>credit: Float<br>brief: String} |  返回一个列表，里面包含课程号、课程名称、学分和简介  |    学生     |
-| POST |         /classes/register         |                  **json:**<br>classId: Long                  |                        status:String                         |                         选课                         |    学生     |
-| PUT  |         /classes/confirm          |           **json:**<br>uid:String[] classId: Long            |                        status:String                         |          确认**选上**此课程，uid是学生的id           |   管理员    |
-| PUT  |          /classes/finish          |  **json**:<br>uid:String[]<br> classId: Long score: Integer  |                        status:String                         |            确认完成此课程，uid是学生的id             | 管理员/老师 |
-| PUT  |          /classes/fail          |       **json:**<br>uid: String[]<br>classId: Long<br>        |                        status: String                        |             确认某课已挂，uid是学生的id              | 管理员/老师 |
+| 方法 |                uri                |                     请求参数(json或url)                      |                        返回参数(json)                        |                         说明                         |
+| :--: | :-------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :--------------------------------------------------: |
+| POST |          /course/search           |                       content: String                       | List:{<br>cid: String<br>name:String<br>credit: Float<br>brief: String<br>} |  根据课程名称，返回一个列表，里面包含课程号、课程名称、学分和简介  |
+| POST |         /classes/register         |                  classId: Long                  |                        status:String                         |                         选课                         |
+| POST | /classes/search | courseName: String<br>courseId: String<br>teacherName: String | List {<br>id: Long<br> year: Integer<br> semester: enum<br> capacity: Integer<br> numStudent: Integer<br>courseId: String<br>courseName: String<br>teacherName: String<br>timeSlot: String<br>classroom: String<br>selected: Integer<br>} | 按一定的条件搜索可选的课程。判断顺序为：(1)如果courseId不为空则按课程ID搜索，不管课程名称和教师名称；(2)如果courseId为空，则courseName和teacherName必须要有一个不空。selected: 0为未选，1为已选 |
 
-### 3. 选课结果
+### 3. 选课相关（管理员/老师）
+
+| 方法 |       uri        |                 请求参数(json)                  | 返回参数(json) |             说明              |
+| :--: | :--------------: | :---------------------------------------------: | :------------: | :---------------------------: |
+| PUT  | /classes/confirm |          uid:String[]<br>classId: Long          | status:String  | 确认选上此课程，uid是学生的id |
+| PUT  | /classes/finish  | uid:String[]<br>classId: Long<br>score: Integer | status:String  | 确认完成此课程，uid是学生的id |
+| PUT  |  /classes/fail   |         uid: String[]<br>classId: Long          | status:String  |  确认某课已挂，uid是学生的id  |
+
+### 4. 选课结果相关
 
 | 方法 |                   uri                   | 请求参数(json) |                        返回参数(json)                        |     说明     |
 | :--: | :-------------------------------------: | :------------: | :----------------------------------------------------------: | :----------: |

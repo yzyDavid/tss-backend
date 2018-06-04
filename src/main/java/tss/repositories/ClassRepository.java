@@ -23,4 +23,7 @@ public interface ClassRepository extends JpaRepository<ClassEntity, Long> {
             semester);
 
     List<ClassEntity> findByYearAndSemester(Integer year, SemesterEnum semester);
+
+    List<ClassEntity> findByCourse_NameLikeAndTeacher_NameLike(String courseName, String teacherName);
+    List<ClassEntity> findByTeacher_NameLike(String name);
 }

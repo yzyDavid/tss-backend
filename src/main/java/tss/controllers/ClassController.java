@@ -1,5 +1,6 @@
 package tss.controllers;
 
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,9 +11,11 @@ import tss.entities.*;
 import tss.exceptions.*;
 import tss.models.ClassArrangementResult;
 import tss.models.Clazz;
+import tss.models.ClazzList;
 import tss.repositories.*;
 import tss.requests.information.AddClassRegistrationRequest;
 import tss.requests.information.ConfirmClassRequest;
+import tss.requests.information.GetClassesForSelectionRequest;
 import tss.requests.information.ModifyClassRegistrationRequest;
 import tss.responses.information.BasicResponse;
 import tss.responses.information.GetClassesResponse;
@@ -168,6 +171,40 @@ public class ClassController {
         return new ClassArrangementResult(count, pendingClassIds);
     }
 
+    @PostMapping("/classes/search")
+    @Authorization
+    @ResponseStatus(HttpStatus.OK)
+    public GetClassesResponse searchClasses(@RequestBody GetClassesForSelectionRequest request) {
+        List<ClassEntity> classes;
+        if (request.getCourseId() != null) {
+            classes = classRepository.findByCourse_Id(request.getCourseId());
+            if (classes.isEmpty()) {
+                throw new ClazzNotFoundException();
+            }
+            return new GetClassesResponse(classes);
+        }
+        if (request.getCourseName() != null) {
+            if (request.getTeacherName() != null) {
+                classes = classRepository.findByCourse_NameLikeAndTeacher_NameLike(request.getCourseName(),
+                        request.getTeacherName());
+            }
+            else
+                classes = classRepository.findByCourse_NameLike(request.getCourseName());
+        }
+        else if (request.getTeacherName() != null) {
+            classes = classRepository.findByTeacher_NameLike(request.getTeacherName());
+        }
+        else {
+            throw new ClassSearchInvalidException();
+        }
+
+        if (classes.isEmpty()) {
+            throw new ClazzNotFoundException();
+        }
+        return new GetClassesResponse(classes);
+    }
+
+/*
     @GetMapping("/classes/search/findByCourseName")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
@@ -201,10 +238,10 @@ public class ClassController {
         } else {
             classes = classRepository.findByCourse_IdAndYearAndSemester(courseId, year, semester);
         }
-        /*
-        if (classes.isEmpty()) {
-            ...
-        }*/
+
+        //if (classes.isEmpty()) {
+        //  ...
+        //}
 
         return new GetClassesResponse(classes);
     }
@@ -217,10 +254,10 @@ public class ClassController {
                                                    @RequestParam(required = false) SemesterEnum semester) {
 
         List<UserEntity> teachers = userRepository.findByNameLikeAndType_Name("%" + teacherName + "%", "System Administrator");
-        /*
-        if (teachers.isEmpty()) {
-            ...
-        }*/
+
+        //if (teachers.isEmpty()) {
+         //   ...
+        //}
 
         List<ClassEntity> classesAll = new ArrayList<>();
         for (UserEntity teacher : teachers) {
@@ -237,9 +274,8 @@ public class ClassController {
         }
 
         return new GetClassesResponse(classesAll);
-    }
-
-    @GetMapping("/classes/search/findByBoth")
+    } */
+    /*@GetMapping("/classes/search/findByBoth")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
     public GetClassesResponse searchClassByBoth(@RequestParam String courseName,
@@ -250,7 +286,7 @@ public class ClassController {
         if (year == null || semester == null) {
             Set<ClassEntity> classesByCourseName = new HashSet<>(classRepository.findByCourse_NameLike(courseName));
             List<UserEntity> teachers = userRepository.findByName(teacherName);
-            /* if (classes.isEmpty() || teachers.isEmpty()) { ... } */
+            // if (classes.isEmpty() || teachers.isEmpty()) { ... }
             Set<ClassEntity> classesByTeacherName = new HashSet<>();
             for (UserEntity teacher : teachers) {
                 if (!teacher.readTypeName().equals("Teacher")) {
@@ -286,18 +322,17 @@ public class ClassController {
 
         return new GetClassesResponse(new ArrayList<>(res));
     }
-
+*/
     @PostMapping(path = "/classes/register")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
     public BasicResponse addClassRegistration(@CurrentUser UserEntity user, @RequestBody AddClassRegistrationRequest request) {
         long classId = request.getClassId();
-        System.out.print(classId);
         ClassEntity clazz = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
-        /*
-         * TODO: find the program of this user and confirm that the course is in it
-         * CourseEntity course = clazz.getCourse();
-        */
+        //
+        // TODO: find the program of this user and confirm that the course is in it
+        // CourseEntity course = clazz.getCourse();
+        //
 
         if (!user.readTypeName().equals("Student")) {
             throw new UserNotStudentException();
@@ -308,11 +343,17 @@ public class ClassController {
                 new ClassRegistrationEntity(0, user, clazz, crid,
                         classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
                 //new ClassRegistrationEntity(0, user, clazz, classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
+
+        if (clazz.getNumStudent() >= clazz.getCapacity())
+            throw new ClassFullException();
+        clazz.setNumStudent(clazz.getNumStudent() + 1);
+        classRepository.save(clazz);
+
         classRegistrationRepository.save(classRegistrationEntity);
 
         return new BasicResponse("Class registered successfully!");
     }
-
+/*
     @PutMapping(path = "/classes/confirm")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
@@ -344,7 +385,7 @@ public class ClassController {
         classRegistrationRepository.save(classRegistration);
 
         return new BasicResponse("Class confirmed");
-    }
+    }*/
 
     @PutMapping(path = "/classes/finish")
     @Authorization
@@ -413,6 +454,39 @@ public class ClassController {
         return new BasicResponse("Class failed.");
     }
 
+    @DeleteMapping(path = "/classes/drop")
+    @Authorization
+    @ResponseStatus(HttpStatus.OK)
+    public BasicResponse dropClass(@CurrentUser UserEntity user, @RequestBody AddClassRegistrationRequest request) {
+        String userId = user.getUid();
+        Long classId = request.getClassId();
+
+        Optional<ClassEntity> Oclazz = classRepository.findById(classId);
+
+        if (!user.readTypeName().equals("Student")) {
+            throw new UserNotStudentException();
+        }
+
+        if (!Oclazz.isPresent()) {
+            throw new ClazzNotFoundException();
+        }
+
+        String Id = userId + "CR" + classId.toString();
+
+        Optional<ClassRegistrationEntity> cr = classRegistrationRepository.findByCrid(Id);
+        if (!cr.isPresent()) {
+            throw new ClassNotRegisteredException();
+        }
+        classRegistrationRepository.delete(cr.get());
+
+        ClassEntity clazz = Oclazz.get();
+        clazz.setNumStudent(clazz.getNumStudent()-1);
+        classRepository.save(clazz);
+
+
+        return new BasicResponse("Class dropped.");
+    }
+
     // semester = "FIRST" / "SECOND"
     @GetMapping(path = "/classes/get_selected/{year}/{semester}")
     @Authorization
@@ -433,6 +507,8 @@ public class ClassController {
         }
         return new GetSelectedClassesResponse(classesSelected);
     }
+
+
 
 }
 

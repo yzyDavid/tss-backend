@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.*;
-import tss.repositories.CourseRepository;
-import tss.repositories.ProgramCourseRepository;
-import tss.repositories.ProgramRepository;
-import tss.repositories.UserRepository;
+import tss.exceptions.UserNotStudentException;
+import tss.repositories.*;
 import tss.requests.information.*;
 import tss.responses.information.*;
 
@@ -21,20 +19,23 @@ import java.util.*;
 @Controller
 @RequestMapping(path = "program")
 public class ProgramController {
+    private final ClassRegistrationRepository classRegistrationRepository;
     private final ProgramRepository programRepository;
     private final ProgramCourseRepository programCourseRepository;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
 
     @Autowired
-    public ProgramController(ProgramRepository programRepository, UserRepository userRepository,
-                             CourseRepository courseRepository, ProgramCourseRepository programCourseRepository)
-    {
+    public ProgramController(ClassRegistrationRepository classRegistrationRepository, ProgramRepository programRepository,
+                             ProgramCourseRepository programCourseRepository, UserRepository userRepository,
+                             CourseRepository courseRepository) {
+        this.classRegistrationRepository = classRegistrationRepository;
         this.programRepository = programRepository;
-        this.courseRepository = courseRepository;
-        this.userRepository = userRepository;
         this.programCourseRepository = programCourseRepository;
+        this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
     }
+
     @PutMapping
     @Authorization
     public ResponseEntity<AddProgramResponse> addProgram(@CurrentUser UserEntity user,
@@ -136,26 +137,56 @@ public class ProgramController {
 
         return new ResponseEntity<>(new DeleteCourseinProgramResponse("ok", cid, cname,pid), HttpStatus.OK);
     }
-/*
+
     @GetMapping("/status")
     @Authorization
     public ResponseEntity<GetProgramCoursesResponse> getProgramCourses(@CurrentUser UserEntity user) {
         String uid = user.getUid();
+
+        if (!user.readTypeName().equals("Student")) {
+            throw new UserNotStudentException();
+        }
+
         MajorEntity major = user.getMajorClass().getMajor();
         Set<CourseEntity> coursesCompulsory = major.getSetOfCompulsory();
         Set<CourseEntity> coursesSelective = major.getSetOfSelective();
         Set<CourseEntity> coursesPublic = major.getSetOfPublic();
 
         List<CourseEntity> courses_final = new ArrayList<>();
-        List<Integer> courses_type = new ArrayList<>();
-        List<Integer> courses_status = new ArrayList<>();
+        List<CourseTypeEnum> courses_type = new ArrayList<>();
+        List<ClassStatusEnum> courses_status = new ArrayList<>();
 
         for (CourseEntity course : coursesCompulsory) {
-
+            courses_final.add(course);
+            courses_type.add(CourseTypeEnum.COMPULSORY);
+            Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
+            if (!crs.isPresent())
+                courses_status.add(ClassStatusEnum.NOT_SELECTED);
+            else
+                courses_status.add(crs.get().getStatus());
         }
 
-        return new ResponseEntity<>(new GetProgramCoursesResponse(courses_final, courses_type), HttpStatus.OK);
+        for (CourseEntity course : coursesSelective) {
+            courses_final.add(course);
+            courses_type.add(CourseTypeEnum.SELECTIVE);
+            Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
+            if (!crs.isPresent())
+                courses_status.add(ClassStatusEnum.NOT_SELECTED);
+            else
+                courses_status.add(crs.get().getStatus());
+        }
+
+        for (CourseEntity course : coursesPublic) {
+            courses_final.add(course);
+            courses_type.add(CourseTypeEnum.PUBLIC);
+            Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
+            if (!crs.isPresent())
+                courses_status.add(ClassStatusEnum.NOT_SELECTED);
+            else
+                courses_status.add(crs.get().getStatus());
+        }
+
+        return new ResponseEntity<>(new GetProgramCoursesResponse(courses_final, courses_type, courses_status), HttpStatus.OK);
     }
-    */
 
 }

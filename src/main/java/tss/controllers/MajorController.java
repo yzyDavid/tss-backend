@@ -16,4 +16,6 @@ public class MajorController {
         this.courseRepository = courseRepository;
         this.majorRepository = majorRepository;
     }
+
+
 }
