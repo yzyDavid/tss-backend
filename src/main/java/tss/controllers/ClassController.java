@@ -22,6 +22,7 @@ import tss.responses.information.GetClassesResponse;
 import tss.responses.information.GetSelectedClassesResponse;
 
 import javax.persistence.Basic;
+import javax.swing.text.html.Option;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -39,13 +40,15 @@ public class ClassController {
     private final UserRepository userRepository;
     private final ClassroomRepository classroomRepository;
     private final TimeSlotRepository timeSlotRepository;
+    private final SelectionTimeRepository selectionTimeRepository;
     private final ClassRegistrationRepository classRegistrationRepository;
+
 
     @Autowired
     public ClassController(CourseRepository courseRepository, ClassRepository classRepository,
                            ProgramRepository programRepository, ProgramCourseRepository programCourseRepository,
                            UserRepository userRepository, ClassroomRepository classroomRepository,
-                           TimeSlotRepository timeSlotRepository,
+                           TimeSlotRepository timeSlotRepository, SelectionTimeRepository selectionTimeRepository,
                            ClassRegistrationRepository classRegistrationRepository) {
         this.courseRepository = courseRepository;
         this.classRepository = classRepository;
@@ -54,8 +57,10 @@ public class ClassController {
         this.userRepository = userRepository;
         this.classroomRepository = classroomRepository;
         this.timeSlotRepository = timeSlotRepository;
+        this.selectionTimeRepository = selectionTimeRepository;
         this.classRegistrationRepository = classRegistrationRepository;
     }
+
 
     @PostMapping("/courses/{courseId}/classes")
     @ResponseStatus(HttpStatus.CREATED)
@@ -179,155 +184,100 @@ public class ClassController {
     @PostMapping("/classes/search")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public GetClassesResponse searchClasses(@RequestBody GetClassesForSelectionRequest request) {
+    public GetClassesResponse searchClasses(@CurrentUser UserEntity user,
+                                            @RequestBody GetClassesForSelectionRequest request) {
         List<ClassEntity> classes;
+
+        // Error: Program not found
+        ProgramEntity programEntity = programRepository.findByPid(user.getUid()).orElseThrow(ProgramNotFoundException::new);
+
+        // 1. Use ID to search
         if (request.getCourseId() != null) {
+            // Error 1: Course not found
+            CourseEntity courseEntity;
+            courseEntity = courseRepository.findById(request.getCourseId()).orElseThrow(CourseNotFoundException::new);
+            // Error 2: Courses not found in program
+            if (!programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity)) {
+                throw new CourseNotFoundInProgramException();
+            }
+            // Error 3: Classes not found
             classes = classRepository.findByCourse_Id(request.getCourseId());
             if (classes.isEmpty()) {
                 throw new ClazzNotFoundException();
             }
             return new GetClassesResponse(classes);
         }
+
         if (request.getCourseName() != null) {
             if (request.getTeacherName() != null) {
-                classes = classRepository.findByCourse_NameLikeAndTeacher_NameLike(request.getCourseName(),
-                        request.getTeacherName());
+                // 2. Use courseName and teacherName
+                classes = new ArrayList<>();
+                List<CourseEntity> courseEntityList = courseRepository.findByNameLike(request.getCourseName());
+
+                for (CourseEntity courseEntity : courseEntityList) {
+                    if (!programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity))
+                        continue;
+
+                    List<ClassEntity> classEntityList = classRepository.findByCourse_IdAndTeacher_Name(courseEntity.getId(), request.getTeacherName());
+                    classes.addAll(classEntityList);
+                }
+
+                if (classes.isEmpty()) {
+                    throw new ClazzNotFoundException();
+                }
             }
-            else
-                classes = classRepository.findByCourse_NameLike(request.getCourseName());
+            else {
+                // 3. Use only courseName to search
+                classes = new ArrayList<>();
+                List<CourseEntity> courseEntityList = courseRepository.findByNameLike(request.getCourseName());
+
+                for (CourseEntity courseEntity : courseEntityList) {
+                    if (!programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity))
+                        continue;
+
+                    List<ClassEntity> classEntityList = classRepository.findByCourse_Id(courseEntity.getId());
+                    classes.addAll(classEntityList);
+                }
+
+                if (classes.isEmpty()) {
+                    throw new ClazzNotFoundException();
+                }
+            }
         }
         else if (request.getTeacherName() != null) {
-            classes = classRepository.findByTeacher_NameLike(request.getTeacherName());
+            // 4. Use only teacher name to search
+            classes = new ArrayList<>();
+
+            List<ClassEntity> classesList = classRepository.findByTeacher_NameLike(request.getTeacherName());
+
+            Set<CourseEntity> courseEntities = new HashSet<>(); // Temporary
+            Set<CourseEntity> courseEntities1 = new HashSet<>();  // courses in program
+            for (ClassEntity classEntity : classesList) {
+                CourseEntity courseEntity = classEntity.getCourse();
+                if (courseEntities.contains(courseEntity))
+                    continue;
+                courseEntities.add(courseEntity);
+                if (!programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity))
+                    continue;
+                courseEntities1.add(courseEntity);
+            }
+
+            for (CourseEntity courseEntity : courseEntities1) {
+                List<ClassEntity> classEntityList = classRepository.findByCourse_Id(courseEntity.getId());
+                classes.addAll(classEntityList);
+            }
+
+            if (classes.isEmpty()) {
+                throw new ClazzNotFoundException();
+            }
         }
         else {
             throw new ClassSearchInvalidException();
         }
 
-        if (classes.isEmpty()) {
-            throw new ClazzNotFoundException();
-        }
         return new GetClassesResponse(classes);
     }
 
-/*
-    @GetMapping("/classes/search/findByCourseName")
-    @Authorization
-    @ResponseStatus(HttpStatus.OK)
-    public GetClassesResponse searchClassByName(@RequestParam String name,
-                                                @RequestParam(required = false) Integer year,
-                                                @RequestParam(required = false) SemesterEnum semester) {
-        List<ClassEntity> classes;
-        if (year == null || semester == null) {
-            //classes = classRepository.findByCourse_NameLike("%"+courseName+"%");
-            classes = classRepository.findByCourse_Name("%"+name+"%");
-        }
-        else classes = classRepository.findByCourse_NameLikeAndYearAndSemester("%"+name+"%", year, semester);
-
-        if (classes.isEmpty()) {
-            System.out.println("Empty");
-        }
-
-        return new GetClassesResponse(classes);
-    }
-
-    @GetMapping("/classes/search/findByCourseId")
-    @Authorization
-    @ResponseStatus(HttpStatus.OK)
-    public GetClassesResponse searchClassById(@RequestParam String courseId,
-                                              @RequestParam(required = false) Integer year,
-                                              @RequestParam(required = false) SemesterEnum semester) {
-        List<ClassEntity> classes;
-
-        if (year == null || semester == null) {
-            classes = classRepository.findByCourse_Id(courseId);
-        } else {
-            classes = classRepository.findByCourse_IdAndYearAndSemester(courseId, year, semester);
-        }
-
-        //if (classes.isEmpty()) {
-        //  ...
-        //}
-
-        return new GetClassesResponse(classes);
-    }
-
-    @GetMapping("/classes/search/findByTeacher")
-    @Authorization
-    @ResponseStatus(HttpStatus.OK)
-    public GetClassesResponse searchClassByTeacher(@RequestParam String teacherName,
-                                                   @RequestParam(required = false) Integer year,
-                                                   @RequestParam(required = false) SemesterEnum semester) {
-
-        List<UserEntity> teachers = userRepository.findByNameLikeAndType_Name("%" + teacherName + "%", "System Administrator");
-
-        //if (teachers.isEmpty()) {
-         //   ...
-        //}
-
-        List<ClassEntity> classesAll = new ArrayList<>();
-        for (UserEntity teacher : teachers) {
-            List<ClassEntity> classes = teacher.getClassesTeaching();
-            if (year == null || semester == null) {
-                classesAll.addAll(classes);
-                continue;
-            }
-            for (ClassEntity clazz : classes) {
-                if (clazz.getYear().equals(year) && clazz.getSemester().equals(semester)) {
-                    classesAll.add(clazz);
-                }
-            }
-        }
-
-        return new GetClassesResponse(classesAll);
-    } */
-    /*@GetMapping("/classes/search/findByBoth")
-    @Authorization
-    @ResponseStatus(HttpStatus.OK)
-    public GetClassesResponse searchClassByBoth(@RequestParam String courseName,
-                                                @RequestParam String teacherName,
-                                                @RequestParam(required = false) Integer year,
-                                                @RequestParam(required = false) SemesterEnum semester) {
-
-        if (year == null || semester == null) {
-            Set<ClassEntity> classesByCourseName = new HashSet<>(classRepository.findByCourse_NameLike(courseName));
-            List<UserEntity> teachers = userRepository.findByName(teacherName);
-            // if (classes.isEmpty() || teachers.isEmpty()) { ... }
-            Set<ClassEntity> classesByTeacherName = new HashSet<>();
-            for (UserEntity teacher : teachers) {
-                if (!teacher.readTypeName().equals("Teacher")) {
-                    continue;
-                }
-                classesByTeacherName.addAll(teacher.getClassesTeaching());
-            }
-            Set<ClassEntity> res = new HashSet<>();
-            res.clear();
-            res.addAll(classesByCourseName);
-            res.retainAll(classesByTeacherName);
-            return new GetClassesResponse(new ArrayList<>(res));
-        }
-
-        Set<ClassEntity> classesByCourseName = new HashSet<>(classRepository.findByCourse_NameLikeAndYearAndSemester(courseName, year, semester));
-        List<UserEntity> teachers = userRepository.findByName(teacherName);
-        Set<ClassEntity> classesByTeacherName = new HashSet<>();
-        for (UserEntity teacher : teachers) {
-            if (!teacher.readTypeName().equals("Teacher")) {
-                continue;
-            }
-            List<ClassEntity> classes = teacher.getClassesTeaching();
-            for (ClassEntity clazz : classes) {
-                if (clazz.getYear().equals(year) && clazz.getSemester().equals(semester)) {
-                    classesByTeacherName.add(clazz);
-                }
-            }
-        }
-        Set<ClassEntity> res = new HashSet<>();
-        res.clear();
-        res.addAll(classesByCourseName);
-        res.retainAll(classesByTeacherName);
-
-        return new GetClassesResponse(new ArrayList<>(res));
-    }
-*/
     @PostMapping(path = "/classes/register")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
@@ -360,7 +310,9 @@ public class ClassController {
 
         // Error 6: Not in the selection time
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-
+        if (!selectionTimeRepository.existsByStartLessThanEqualAndEndGreaterThanEqualAndRegisterTrue(currentTime, currentTime)) {
+            throw new SelectionTimeInvalidRegisterException();
+        }
 
         ClassRegistrationEntity classRegistrationEntity =
                 new ClassRegistrationEntity(0, user, clazz, crid,
@@ -453,7 +405,8 @@ public class ClassController {
     @PutMapping(path = "/classes/fail")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
-    public BasicResponse failClass(@RequestBody ConfirmClassRequest request) {        String studentId = request.getUid();
+    public BasicResponse failClass(@RequestBody ConfirmClassRequest request) {
+        String studentId = request.getUid();
         Long classId = request.getClassId();
 
         // Error 1: Class not found
@@ -487,6 +440,59 @@ public class ClassController {
         return new BasicResponse("Class failed.");
     }
 
+    @PostMapping(path = "/classes/complement")
+    @Authorization
+    @ResponseStatus(HttpStatus.OK)
+    public BasicResponse complementClass(@CurrentUser UserEntity user, @RequestBody AddClassRegistrationRequest request) {
+
+        long classId = request.getClassId();
+        // Error 1: The class doesn't exist
+        ClassEntity clazz = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
+
+        // Error 2: The user is not a student
+        if (!user.readTypeName().equals("Student")) {  // The operator is not a student
+            throw new UserNotStudentException();
+        }
+        ClassStatusEnum classStatusEnum = ClassStatusEnum.SELECTED;
+        String crid = user.getUid()+"CR"+classId;
+
+        // Error 3: The class has been registered
+        if (classRegistrationRepository.existsByStudentAndClazz_Course(user, clazz.getCourse())) {
+            throw new ClassRegisteredException();
+        }
+
+        // Error 4: The program doesn't exist
+        ProgramEntity programEntity = programRepository.findByPid(user.getUid()).orElseThrow(ProgramNotFoundException::new);
+
+        CourseEntity courseEntity = clazz.getCourse();
+
+        // Error 5: The program_course doesn't exist
+        if (!programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity)) {
+            throw new CourseNotFoundInProgramException();
+        }
+
+        // Error 6: Not in the selection time
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        if (!selectionTimeRepository.existsByStartLessThanEqualAndEndGreaterThanEqualAndRegisterTrue(currentTime, currentTime)) {
+            throw new SelectionTimeInvalidRegisterException();
+        }
+
+        ClassRegistrationEntity classRegistrationEntity =
+                new ClassRegistrationEntity(0, user, clazz, crid,
+                        classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
+        //new ClassRegistrationEntity(0, user, clazz, classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
+
+        // Error 7: Classroom is full of students
+        if (clazz.getNumStudent() >= clazz.getCapacity())
+            throw new ClassFullException();
+        clazz.setNumStudent(clazz.getNumStudent() + 1);
+        classRepository.save(clazz);
+
+        classRegistrationRepository.save(classRegistrationEntity);
+
+        return new BasicResponse("Class filled successfully!");
+    }
+
     @DeleteMapping(path = "/classes/drop")
     @Authorization
     @ResponseStatus(HttpStatus.OK)
@@ -510,6 +516,12 @@ public class ClassController {
         ClassStatusEnum status = cr.getStatus();
         if (status.equals(ClassStatusEnum.FINISHED)) {
             throw new ClassFinishedNotForDroppingException();
+        }
+
+        // Error 5: Not in the drop time
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        if (!selectionTimeRepository.existsByStartLessThanEqualAndEndGreaterThanEqualAndDropTrue(currentTime, currentTime)) {
+            throw new SelectionTimeInvalidRegisterException();
         }
 
         classRegistrationRepository.delete(cr);

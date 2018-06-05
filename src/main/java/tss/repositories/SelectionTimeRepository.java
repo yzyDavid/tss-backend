@@ -13,11 +13,15 @@ import java.util.Optional;
  */
 public interface SelectionTimeRepository extends CrudRepository<SelectionTimeEntity, Integer> {
     Optional<SelectionTimeEntity> findByStartAndEnd(Timestamp start, Timestamp end);
+
     List<SelectionTimeEntity> findAll();
 
 
     Optional<SelectionTimeEntity> findById(Long id);
     //List<SelectionTimeEntity> findBy
 
+    boolean existsByStartLessThanEqualAndEndGreaterThanEqualAndRegisterTrue(Timestamp start, Timestamp end);
+    boolean existsByStartLessThanEqualAndEndGreaterThanEqualAndDropTrue(Timestamp start, Timestamp end);
+    boolean existsByStartLessThanEqualAndEndGreaterThanEqualAndComplementTrue(Timestamp start, Timestamp end);
     boolean existsById(Long id);
 }
