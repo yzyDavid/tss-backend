@@ -263,7 +263,7 @@ public class ClassController {
             }
 
             for (CourseEntity courseEntity : courseEntities1) {
-                List<ClassEntity> classEntityList = classRepository.findByCourse_Id(courseEntity.getId());
+                List<ClassEntity> classEntityList = classRepository.findByCourse_IdAndTeacher_Name(courseEntity.getId(), request.getTeacherName());
                 classes.addAll(classEntityList);
             }
 
