@@ -107,6 +107,7 @@ public class BbsRetrieveController {
         List<String> titles = new ArrayList<>();
         List<String> texts = new ArrayList<>();
         List<String> times = new ArrayList<>();
+        List<String> reads = new ArrayList<>();
 
         int count = 0;
         for(BbsRetrieveEntity mess : messages){
@@ -121,9 +122,10 @@ public class BbsRetrieveController {
             titles.add(mess.getTitle());
             texts.add(mess.getContent());
             times.add(mess.getTime().toString());
+            reads.add(String.valueOf(mess.getIsChecked()));
         }
 
-        return new ResponseEntity<>(new CheckInBoxResponse(currentPage, totalPage, destinations, titles, texts, times), HttpStatus.OK);
+        return new ResponseEntity<>(new CheckInBoxResponse(currentPage, totalPage, destinations, titles, texts, times, reads), HttpStatus.OK);
     }
 
 

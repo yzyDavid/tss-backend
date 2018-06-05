@@ -9,9 +9,11 @@ import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.UserEntity;
 import tss.entities.bbs.BbsReplyEntity;
+import tss.entities.bbs.BbsRetrieveEntity;
 import tss.entities.bbs.BbsTopicEntity;
 import tss.repositories.UserRepository;
 import tss.repositories.bbs.BbsReplyRepository;
+import tss.repositories.bbs.BbsRetrieveRepository;
 import tss.repositories.bbs.BbsTopicRepository;
 import tss.requests.information.bbs.*;
 import tss.responses.information.bbs.*;
@@ -26,15 +28,17 @@ public class BbsReplyController {
     private final BbsTopicRepository bbsTopicRepository;
     private final UserRepository userRepository;
     private final BbsReplyRepository bbsReplyRepository;
+    private final BbsRetrieveRepository bbsRetrieveRepository;
 
-    public BbsReplyController(BbsTopicRepository bbsTopicRepository, UserRepository userRepository, BbsReplyRepository bbsReplyRepository) {
+    public BbsReplyController(BbsTopicRepository bbsTopicRepository, UserRepository userRepository, BbsReplyRepository bbsReplyRepository, BbsRetrieveRepository bbsRetrieveRepository) {
         this.bbsTopicRepository = bbsTopicRepository;
         this.userRepository = userRepository;
         this.bbsReplyRepository = bbsReplyRepository;
+        this.bbsRetrieveRepository = bbsRetrieveRepository;
     }
 
     /**
-     *  create a new reply to a topic/reply
+     * create a new reply to a topic/reply
      * request: tid, text, quoteIndex
      * permission: user in the section?
      * return: status
@@ -84,15 +88,15 @@ public class BbsReplyController {
         /* if quoted, the one quoted, unread ++
          * wait to be confirm
          */
-        if(Integer.valueOf(quoteIndex) != 0){
+        if (Integer.valueOf(quoteIndex) != 0) {
             /* do to the quoted one, unread ++ */
             BbsReplyEntity quoted = bbsReplyRepository.findByBelongedTopicAndIndex(topic, Integer.valueOf(quoteIndex));
-            quoted.setUnread(quoted.getUnread()+1);
+            quoted.setUnread(quoted.getUnread() + 1);
             bbsReplyRepository.save(quoted);
 
             /* this reply unread */
             reply.setStatus(0);
-        }else{
+        } else {
             reply.setStatus(-1);
         }
 
@@ -184,7 +188,7 @@ public class BbsReplyController {
                                                                @RequestBody GetAllReplyRequest request) {
         Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTid()));
         if (!ret.isPresent()) {
-            return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,null,null,null,null,null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
         }
 
         BbsTopicEntity topic = ret.get();
@@ -252,10 +256,10 @@ public class BbsReplyController {
         }
 
         if (ids.isEmpty()) {
-            return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,null,null,null,null,null,null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(new GetAllReplyResponse(title, totalPage, currentPage, postTime, boardName, boardID, topicID, lzid, lztext,lzphoto,lztime,lzname,ids, texts, quotes, times, photos, indexs, quoteAuthors, quoteTimes, quoteIndexs, names), HttpStatus.OK);
+        return new ResponseEntity<>(new GetAllReplyResponse(title, totalPage, currentPage, postTime, boardName, boardID, topicID, lzid, lztext, lzphoto, lztime, lzname, ids, texts, quotes, times, photos, indexs, quoteAuthors, quoteTimes, quoteIndexs, names), HttpStatus.OK);
     }
 
 
@@ -268,7 +272,7 @@ public class BbsReplyController {
     @PostMapping(path = "/confirm")
     //@Authorization
     public ResponseEntity<ConfirmReplyReadResponse> confirmReplyRead(//@CurrentUser UserEntity user,
-                                                                     @RequestBody ConfirmReplyReadRequest request){
+                                                                     @RequestBody ConfirmReplyReadRequest request) {
         Integer index = Integer.valueOf(request.getReplyPos());
         BbsTopicEntity topic = bbsTopicRepository.findById(Long.valueOf(request.getTopicID())).get();
 
@@ -276,21 +280,96 @@ public class BbsReplyController {
         reply.setStatus(1);
 
         BbsReplyEntity quoted = bbsReplyRepository.findByBelongedTopicAndIndex(topic, reply.getQuoteIndex());
-        quoted.setUnread(quoted.getUnread()-1);
+        quoted.setUnread(quoted.getUnread() - 1);
         bbsReplyRepository.save(quoted);
-        bbsReplyRepository.save(reply)`;
+        bbsReplyRepository.save(reply);
 
         return new ResponseEntity<>(new ConfirmReplyReadResponse("confirm ok!"), HttpStatus.OK);
     }
 
 
     /**
-     * show unread
+     * show unread, message & replies
      * v1.0, done
      */
     @GetMapping(path = "/unread")
     @Authorization
-    public ResponseEntity<CountUnreadResponse> countUnread(@CurrentUser UserEntity user){
-        
+    public ResponseEntity<CountUnreadResponse> countUnread(@CurrentUser UserEntity user) {
+        Integer unMeg = 0;
+        Integer unReply = 0;
+
+        /* cannot be null */
+        List<BbsRetrieveEntity> megs = bbsRetrieveRepository.findByReceiver(user);
+        for (BbsRetrieveEntity meg : megs) {
+            if (!meg.getIsChecked()) {
+                unMeg++;
+            }
+        }
+
+        Optional<List<BbsReplyEntity>> ret = bbsReplyRepository.findByAuthor(user);
+        if (!ret.isPresent()) {
+            return new ResponseEntity<>(new CountUnreadResponse(null, null), HttpStatus.BAD_REQUEST);
+        }
+
+        List<BbsReplyEntity> replies = ret.get();
+        for (BbsReplyEntity reply : replies) {
+            unReply += reply.getUnread();
+        }
+
+        return new ResponseEntity<>(new CountUnreadResponse(unMeg.toString(), unReply.toString()), HttpStatus.OK);
+    }
+
+
+    @PostMapping(path = "/show")
+    //@Authorization
+    public ResponseEntity<ShowReplytoMeResponse> showReplytoMe(//@CurrentUser UserEntity user,
+                                                               @RequestBody ShowReplytoMeRequest request) {
+        UserEntity user = userRepository.findById("3150102242").get();
+
+        String currentPage = request.getPage();
+        String totalPage;
+        List<String> times = new ArrayList<>();
+        List<String> userIDs = new ArrayList<>();
+        List<String> userNames = new ArrayList<>();
+        List<String> topicIDs = new ArrayList<>();
+        List<String> replyPos = new ArrayList<>();
+        List<String> reads = new ArrayList<>();
+
+        Optional<List<BbsReplyEntity>> ret = bbsReplyRepository.findByAuthor(user);
+        if (!ret.isPresent()) {
+            return new ResponseEntity<>(new ShowReplytoMeResponse(null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
+        }
+
+        List<BbsReplyEntity> replsAsAuthor = ret.get();
+
+        int count = 0;
+        /* search all reply as author */
+        for (BbsReplyEntity replyAsAuthor : replsAsAuthor) {
+            BbsTopicEntity topic = replyAsAuthor.getBelongedTopic();
+            Integer index = replyAsAuthor.getIndex();
+
+            /* search current topic */
+            for (BbsReplyEntity reply : topic.getReplies()) {
+                /* quote the reply */
+                if (reply.getQuoteIndex().equals(index)) {
+                    count++;
+                    if (count < (Integer.valueOf(currentPage) - 1) * 10 + 1) {
+                        continue;
+                    }
+                    if (count > Integer.valueOf(currentPage) * 10) {
+                        continue;
+                    }
+                    times.add(reply.getTime().toString());
+                    userIDs.add(reply.getAuthor().getUid());
+                    userNames.add(reply.getAuthor().getName());
+                    topicIDs.add(String.valueOf(reply.getBelongedTopic().getId()));
+                    replyPos.add(reply.getIndex().toString());
+                    reads.add(reply.getStatus().toString());
+                }
+            }
+        }
+        totalPage = String.valueOf(count / 20 + 1);
+
+        return new ResponseEntity<>(new ShowReplytoMeResponse(currentPage, totalPage, times, userIDs, userNames, topicIDs, replyPos, reads), HttpStatus.OK);
     }
 }

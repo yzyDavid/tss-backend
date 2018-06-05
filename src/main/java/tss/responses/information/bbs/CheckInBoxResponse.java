@@ -12,14 +12,16 @@ public class CheckInBoxResponse {
     private final List<String> titles;
     private final List<String> texts;
     private final List<String> times;
+    private final List<String> reads;
 
-    public CheckInBoxResponse(String currentPage, String totalPage, List<String> destinations, List<String> titles, List<String> texts, List<String> times) {
+    public CheckInBoxResponse(String currentPage, String totalPage, List<String> destinations, List<String> titles, List<String> texts, List<String> times, List<String> reads) {
         this.currentPage = currentPage;
         this.totalPage = totalPage;
         this.destinations = destinations;
         this.titles = titles;
         this.texts = texts;
         this.times = times;
+        this.reads = reads;
     }
 
     public String getCurrentPage() {
@@ -44,5 +46,9 @@ public class CheckInBoxResponse {
 
     public List<String> getTimes() {
         return times;
+    }
+
+    public List<String> getReads() {
+        return reads;
     }
 }
