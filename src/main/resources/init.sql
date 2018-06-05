@@ -11,3 +11,4 @@ source class.sql;
 source time_slot.sql;
 source program.sql;
 source program_course.sql;
+source class_registration.sql;

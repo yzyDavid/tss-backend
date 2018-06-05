@@ -358,6 +358,10 @@ public class ClassController {
             throw new CourseNotFoundInProgramException();
         }
 
+        // Error 6: Not in the selection time
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+
+
         ClassRegistrationEntity classRegistrationEntity =
                 new ClassRegistrationEntity(0, user, clazz, crid,
                         classStatusEnum, new Timestamp(System.currentTimeMillis()), null);

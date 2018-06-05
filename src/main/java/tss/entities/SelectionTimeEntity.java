@@ -4,9 +4,11 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "selection_time")
+@Table(name = "selection_time", indexes = {
+    @Index(name = "selection_time_index", columnList = "id")
+})
 public class SelectionTimeEntity {
-    private int id;
+    private Long id;
     private Timestamp start;
     private Timestamp end;
     private boolean register; // registrationPermissive
@@ -15,15 +17,13 @@ public class SelectionTimeEntity {
     private boolean complement; // complementPermissive
 
 
-
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -49,7 +49,7 @@ public class SelectionTimeEntity {
     }
 
 
-    @Column(name = "drop", nullable = false)
+    @Column(name = "drop_perm", nullable = false)
     public boolean isDrop() {
         return drop;
     }
@@ -59,7 +59,7 @@ public class SelectionTimeEntity {
     }
 
 
-    @Column(name = "register", nullable = false)
+    @Column(name = "register_perm", nullable = false)
     public boolean isRegister() {
         return register;
     }
@@ -69,7 +69,7 @@ public class SelectionTimeEntity {
     }
 
 
-    @Column(name = "complement", nullable = false)
+    @Column(name = "complement_perm", nullable = false)
     public boolean isComplement() {
         return complement;
     }

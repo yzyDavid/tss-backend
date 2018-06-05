@@ -1,24 +1,30 @@
 package tss.requests.information;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.sql.Timestamp;
 
 public class AddSelectionTimeRequest {
-    private Timestamp startTime;
-    private Timestamp endTime;
 
-    public Timestamp getStartTime() {
-        return startTime;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private Timestamp start;
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private Timestamp end;
+
+    public Timestamp getStart() {
+        return start;
     }
 
-    public void setStartTime(Timestamp startTime) {
-        this.startTime = startTime;
+    public void setStart(Timestamp start) {
+        this.start = start;
     }
 
-    public Timestamp getEndTime() {
-        return endTime;
+    public Timestamp getEnd() {
+        return end;
     }
 
-    public void setEndTime(Timestamp endTime) {
-        this.endTime = endTime;
+    public void setEnd(Timestamp end) {
+        this.end = end;
     }
 }

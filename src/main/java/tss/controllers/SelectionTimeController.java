@@ -1,5 +1,6 @@
 package tss.controllers;
 
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -8,11 +9,17 @@ import tss.annotations.session.CurrentUser;
 import tss.entities.SelectionTimeEntity;
 import tss.entities.UserEntity;
 import tss.exceptions.PermissionDeniedException;
-import tss.models.Clazz;
+import tss.exceptions.SelectionTimeNotFoundException;
 import tss.repositories.*;
 import tss.requests.information.AddSelectionTimeRequest;
+import tss.requests.information.ModifyClassRegistrationRequest;
+import tss.requests.information.ModifySelectionTimeEndRequest;
+import tss.requests.information.ModifySelectionTimeStartRequest;
 import tss.responses.information.BasicResponse;
+import tss.responses.information.DeleteSelectionTimeByIdRequest;
+import tss.responses.information.GetSelectionTimeResponse;
 
+import javax.jws.soap.SOAPBinding;
 import java.sql.Timestamp;
 import java.util.Optional;
 
@@ -33,13 +40,13 @@ public class SelectionTimeController {
     @Authorization
     @ResponseStatus(HttpStatus.CREATED)
     public BasicResponse addRegisterTime(@CurrentUser UserEntity user, @RequestBody AddSelectionTimeRequest request) {
-        Timestamp startTime = request.getStartTime();
-        Timestamp endTime = request.getEndTime();
+        Timestamp startTime = request.getStart();
+        Timestamp endTime = request.getEnd();
 
-
+        /*
         if (!user.readTypeName().equals("System administrator") && !user.readTypeName().equals("Teaching administrator")) {
             throw new PermissionDeniedException();
-        }
+        }*/
 
         SelectionTimeEntity selectionTimeEntity;
         Optional<SelectionTimeEntity> selectionTimeEntityOptional = selectionTimeRepository.findByStartAndEnd(startTime, endTime);
@@ -63,13 +70,9 @@ public class SelectionTimeController {
     @PostMapping("/selection_time/complement")
     @Authorization
     @ResponseStatus(HttpStatus.CREATED)
-    public BasicResponse addComplementTime(@CurrentUser UserEntity user, @RequestBody AddSelectionTimeRequest request) {
-        Timestamp startTime = request.getStartTime();
-        Timestamp endTime = request.getEndTime();
-
-        if (!user.readTypeName().equals("System administrator") && !user.readTypeName().equals("Teaching administrator")) {
-            throw new PermissionDeniedException();
-        }
+    public BasicResponse addComplementTime(@RequestBody AddSelectionTimeRequest request) {
+        Timestamp startTime = request.getStart();
+        Timestamp endTime = request.getEnd();
 
         SelectionTimeEntity selectionTimeEntity;
         Optional<SelectionTimeEntity> selectionTimeEntityOptional = selectionTimeRepository.findByStartAndEnd(startTime, endTime);
@@ -94,13 +97,9 @@ public class SelectionTimeController {
     @PostMapping("/selection_time/drop")
     @Authorization
     @ResponseStatus(HttpStatus.CREATED)
-    public BasicResponse addDropTime(@CurrentUser UserEntity user, @RequestBody AddSelectionTimeRequest request) {
-        Timestamp startTime = request.getStartTime();
-        Timestamp endTime = request.getEndTime();
-
-        if (!user.readTypeName().equals("System administrator") && !user.readTypeName().equals("Teaching administrator")) {
-            throw new PermissionDeniedException();
-        }
+    public BasicResponse addDropTime(@RequestBody AddSelectionTimeRequest request) {
+        Timestamp startTime = request.getStart();
+        Timestamp endTime = request.getEnd();
 
         SelectionTimeEntity selectionTimeEntity;
         Optional<SelectionTimeEntity> selectionTimeEntityOptional = selectionTimeRepository.findByStartAndEnd(startTime, endTime);
@@ -121,4 +120,59 @@ public class SelectionTimeController {
 
         return new BasicResponse("Set drop time successfully.");
     }
+
+    @GetMapping("/selection_time/show")
+    @Authorization
+    @ResponseStatus(HttpStatus.OK)
+    public GetSelectionTimeResponse showSelectionTime() {
+        return new GetSelectionTimeResponse(selectionTimeRepository.findAll());
+
+    }
+
+    @DeleteMapping("/selection_time/deleteById")
+    @Authorization
+    @ResponseStatus(HttpStatus.OK)
+    public BasicResponse deleteSelectionTimeById(@RequestBody DeleteSelectionTimeByIdRequest request) {
+        Long id = request.getId();
+
+        // Error: Selection time entity not exist
+        SelectionTimeEntity selectionTimeEntity = selectionTimeRepository.findById(id).orElseThrow(SelectionTimeNotFoundException::new);
+        selectionTimeRepository.delete(selectionTimeEntity);
+        return new BasicResponse("Selection time deleted");
+    }
+
+    @PutMapping("/selection_time/modify/start")
+    @Authorization
+    @ResponseStatus(HttpStatus.OK)
+    public BasicResponse modifyStartTime(@RequestBody ModifySelectionTimeStartRequest request) {
+        Long id = request.getId();
+        // Error: Selection time entity not exist
+        SelectionTimeEntity selectionTimeEntity = selectionTimeRepository.findById(id).orElseThrow(SelectionTimeNotFoundException::new);
+
+        selectionTimeEntity.setStart(request.getStart());
+        selectionTimeRepository.save(selectionTimeEntity);
+
+        return new BasicResponse("Start time modified");
+    }
+
+    @PutMapping("/selection_time/modify/end")
+    @Authorization
+    @ResponseStatus(HttpStatus.OK)
+    public BasicResponse modifyEndTime(@RequestBody ModifySelectionTimeEndRequest request) {
+        Long id = request.getId();
+        // Error: Selection time entity not exist
+        SelectionTimeEntity selectionTimeEntity = selectionTimeRepository.findById(id).orElseThrow(SelectionTimeNotFoundException::new);
+
+        selectionTimeEntity.setEnd(request.getEnd());
+        selectionTimeRepository.save(selectionTimeEntity);
+
+        return new BasicResponse("End time modified");
+
+    }
+/*
+    @PutMapping("/selection_time/modify/register")
+    @Authorization
+    @ResponseStatus(HttpStatus.OK)
+    public BasicResponse setRegister(@RequestBody )
+    */
 }
