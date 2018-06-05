@@ -187,6 +187,7 @@ public class ClassController {
     public GetClassesResponse searchClasses(@CurrentUser UserEntity user,
                                             @RequestBody GetClassesForSelectionRequest request) {
         List<ClassEntity> classes;
+        List<Boolean> selected = new ArrayList<>();
 
         // Error: Program not found
         ProgramEntity programEntity = programRepository.findByPid(user.getUid()).orElseThrow(ProgramNotFoundException::new);
@@ -205,7 +206,14 @@ public class ClassController {
             if (classes.isEmpty()) {
                 throw new ClazzNotFoundException();
             }
-            return new GetClassesResponse(classes);
+            for (ClassEntity classEntity : classes) {
+                if (classRegistrationRepository.existsByStudentAndClazz(user, classEntity)) {
+                    selected.add(Boolean.TRUE);
+                }
+                else
+                    selected.add(Boolean.FALSE);
+            }
+            return new GetClassesResponse(classes, selected);
         }
 
         if (request.getCourseName() != null) {
@@ -275,7 +283,14 @@ public class ClassController {
             throw new ClassSearchInvalidException();
         }
 
-        return new GetClassesResponse(classes);
+        for (ClassEntity classEntity : classes) {
+            if (classRegistrationRepository.existsByStudentAndClazz(user, classEntity)) {
+                selected.add(Boolean.TRUE);
+            }
+            else
+                selected.add(Boolean.FALSE);
+        }
+        return new GetClassesResponse(classes, selected);
     }
 
     @PostMapping(path = "/classes/register")
@@ -539,6 +554,10 @@ public class ClassController {
             @CurrentUser UserEntity user,
             @PathVariable Integer year,
             @PathVariable SemesterEnum semester) {
+
+        if (!user.readTypeName().equals("Student")) {
+            throw new UserNotStudentException();
+        }
 
         List<ClassEntity> classesSelected = new ArrayList<>();
         List<ClassRegistrationEntity> classesRegistered = classRegistrationRepository.findByStudent(user);

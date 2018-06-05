@@ -25,13 +25,14 @@ public class GetClassesResponse {
         private String teacherName;
         private String timeSlot;
         private String classroom;
+        private String status;
 
         public ClassInfo() {
         }
 
         public ClassInfo(Long id, Integer year, SemesterEnum semester, Integer capacity,
-                         Integer numStudent, String courseId, String courseName, String teacherName,
-                         String timeSlot, String classroom) {
+                         Integer numStudent, String courseId, String courseName,
+                         String teacherName, String timeSlot, String classroom, String status) {
             this.id = id;
             this.year = year;
             this.semester = semester;
@@ -42,6 +43,7 @@ public class GetClassesResponse {
             this.teacherName = teacherName;
             this.timeSlot = timeSlot;
             this.classroom = classroom;
+            this.status = status;
         }
 
         public Long getId() {
@@ -114,7 +116,15 @@ public class GetClassesResponse {
             this.classroom = classroom;
         }
 
-        ClassInfo(ClassEntity clazz) {
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        ClassInfo(ClassEntity clazz, Boolean selected) {
             id = clazz.getId();
             year = clazz.getYear();
             semester = clazz.getSemester();
@@ -136,13 +146,14 @@ public class GetClassesResponse {
                     size--;
                 }
             }
+            status = selected ? "SELECTED" : "NOT_SELECTED";
         }
     }
 
-    public GetClassesResponse(List<ClassEntity> classes) {
+    public GetClassesResponse(List<ClassEntity> classes, List<Boolean> selected) {
         this.classes = new ArrayList<>();
-        for (ClassEntity clazz : classes)
-            this.classes.add(new ClassInfo(clazz));
+        for (int i=0; i<classes.size(); i++)
+            this.classes.add(new ClassInfo(classes.get(i), selected.get(i)));
     }
 
     public List<ClassInfo> getClasses() {
