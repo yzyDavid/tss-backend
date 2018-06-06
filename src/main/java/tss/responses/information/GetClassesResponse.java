@@ -124,12 +124,12 @@ public class GetClassesResponse {
             this.status = status;
         }
 
-        ClassInfo(ClassEntity clazz, Boolean selected) {
+        ClassInfo(ClassEntity clazz, Boolean selected, Integer numOfStudents) {
             id = clazz.getId();
             year = clazz.getYear();
             semester = clazz.getSemester();
             capacity = clazz.getCapacity();
-            numStudent = clazz.getNumStudent();
+            numStudent = numOfStudents;
             courseId = clazz.getCourse().getId();
             courseName = clazz.getCourse().getName();
             teacherName = clazz.getTeacher().getName();
@@ -150,10 +150,10 @@ public class GetClassesResponse {
         }
     }
 
-    public GetClassesResponse(List<ClassEntity> classes, List<Boolean> selected) {
+    public GetClassesResponse(List<ClassEntity> classes, List<Boolean> selected, List<Integer> numOfStudents) {
         this.classes = new ArrayList<>();
         for (int i=0; i<classes.size(); i++)
-            this.classes.add(new ClassInfo(classes.get(i), selected.get(i)));
+            this.classes.add(new ClassInfo(classes.get(i), selected.get(i), numOfStudents.get(i)));
     }
 
     public List<ClassInfo> getClasses() {

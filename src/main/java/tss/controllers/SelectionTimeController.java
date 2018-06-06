@@ -113,7 +113,7 @@ public class SelectionTimeController {
         }
         else {
             selectionTimeEntity = selectionTimeEntityOptional.get();
-            selectionTimeEntity.setComplement(true);
+            selectionTimeEntity.setDrop(true);
         }
 
         selectionTimeRepository.save(selectionTimeEntity);

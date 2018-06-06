@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.*;
+import tss.exceptions.CourseNotFoundException;
+import tss.exceptions.PermissionDeniedException;
+import tss.exceptions.ProgramNotFoundException;
 import tss.exceptions.UserNotStudentException;
 import tss.repositories.*;
 import tss.requests.information.*;
@@ -71,15 +74,20 @@ public class ProgramController {
             return new ResponseEntity<>(new AddCourseinProgramResponse("permission denied"), HttpStatus.FORBIDDEN);
         }*/
 
-        CourseEntity course = courseRepository.findById(request.getCid()).get();
-        ProgramEntity program = programRepository.findByPid(request.getPid()).get();
-        if (course == null) {
+        Optional<CourseEntity> courseEntityOptional = courseRepository.findById(request.getCid());
+        if (!courseEntityOptional.isPresent()) {
             return new ResponseEntity<>(new AddCourseinProgramResponse("no such course"), HttpStatus.FORBIDDEN);
-        } else if (program == null) {
+        }
+        Optional<ProgramEntity> programEntityOptional = programRepository.findByPid(request.getPid());
+        if (!programEntityOptional.isPresent()) {
             return new ResponseEntity<>(new AddCourseinProgramResponse("no such student"), HttpStatus.FORBIDDEN);
         }
 
-        if (programCourseRepository.existsByCourse(course) && programCourseRepository.existsByProgram(program))
+        CourseEntity courseEntity = courseEntityOptional.get();
+        ProgramEntity programEntity = programEntityOptional.get();
+
+        if (programCourseRepository.existsByCourse(courseEntity)
+                && programCourseRepository.existsByProgram(programEntity))
         {
             return new ResponseEntity<>(new AddCourseinProgramResponse("duplicate insert"), HttpStatus.FORBIDDEN);
         }
@@ -87,8 +95,8 @@ public class ProgramController {
 
 
         programcourse.setType(request.getType());
-        programcourse.setCourse(courseRepository.findById(request.getCid()).get());
-        programcourse.setProgram(programRepository.findByPid(request.getPid()).get());
+        programcourse.setCourse(courseEntity);
+        programcourse.setProgram(programEntity);
         programCourseRepository.save(programcourse);
 
 
@@ -144,8 +152,14 @@ public class ProgramController {
         String uid = user.getUid();
 
         if (!user.readTypeName().equals("Student")) {
-            throw new UserNotStudentException();
+            throw new PermissionDeniedException();
         }
+
+        Optional<ProgramEntity> programEntity = programRepository.findByPid(user.getUid());
+        if (!programEntity.isPresent()) {
+            throw new ProgramNotFoundException();
+        }
+        ProgramEntity program = programEntity.get();
 
         MajorEntity major = user.getMajorClass().getMajor();
         Set<CourseEntity> coursesCompulsory = major.getSetOfCompulsory();
@@ -160,18 +174,28 @@ public class ProgramController {
             courses_final.add(course);
             courses_type.add(CourseTypeEnum.COMPULSORY);
             Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
-            if (!crs.isPresent())
-                courses_status.add(ClassStatusEnum.NOT_SELECTED);
-            else
+            if (crs.isPresent())
                 courses_status.add(crs.get().getStatus());
+            else {
+                Optional<ProgramCourseEntity> programCourseEntityOptional = programCourseRepository.findByCourseAndProgram(course, program);
+                if (programCourseEntityOptional.isPresent()) {
+                    courses_status.add(ClassStatusEnum.NOT_SELECTED);
+                }
+                else courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
+            }
         }
 
         for (CourseEntity course : coursesSelective) {
             courses_final.add(course);
             courses_type.add(CourseTypeEnum.SELECTIVE);
             Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
-            if (!crs.isPresent())
-                courses_status.add(ClassStatusEnum.NOT_SELECTED);
+            if (!crs.isPresent()) {
+                Optional<ProgramCourseEntity> programCourseEntityOptional = programCourseRepository.findByCourseAndProgram(course, program);
+                if (programCourseEntityOptional.isPresent()) {
+                    courses_status.add(ClassStatusEnum.NOT_SELECTED);
+                }
+                else courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
+            }
             else
                 courses_status.add(crs.get().getStatus());
         }
@@ -180,8 +204,13 @@ public class ProgramController {
             courses_final.add(course);
             courses_type.add(CourseTypeEnum.PUBLIC);
             Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
-            if (!crs.isPresent())
-                courses_status.add(ClassStatusEnum.NOT_SELECTED);
+            if (!crs.isPresent()) {
+                Optional<ProgramCourseEntity> programCourseEntityOptional = programCourseRepository.findByCourseAndProgram(course, program);
+                if (programCourseEntityOptional.isPresent()) {
+                    courses_status.add(ClassStatusEnum.NOT_SELECTED);
+                }
+                else courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
+            }
             else
                 courses_status.add(crs.get().getStatus());
         }

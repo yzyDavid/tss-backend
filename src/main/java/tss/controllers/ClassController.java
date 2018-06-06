@@ -188,6 +188,7 @@ public class ClassController {
                                             @RequestBody GetClassesForSelectionRequest request) {
         List<ClassEntity> classes;
         List<Boolean> selected = new ArrayList<>();
+        List<Integer> numOfStudents = new ArrayList<>();
 
         // Error: Program not found
         ProgramEntity programEntity = programRepository.findByPid(user.getUid()).orElseThrow(ProgramNotFoundException::new);
@@ -212,21 +213,22 @@ public class ClassController {
                 }
                 else
                     selected.add(Boolean.FALSE);
+                numOfStudents.add(classRegistrationRepository.countByClazz(classEntity));
             }
-            return new GetClassesResponse(classes, selected);
+            return new GetClassesResponse(classes, selected, numOfStudents);
         }
 
         if (request.getCourseName() != null) {
             if (request.getTeacherName() != null) {
                 // 2. Use courseName and teacherName
                 classes = new ArrayList<>();
-                List<CourseEntity> courseEntityList = courseRepository.findByNameLike(request.getCourseName());
+                List<CourseEntity> courseEntityList = courseRepository.findByNameLike("%"+request.getCourseName()+"%");
 
                 for (CourseEntity courseEntity : courseEntityList) {
                     if (!programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity))
                         continue;
 
-                    List<ClassEntity> classEntityList = classRepository.findByCourse_IdAndTeacher_Name(courseEntity.getId(), request.getTeacherName());
+                    List<ClassEntity> classEntityList = classRepository.findByCourse_IdAndTeacher_NameLike(courseEntity.getId(), request.getTeacherName());
                     classes.addAll(classEntityList);
                 }
 
@@ -237,7 +239,7 @@ public class ClassController {
             else {
                 // 3. Use only courseName to search
                 classes = new ArrayList<>();
-                List<CourseEntity> courseEntityList = courseRepository.findByNameLike(request.getCourseName());
+                List<CourseEntity> courseEntityList = courseRepository.findByNameLike("%"+request.getCourseName()+"%");
 
                 for (CourseEntity courseEntity : courseEntityList) {
                     if (!programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity))
@@ -256,7 +258,7 @@ public class ClassController {
             // 4. Use only teacher name to search
             classes = new ArrayList<>();
 
-            List<ClassEntity> classesList = classRepository.findByTeacher_NameLike(request.getTeacherName());
+            List<ClassEntity> classesList = classRepository.findByTeacher_NameLike("%"+request.getTeacherName()+"%");
 
             Set<CourseEntity> courseEntities = new HashSet<>(); // Temporary
             Set<CourseEntity> courseEntities1 = new HashSet<>();  // courses in program
@@ -271,7 +273,9 @@ public class ClassController {
             }
 
             for (CourseEntity courseEntity : courseEntities1) {
-                List<ClassEntity> classEntityList = classRepository.findByCourse_IdAndTeacher_Name(courseEntity.getId(), request.getTeacherName());
+                List<ClassEntity> classEntityList = classRepository.findByCourse_IdAndTeacher_NameLike(
+                        courseEntity.getId(),
+                        "%"+request.getTeacherName()+"%");
                 classes.addAll(classEntityList);
             }
 
@@ -289,8 +293,9 @@ public class ClassController {
             }
             else
                 selected.add(Boolean.FALSE);
+            numOfStudents.add(classRegistrationRepository.countByClazz(classEntity));
         }
-        return new GetClassesResponse(classes, selected);
+        return new GetClassesResponse(classes, selected, numOfStudents);
     }
 
     @PostMapping(path = "/classes/register")
@@ -303,7 +308,7 @@ public class ClassController {
 
         // Error 2: The user is not a student
         if (!user.readTypeName().equals("Student")) {  // The operator is not a student
-            throw new UserNotStudentException();
+            throw new PermissionDeniedException();
         }
         ClassStatusEnum classStatusEnum = ClassStatusEnum.SELECTED;
         String crid = user.getUid()+"CR"+classId;
@@ -335,9 +340,8 @@ public class ClassController {
                 //new ClassRegistrationEntity(0, user, clazz, classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
 
         // Error 6: Classroom is full of students
-        if (clazz.getNumStudent() >= clazz.getCapacity())
+        if (classRegistrationRepository.countByClazz(clazz) >= clazz.getCapacity())
             throw new ClassFullException();
-        clazz.setNumStudent(clazz.getNumStudent() + 1);
         classRepository.save(clazz);
 
         classRegistrationRepository.save(classRegistrationEntity);
@@ -536,7 +540,7 @@ public class ClassController {
         // Error 5: Not in the drop time
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
         if (!selectionTimeRepository.existsByStartLessThanEqualAndEndGreaterThanEqualAndDropTrue(currentTime, currentTime)) {
-            throw new SelectionTimeInvalidRegisterException();
+            throw new SelectionTimeInvalidDropException();
         }
 
         classRegistrationRepository.delete(cr);

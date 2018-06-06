@@ -31,13 +31,13 @@ Program and class selection APIs
 
 ### 2. 选课相关（学生）
 
-|  方法  |                     uri                     | 请求参数(json) |                        返回参数(json)                        |     说明     |
-| :----: | :-----------------------------------------: | :------------: | :----------------------------------------------------------: | :----------: |
-|  POST  |               /classes/search               | 四选一（见下） | **List of**:<br>id(Long)<br>year(Integer)<br>semester<br>capacity(Integer)<br>numStudent(Integer)<br>courseId<br>courseName<br>teachearName<br>timeSlot<br>classroom | 搜索可选课程 |
-|  POST  |              /classes/register              | classId(Long)  |                            status                            |     选课     |
-| DELETE |                /classes/drop                | classId(Long)  |                            status                            |     退课     |
-|  GET   | /classes/get_selected/<br>{year}/{semester} |       无       | **List of:**<br>courseId<br>courseName<br>credit(Float)<br>timeSlot<br>teacher<br>classroom |   查看课表   |
-|  POST  |              /course/get/info               |      cid       | status<br>cid<br>name<br>credit(Float)<br>numLessonsEachWeek(Integer)<br>department<br>intro | 查看课程信息 |
+|  方法  |                     uri                     | 请求参数(json) |                        返回参数(json)                        |              说明              |
+| :----: | :-----------------------------------------: | :------------: | :----------------------------------------------------------: | :----------------------------: |
+|  POST  |               /classes/search               | 四选一（见下） | **List of**:<br>id(Long)<br>year(Integer)<br>semester<br>capacity(Integer)<br>numStudent(Integer)<br>courseId<br>courseName<br>teachearName<br>timeSlot<br>classroom |          搜索可选课程          |
+|  POST  |              /classes/register              | classId(Long)  |                            status                            |              选课              |
+| DELETE |                /classes/drop                | classId(Long)  |                            status                            |              退课              |
+|  GET   | /classes/get_selected/<br>{year}/{semester} |       无       | **List of:**<br>courseId<br>courseName<br>credit(Float)<br>timeSlot<br>teacher<br>classroom |            查看课表            |
+|  POST  |              /course/get/info               |      cid       | status<br>cid<br>name<br>credit(Float)<br>numLessonsEachWeek(Integer)<br>department<br>intro | 查看课程信息**（是A2组写的）** |
 
 - 按**课程Id，课程名称，教师名称，课程与教师名称**来搜索可选的课程
   - url: `POST /classes/search`
@@ -113,3 +113,18 @@ Program and class selection APIs
  GET: /selection_time/show 例子：
 
 ![1528225003993](img\001.png)
+
+
+
+## 后期
+
+#### 对培养方案模块接口的优化
+
+PUT /program/course: 加上@Authorization, 在request中只留下cid
+
+DELETE /program/course: 加上@Authorization, 在request中只留下cid
+
++ 在确保没有选这门课的情况下才可以删除
+
+#### 对选课/退课的优化
+

@@ -16,6 +16,8 @@ public interface ClassRegistrationRepository extends JpaRepository<ClassRegistra
     boolean existsByStudentAndClazz_Course(UserEntity student, CourseEntity course);
     boolean existsByStudentAndClazz(UserEntity student, ClassEntity clazz);
 
+    Integer countByClazz(ClassEntity clazz);
+
     Optional<ClassRegistrationEntity> findByCrid(String crid);
     List<ClassRegistrationEntity> findByStudent(UserEntity student);
     List<ClassRegistrationEntity> findByStudentAndClazz(UserEntity student, ClassEntity clazz);
