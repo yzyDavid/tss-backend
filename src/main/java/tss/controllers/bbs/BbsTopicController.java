@@ -69,17 +69,14 @@ public class BbsTopicController {
         long sectionId = Long.valueOf(request.getBoardID());
         Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(sectionId);
         if (!ret.isPresent()) {
-            return new ResponseEntity<>(new AddBbsTopicResponse(null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AddBbsTopicResponse("-1"), HttpStatus.BAD_REQUEST);
         }
 
         BbsTopicEntity topic = new BbsTopicEntity();
 
         /* FIXME */
-        UserEntity user = new UserEntity();
-        user.setHashedPassword("123");
-        user.setName("joeyyoung");
-        user.setUid("8800");
-        user.setSalt("343");
+        UserEntity user = userRepository.findById("6162").get();
+
 
         topic.setAuthor(user);
         topic.setBelongedSection(ret.get());

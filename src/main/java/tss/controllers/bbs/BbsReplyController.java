@@ -60,11 +60,7 @@ public class BbsReplyController {
         BbsReplyEntity reply = new BbsReplyEntity();
 
         // FIXME
-        UserEntity user = new UserEntity();
-        user.setUid("9669");
-        user.setName("kobe");
-        user.setSalt("12");
-        user.setHashedPassword("601");
+        UserEntity user = userRepository.findById("6162").get();
 
         reply.setAuthor(user);
         reply.setBelongedTopic(topic);
