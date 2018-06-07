@@ -128,10 +128,10 @@ Program and class selection APIs
 
 权限：管理员或老师
 
-| 方法 |             url             | 请求参数(json) | 返回参数(json) |         说明         |
-| :--: | :-------------------------: | :------------: | :------------: | :------------------: |
-| GET  |    /download/{courseId}     |       -        |  一个excel表   | 导出一个course的名单 |
-| GET  | /download/classes/{classId} |       -        |  一个excel表   | 导出一个class的名单  |
+| 方法 |                url                | 请求参数(json) |    返回     |         说明         |
+| :--: | :-------------------------------: | :------------: | :---------: | :------------------: |
+| GET  |    /excel/download/{courseId}     |       -        | 一个excel表 | 导出一个course的名单 |
+| GET  | /excel/download/classes/{classId} |       -        | 一个excel表 | 导出一个class的名单  |
 
 
 
