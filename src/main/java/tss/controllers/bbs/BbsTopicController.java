@@ -1,22 +1,22 @@
 package tss.controllers.bbs;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
+import tss.configs.Config;
+import tss.entities.TypeGroupEntity;
 import tss.entities.UserEntity;
 import tss.entities.bbs.BbsSectionEntity;
 import tss.entities.bbs.BbsTopicEntity;
 import tss.repositories.UserRepository;
 import tss.repositories.bbs.BbsSectionRepository;
 import tss.repositories.bbs.BbsTopicRepository;
-import tss.requests.information.bbs.AddBbsTopicRequest;
-import tss.requests.information.bbs.DeleteBbsTopicRequest;
-import tss.requests.information.bbs.GetAllTopicsPublicRequest;
-import tss.requests.information.bbs.ModifyTopicContentRequest;
+import tss.requests.information.bbs.*;
 import tss.responses.information.bbs.*;
 
 import java.text.DateFormat;
@@ -38,76 +38,102 @@ public class BbsTopicController {
         this.bbsTopicRepository = bbsTopicRepository;
     }
 
-    /* create a topic
+    /**
+     * before add, return the boardName
+     * v1.0, done
+     */
+    @PostMapping(path = "/beforeadd")
+    public ResponseEntity<BeforeAddResponse> beforeAdd(@RequestBody BeforeAddRequest request) {
+        Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(Long.valueOf(request.getBoardID()));
+        if (!ret.isPresent()) {
+            return new ResponseEntity<>(new BeforeAddResponse(null), HttpStatus.OK);
+        }
+        BbsSectionEntity section = ret.get();
+        return new ResponseEntity<>(new BeforeAddResponse(section.getName()), HttpStatus.OK);
+    }
+
+    /**
+     * create a topic
      * request: id, name, section id, content
      * permission: anyone login
      * return: id, name, content, time
+     * v1.0, done
+     * FIXME
      */
     @PostMapping(path = "/add")
-    @Authorization
-    public ResponseEntity<AddBbsTopicResponse> addBbsTopic(@CurrentUser UserEntity user,
+    public ResponseEntity<AddBbsTopicResponse> addBbsTopic(//@CurrentUser UserEntity user,
                                                            @RequestBody AddBbsTopicRequest request) {
-        /* every topic bind to a section
+        /*
          * invalid section id error
          */
-        long sectionId = request.getSectionId();
+        long sectionId = Long.valueOf(request.getBoardID());
         Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(sectionId);
         if (!ret.isPresent()) {
-            return new ResponseEntity<>(new AddBbsTopicResponse("invalid section id", -1, null, null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AddBbsTopicResponse("-1"), HttpStatus.BAD_REQUEST);
         }
 
-        /* anyone login got the permission
-         * bind the author & belongedSectionId
-         */
-        BbsTopicEntity topic = new BbsTopicEntity(user, ret.get());
+        BbsTopicEntity topic = new BbsTopicEntity();
+
+        /* FIXME */
+        UserEntity user = userRepository.findById("6162").get();
+
+
+        topic.setAuthor(user);
+        topic.setBelongedSection(ret.get());
 
         /* init id & name & content */
-        long topicId = request.getId();
-        String name = request.getName();
-        String content = request.getContent();
+        String name = request.getTitle();
+        String content = request.getText();
         topic.setContent(content);
         topic.setName(name);
-        topic.setId(topicId);
 
-        /* init timestamp */
+
+        /* init timestamp, last reply time with create time */
         Date date = new Date();
         DateFormat mediumDateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
         mediumDateFormat.format(date);
         topic.setTime(date);
+        topic.setLastReplyTime(date);
 
-        /* reply num */
+        /* id init auto */
         bbsTopicRepository.save(topic);
-        return new ResponseEntity<>(new AddBbsTopicResponse("ok", topicId, name, content, date), HttpStatus.OK);
+
+        return new ResponseEntity<>(new AddBbsTopicResponse(String.valueOf(topic.getId())), HttpStatus.OK);
     }
 
-    /* delete by id
+    /**
+     * delete by id
      * request: id
      * permission : manager, author
-     * response: id, name, author name;
+     * response: status
+     * v1.0, done
+     * TODO check permission
      */
-    @DeleteMapping(path = "delete")
-    @Authorization
-    public ResponseEntity<DeleteBbsTopicResponse> deleteBbsTopic(@CurrentUser UserEntity user,
+    @PostMapping(path = "/delete")
+    //@Authorization
+    public ResponseEntity<DeleteBbsTopicResponse> deleteBbsTopic(//@CurrentUser UserEntity user,
                                                                  @RequestBody DeleteBbsTopicRequest request) {
         /* invalid topic id error */
-        Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(request.getId());
+        Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTopicID()));
         if (!ret.isPresent()) {
-            return new ResponseEntity<>(new DeleteBbsTopicResponse("no such topic id", -1, null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new DeleteBbsTopicResponse("no such id"), HttpStatus.BAD_REQUEST);
         }
 
         BbsTopicEntity topic = ret.get();
 
         /* only author and manager get the permission */
-        // TODO
+//        if (!Config.TYPES[1].equals(user.readTypeName())
+//                && !user.getUid().equals(topic.getAuthor().getUid())) {
+//            return new ResponseEntity<>(new DeleteBbsTopicResponse("permission denied"), HttpStatus.BAD_REQUEST);
+//        }
 
-        String authorName = topic.getAuthor().getName();
-        String topicName = topic.getName();
         bbsTopicRepository.delete(topic);
 
-        return new ResponseEntity<>(new DeleteBbsTopicResponse("ok", request.getId(), topicName, authorName), HttpStatus.OK);
+        return new ResponseEntity<>(new DeleteBbsTopicResponse("delete ok"), HttpStatus.OK);
     }
 
-    /* modify the topic content
+    /**
+     * modify the topic content
      * request: id, new content
      * permission: author only
      * return: id, name, content, time
@@ -140,35 +166,9 @@ public class BbsTopicController {
         return new ResponseEntity<>(new ModifyTopicContentResponse("ok", topic.getId(), topic.getName(), topic.getContent(), topic.getTime()), HttpStatus.OK);
     }
 
-    /* Look for topic by id
-     * get par: id
-     * permission: anyone
-     * return: id, name, content, time, author_name, section_name, reply number
-     */
-    @GetMapping(path = "id")
-    public ResponseEntity<GetTopicInfoByIdResponse> getTopicInfoById(@RequestParam long id) {
-        /* invalid topic id error */
-        Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(id);
-        if (!ret.isPresent()) {
-            return new ResponseEntity<>(new GetTopicInfoByIdResponse("no such topic", -1, null, null, null,
-                    null, null, 0), HttpStatus.BAD_REQUEST);
-        }
 
-        BbsTopicEntity topic = ret.get();
-        String name = topic.getName();
-        String content = topic.getContent();
-        String authorName = topic.getAuthor().getName();
-        String sectionName = topic.getBelongedSection().getName();
-        Date time = topic.getTime();
-        DateFormat mediumDateFormat = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
-        mediumDateFormat.format(time);
-        int replyNum = topic.getReplyNum();
-
-        return new ResponseEntity<>(new GetTopicInfoByIdResponse("ok", topic.getId(), name, content,
-                time, authorName, sectionName, replyNum), HttpStatus.OK);
-    }
-
-    /* published topics by current user
+    /**
+     * published topics by current user
      * v1.0, done
      */
     @GetMapping(path = "/published")
@@ -183,7 +183,8 @@ public class BbsTopicController {
 
         String userName = user.getName();
         String currentPage = page;
-        String totalPage = String.valueOf(topics.size() / 20); // +1?
+        /* page + 1 */
+        String totalPage = String.valueOf(topics.size() / 20 + 1);
         List<String> titles = new ArrayList<>();
         List<String> times = new ArrayList<>();
         List<String> topicIDs = new ArrayList<>();
@@ -213,13 +214,13 @@ public class BbsTopicController {
     }
 
 
-    /* show all topics under a certain section
+    /**
+     * show all topics under a certain section
      * public part/ top part
      * v1.0, done
      */
     @PostMapping(path = "/topinfo")
-    public ResponseEntity<GetAllTopicsPublicResponse> getAllTopTopics(@CurrentUser UserEntity user,
-                                                                      @RequestBody GetAllTopicsPublicRequest request) {
+    public ResponseEntity<GetAllTopicsPublicResponse> getAllTopTopics(@RequestBody GetAllTopicsPublicRequest request) {
         /* haven't deal with not found situation */
         Optional<BbsSectionEntity> sret = bbsSectionRepository.findById(Long.valueOf(request.getBoardID()));
         if (!sret.isPresent()) {
@@ -242,12 +243,13 @@ public class BbsTopicController {
         Set<BbsTopicEntity> topics = section.getTopics();
         for (BbsTopicEntity topic : topics) {
             /* find topic been set top */
-            if (topic.isTop()) {
+            if (topic.getIsTop()) {
                 topTitles.add(topic.getName());
                 topAuthors.add(topic.getAuthor().getName());
                 topTimes.add(topic.getTime().toString());
                 topReplys.add(String.valueOf(topic.getReplyNum()));
                 topTopicIDs.add(String.valueOf(topic.getId()));
+
                 topLastReplyTimes.add(topic.getLastReplyTime().toString());
             }
         }
@@ -255,16 +257,113 @@ public class BbsTopicController {
     }
 
     /**
-     * TODO
      * show all topics under a certain section
      * page show, / not top part
+     * v1.0, done
+     */
+    @PostMapping(path = "/info")
+    public ResponseEntity<GetAllNotTopTopicsResponse> getAllNotTopTopics(//@CurrentUser UserEntity user,
+                                                                         @RequestBody GetAllNotTopTopicsRequest request) {
+        /* haven't deal with not found situation */
+        Optional<BbsSectionEntity> sret = bbsSectionRepository.findById(Long.valueOf(request.getBoardID()));
+        if (!sret.isPresent()) {
+            return new ResponseEntity<>(new GetAllNotTopTopicsResponse(null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
+        }
+
+        BbsSectionEntity section = sret.get();
+
+        String currentPage = request.getCurrentPage();
+
+        List<String> topicTitles = new ArrayList<>();
+        List<String> topicAuthors = new ArrayList<>();
+        List<String> topicTimes = new ArrayList<>();
+        List<String> topicReplys = new ArrayList<>();
+        List<String> topicIDs = new ArrayList<>();
+        List<String> topicLastReplyTimes = new ArrayList<>();
+
+        Set<BbsTopicEntity> topics = section.getTopics();
+        String totalPage = String.valueOf(topics.size() / 20 + 1);
+
+        Iterator<BbsTopicEntity> iter = topics.iterator();
+        int count = 0;
+        while (iter.hasNext()) {
+            BbsTopicEntity topic = iter.next();
+            if (topic.getIsTop()) {
+                continue;
+            }
+
+            count++;
+            if (count < (Integer.valueOf(currentPage) - 1) * 20 + 1) {
+                continue;
+            }
+            if (count > (Integer.valueOf(currentPage) * 20)) {
+                break;
+            }
+
+            /* show */
+            topicTitles.add(topic.getName());
+            topicAuthors.add(topic.getAuthor().getName());
+            topicTimes.add(topic.getTime().toString());
+            topicReplys.add(String.valueOf(topic.getReplyNum()));
+            topicIDs.add(String.valueOf(topic.getId()));
+            topicLastReplyTimes.add(topic.getLastReplyTime().toString());
+        }
+
+        return new ResponseEntity<>(new GetAllNotTopTopicsResponse(currentPage, totalPage, topicTitles, topicAuthors, topicTimes, topicReplys, topicIDs, topicLastReplyTimes), HttpStatus.OK);
+    }
+
+
+    /**
+     * set a topic to be top
+     * TODO need check permission
      * v1.0,
      */
-/*    @PostMapping(path = "/info")
-    public ResponseEntity<GetAllNotTopTopicsResponse> getAllNotTopTopics(@CurrentUser UserEntity user,
-                                               @RequestBody GetAllNotTopTopicsRequest request){
-        
-    }*/
+    @PostMapping(path = "/settop")
+    //@Authorization
+    public ResponseEntity<SetTopicTopResponse> setTopicTop(//@CurrentUser UserEntity user,
+                                                           @RequestBody SetTopicTopRequest request) {
+        /* invalid topic id error */
+        Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTopicID()));
+        if (!ret.isPresent()) {
+            return new ResponseEntity<>(new SetTopicTopResponse("no such topic"), HttpStatus.BAD_REQUEST);
+        }
+
+        BbsTopicEntity topic = ret.get();
+
+//        if (!Config.TYPES[1].equals(user.readTypeName())) {
+//            return new ResponseEntity<>(new SetTopicTopResponse("permission denied!"), HttpStatus.BAD_REQUEST);
+//        }
+
+        topic.setIsTop(true);
+        bbsTopicRepository.save(topic);
+
+        return new ResponseEntity<>(new SetTopicTopResponse("set top ok"), HttpStatus.OK);
+    }
 
 
+    @PostMapping(path = "/setntop")
+    //@Authorization
+    public ResponseEntity<SetTopicNotTopResponse> setTopicNotTop(//@CurrentUser UserEntity user,
+                                                                 @RequestBody SetTopicNotTopRequest request) {
+        /* invalid topic id error */
+        Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTopicID()));
+        if (!ret.isPresent()) {
+            return new ResponseEntity<>(new SetTopicNotTopResponse("no such topic"), HttpStatus.BAD_REQUEST);
+        }
+
+        BbsTopicEntity topic = ret.get();
+
+//        if (!Config.TYPES[1].equals(user.readTypeName())) {
+//            return new ResponseEntity<>(new SetTopicTopResponse("permission denied!"), HttpStatus.BAD_REQUEST);
+//        }
+
+        if (topic.getIsTop()) {
+            return new ResponseEntity<>(new SetTopicNotTopResponse("the topic is not top"), HttpStatus.BAD_REQUEST);
+        }
+
+        topic.setIsTop(false);
+        bbsTopicRepository.save(topic);
+
+        return new ResponseEntity<>(new SetTopicNotTopResponse("cancel top ok"), HttpStatus.OK);
+    }
 }

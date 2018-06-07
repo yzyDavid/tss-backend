@@ -7,12 +7,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
+import tss.configs.Config;
 import tss.entities.UserEntity;
 import tss.entities.bbs.BbsSectionEntity;
 import tss.repositories.bbs.BbsSectionRepository;
 import tss.requests.information.bbs.AddBbsSectionRequest;
+import tss.requests.information.bbs.AddSectionNoticeRequest;
 import tss.requests.information.bbs.DeleteBbsSectionRequest;
 import tss.responses.information.bbs.AddBbsSectionResponse;
+import tss.responses.information.bbs.AddSectionNoticeResponse;
 import tss.responses.information.bbs.DeleteBbsSectionResponse;
 import tss.responses.information.bbs.GetInfoBbsSectionResponse;
 
@@ -31,38 +34,27 @@ public class BbsSectionController {
         this.bbsSectionRepository = bbsSectionRepository;
     }
 
-    /* create a section
+    /**
+     * create a section
      * request: id, name, teacher id
      * permission : manager
      * return : id, name, teacher name
+     * maybe no use
      */
-    @PutMapping(path = "/add")
-    @Authorization
-    public ResponseEntity<AddBbsSectionResponse> addBbsSection(@CurrentUser UserEntity user,
-                                                               @RequestBody AddBbsSectionRequest request) {
-        /* every section init bind a teacher */
-        /* test the exit of teacher */
-        String teacherID = request.getTid();
-
-        long id = request.getId();
-        String name = request.getName();
-
-        /* permission and duplicated error */
-        // TODO
-
-        /* init the new section */
+    @PostMapping(path = "/add")
+    public ResponseEntity<AddBbsSectionResponse> addBbsSection(@RequestBody AddBbsSectionRequest request) {
         BbsSectionEntity section = new BbsSectionEntity();
-        section.setId(id);
-        section.setName(name);
+        section.setUsrNum(0);
+        section.setName(request.getName());
 
-        /* sum the user number according to the teacher */
 
         bbsSectionRepository.save(section);
-        // FIXME
-        return new ResponseEntity<>(new AddBbsSectionResponse("add ok", id, name, ""), HttpStatus.OK);
+
+        return new ResponseEntity<>(new AddBbsSectionResponse("ok", request.getId(), request.getName(), request.getTname()), HttpStatus.OK);
     }
 
-    /* delete a section with id
+    /**
+     * delete a section with id
      * request: id
      * permission: manager
      * return: id, name
@@ -116,6 +108,29 @@ public class BbsSectionController {
     }
 
 
-    /* to do: modify, many add section introduction part */
+    /**
+     * create a section notice
+     * v1.0, done
+     */
+    @PostMapping(path = "/addnotice")
+    //@Authorization
+    public ResponseEntity<AddSectionNoticeResponse> addSectionNotice(//@CurrentUser UserEntity user,
+                                                                     @RequestBody AddSectionNoticeRequest request) {
+        Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(Long.valueOf(request.getBoardID()));
+        if (!ret.isPresent()) {
+            return new ResponseEntity<>(new AddSectionNoticeResponse("no such section!"), HttpStatus.BAD_REQUEST);
+        }
+
+        /* check permission, only manager can do*/
+//        if (!Config.TYPES[1].equals(user.readTypeName())) {
+//            return new ResponseEntity<>(new AddSectionNoticeResponse("permission denied"), HttpStatus.FORBIDDEN);
+//        }
+
+        BbsSectionEntity section = ret.get();
+        section.setNotice(request.getBoardText());
+
+        bbsSectionRepository.save(section);
+        return new ResponseEntity<>(new AddSectionNoticeResponse("add notice ok"), HttpStatus.OK);
+    }
 
 }

@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface BbsRetrieveRepository extends CrudRepository<BbsRetrieveEntity, Long>{
     List<BbsRetrieveEntity> findByReceiver(UserEntity receiver);
+    List<BbsRetrieveEntity> findBySender(UserEntity sender);
 }

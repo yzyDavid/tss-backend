@@ -1,8 +1,7 @@
 package tss.requests.information.bbs;
 
-public class GetAllTopicsPublicRequest {
+public class BeforeAddRequest {
     private String boardID;
-
 
     public String getBoardID() {
         return boardID;
