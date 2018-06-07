@@ -45,15 +45,15 @@ public class ProgramController {
                                                          @RequestBody AddProgramRequest request)
     {
 
-        if (!user.getUid().equals(request.getUid()))
-        {
-            return new ResponseEntity<>(new AddProgramResponse("permission denied"), HttpStatus.FORBIDDEN);
+        if (!user.readTypeName().equals("Student")) {
+            return new ResponseEntity<>(new AddProgramResponse("Permission denied: You are not a student"), HttpStatus.FORBIDDEN);
         }
+
         ProgramEntity program = new ProgramEntity();
 
-        program.setUid(request.getUid());
-        program.setPid(request.getUid());
-        UserEntity user_i = userRepository.findById(request.getUid()).get();
+        program.setUid(user.getUid());
+        program.setPid(user.getUid());
+        UserEntity user_i = userRepository.findById(user.getUid()).get();
         HashSet<UserEntity> users = new HashSet<>();
         users.add(user_i);
         program.setStudents(users);
@@ -64,21 +64,19 @@ public class ProgramController {
     }
 
     @PutMapping(path = "course")
-//    @Authorization
-    public ResponseEntity<AddCourseinProgramResponse> addCourseinProgram(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<AddCourseinProgramResponse> addCourseinProgram(@CurrentUser UserEntity user,
                                                                          @RequestBody AddCourseinProgramRequest request)
     {
-
-/*        if (!user.getUid().equals(request.getUid()))
-        {
-            return new ResponseEntity<>(new AddCourseinProgramResponse("permission denied"), HttpStatus.FORBIDDEN);
-        }*/
+        if (!user.readTypeName().equals("Student")) {
+            return new ResponseEntity<>(new AddCourseinProgramResponse("Permission denied: You are not a student"), HttpStatus.FORBIDDEN);
+        }
 
         Optional<CourseEntity> courseEntityOptional = courseRepository.findById(request.getCid());
         if (!courseEntityOptional.isPresent()) {
             return new ResponseEntity<>(new AddCourseinProgramResponse("no such course"), HttpStatus.FORBIDDEN);
         }
-        Optional<ProgramEntity> programEntityOptional = programRepository.findByPid(request.getPid());
+        Optional<ProgramEntity> programEntityOptional = programRepository.findByPid(user.getUid());
         if (!programEntityOptional.isPresent()) {
             return new ResponseEntity<>(new AddCourseinProgramResponse("no such student"), HttpStatus.FORBIDDEN);
         }
@@ -93,39 +91,57 @@ public class ProgramController {
         }
         ProgramCourseEntity programcourse = new ProgramCourseEntity();
 
+        // Modified by ljh
+        MajorEntity major = user.getMajorClass().getMajor();
+        Set<CourseEntity> coursesCompulsory = major.getSetOfCompulsory();
+        Set<CourseEntity> coursesSelective = major.getSetOfSelective();
+        Set<CourseEntity> coursesPublic = major.getSetOfPublic();
 
-        programcourse.setType(request.getType());
+        if (coursesCompulsory.contains(courseEntity)) {
+            programcourse.setType(ProgramCourseEntity.COMPULSORY_COURSE);
+        }
+        else if (coursesSelective.contains(courseEntity)) {
+            programcourse.setType(ProgramCourseEntity.MAJOR_SELECTIVE_COURSE);
+        }
+        else if (coursesPublic.contains(courseEntity)) {
+            programcourse.setType(ProgramCourseEntity.PUBLIC_SELECTIVE_COURSE);
+        }
+        else
+            return new ResponseEntity<>(new AddCourseinProgramResponse("course not in major programs"), HttpStatus.FORBIDDEN);
+
         programcourse.setCourse(courseEntity);
         programcourse.setProgram(programEntity);
         programCourseRepository.save(programcourse);
-
 
         return new ResponseEntity<>(new AddCourseinProgramResponse("ok"), HttpStatus.CREATED);
 
     }
 
     @DeleteMapping(path = "/course")
- //   @Authorization
-    public ResponseEntity<DeleteCourseinProgramResponse> deleCourseinProgram(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<DeleteCourseinProgramResponse> deleCourseinProgram(@CurrentUser UserEntity user,
                                                              @RequestBody DeleteCourseinProgramRequest request)
     {
-/*        if (!user.getUid().equals(request.getPid()))
-        {
-            return new ResponseEntity<>(new DeleteCourseinProgramResponse("permission denied",null,null,null), HttpStatus.FORBIDDEN);
-        }*/
-        String pid = request.getPid();
+        if (!user.readTypeName().equals("Student")) {
+            return new ResponseEntity<>(new DeleteCourseinProgramResponse("Permission denied: You are not a student",
+                    null, null, null), HttpStatus.FORBIDDEN);
+        }
+
+        String pid = user.getUid();
         String cid = request.getCid();
 
         Optional<ProgramEntity> ret = programRepository.findByPid(pid);
         if (!ret.isPresent())
         {
-            return new ResponseEntity<>(new DeleteCourseinProgramResponse("non-existent program id",null,null,null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new DeleteCourseinProgramResponse("non-existent program id",
+                    null,null,null), HttpStatus.BAD_REQUEST);
         }
 
         Optional<CourseEntity> ret2 = courseRepository.findById(cid);
         if (!ret2.isPresent())
         {
-            return new ResponseEntity<>(new DeleteCourseinProgramResponse("non-existent course id",null,null,null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new DeleteCourseinProgramResponse("non-existent course id",
+                    null,null,null), HttpStatus.BAD_REQUEST);
         }
 
 
@@ -218,4 +234,120 @@ public class ProgramController {
         return new ResponseEntity<>(new GetProgramCoursesResponse(courses_final, courses_type, courses_status), HttpStatus.OK);
     }
 
+    @GetMapping("/status/in_program")
+    @Authorization
+    public ResponseEntity<GetProgramCoursesResponse> getCoursesInProgram(@CurrentUser UserEntity user) {
+        String uid = user.getUid();
+
+        if (!user.readTypeName().equals("Student")) {
+            throw new PermissionDeniedException();
+        }
+
+        Optional<ProgramEntity> programEntity = programRepository.findByPid(user.getUid());
+        if (!programEntity.isPresent()) {
+            throw new ProgramNotFoundException();
+        }
+        ProgramEntity program = programEntity.get();
+
+        MajorEntity major = user.getMajorClass().getMajor();
+        Set<CourseEntity> coursesCompulsory = major.getSetOfCompulsory();
+        Set<CourseEntity> coursesSelective = major.getSetOfSelective();
+        Set<CourseEntity> coursesPublic = major.getSetOfPublic();
+
+        List<CourseEntity> courses_final = new ArrayList<>();
+        List<CourseTypeEnum> courses_type = new ArrayList<>();
+        List<ClassStatusEnum> courses_status = new ArrayList<>();
+
+        for (CourseEntity course : coursesCompulsory) {
+            if (programCourseRepository.existsByCourseAndProgram(course, program)) {
+                courses_final.add(course);
+                courses_type.add(CourseTypeEnum.COMPULSORY);
+                Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
+                if (crs.isPresent()) {
+                    courses_status.add(crs.get().getStatus());
+                }
+                else {
+                    courses_status.add(ClassStatusEnum.NOT_SELECTED);
+                }
+            }
+        }
+
+        for (CourseEntity course : coursesSelective) {
+            if (programCourseRepository.existsByCourseAndProgram(course, program)) {
+                courses_final.add(course);
+                courses_type.add(CourseTypeEnum.SELECTIVE);
+                Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
+                if (crs.isPresent()) {
+                    courses_status.add(crs.get().getStatus());
+                }
+                else {
+                    courses_status.add(ClassStatusEnum.NOT_SELECTED);
+                }
+            }
+        }
+
+        for (CourseEntity course : coursesPublic) {
+            if (programCourseRepository.existsByCourseAndProgram(course, program)) {
+                courses_final.add(course);
+                courses_type.add(CourseTypeEnum.PUBLIC);
+                Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
+                if (crs.isPresent()) {
+                    courses_status.add(crs.get().getStatus());
+                }
+                else {
+                    courses_status.add(ClassStatusEnum.NOT_SELECTED);
+                }
+            }
+        }
+
+        return new ResponseEntity<>(new GetProgramCoursesResponse(courses_final, courses_type, courses_status), HttpStatus.OK);
+    }
+
+    @GetMapping("/status/not_in_program")
+    @Authorization
+    public ResponseEntity<GetProgramCoursesResponse> getCoursesNotInProgram(@CurrentUser UserEntity user) {
+        String uid = user.getUid();
+
+        if (!user.readTypeName().equals("Student")) {
+            throw new PermissionDeniedException();
+        }
+
+        Optional<ProgramEntity> programEntity = programRepository.findByPid(user.getUid());
+        if (!programEntity.isPresent()) {
+            throw new ProgramNotFoundException();
+        }
+        ProgramEntity program = programEntity.get();
+
+        MajorEntity major = user.getMajorClass().getMajor();
+        Set<CourseEntity> coursesCompulsory = major.getSetOfCompulsory();
+        Set<CourseEntity> coursesSelective = major.getSetOfSelective();
+        Set<CourseEntity> coursesPublic = major.getSetOfPublic();
+
+        List<CourseEntity> courses_final = new ArrayList<>();
+        List<CourseTypeEnum> courses_type = new ArrayList<>();
+        List<ClassStatusEnum> courses_status = new ArrayList<>();
+
+        for (CourseEntity course : coursesCompulsory) {
+            if (programCourseRepository.existsByCourseAndProgram(course, program)) continue;
+            courses_final.add(course);
+            courses_type.add(CourseTypeEnum.COMPULSORY);
+            courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
+        }
+
+        for (CourseEntity course : coursesSelective) {
+            if (programCourseRepository.existsByCourseAndProgram(course, program)) continue;
+            courses_final.add(course);
+            courses_type.add(CourseTypeEnum.SELECTIVE);
+            courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
+        }
+
+        for (CourseEntity course : coursesPublic) {
+            if (programCourseRepository.existsByCourseAndProgram(course, program)) continue;
+            courses_final.add(course);
+            courses_type.add(CourseTypeEnum.PUBLIC);
+            courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
+        }
+
+        return new ResponseEntity<>(new GetProgramCoursesResponse(courses_final, courses_type, courses_status), HttpStatus.OK);
+    }
 }
