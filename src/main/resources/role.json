@@ -48,5 +48,40 @@
       0,
       1
     ]
+  },
+  "score_administrator":{
+    "prefix":"grade",
+    "paths":[
+      "getallclass",
+      "getclassstudent",
+      "getclasssgrade",
+      "add",
+      "modify"
+    ],
+    "belong2":[
+      3
+    ]
+  },
+  "scoremodify_adminstrator":
+  {
+    "prefix":"grade",
+    "paths":[
+      "getprocessmodify",
+      "processmodify"
+    ],
+    "belong2":[
+      1,
+      2
+    ]
+  },
+  "score_user":
+  {
+    "prefix":"grade",
+    "paths":[
+      "getclassstudentscore"
+    ],
+    "belong2":[
+      4
+    ]
   }
 }
