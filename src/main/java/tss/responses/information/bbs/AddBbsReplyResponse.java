@@ -5,7 +5,6 @@ import org.jetbrains.annotations.Nls;
 import java.util.Date;
 
 public class AddBbsReplyResponse {
-    @Nls
     private final String status;
 
     public AddBbsReplyResponse(String status) {

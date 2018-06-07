@@ -11,6 +11,14 @@ public class GetAllReplyResponse {
     private final String boardName;
     private final String boardID;
     private final String topicID;
+
+    /* topic information */
+    private final String lzid;
+    private final String lztext;
+    private final String lzphoto;
+    private final String lztime;
+    private final String lzname;
+
     private final List<String> ids;
     private final List<String> texts;
     private final List<String> quotes;
@@ -20,8 +28,9 @@ public class GetAllReplyResponse {
     private final List<String> quoteAuthors;
     private final List<String> quoteTimes;
     private final List<String> quoteIndexs;
+    private final List<String> names;
 
-    public GetAllReplyResponse(String title, String totalPage, String currentPage, String postTime, String boardName, String boardID, String topicID, List<String> ids, List<String> texts, List<String> quotes, List<String> times, List<String> photos, List<String> indexs, List<String> quoteAuthors, List<String> quoteTimes, List<String> quoteIndexs) {
+    public GetAllReplyResponse(String title, String totalPage, String currentPage, String postTime, String boardName, String boardID, String topicID, String lzid, String lztext, String lzphoto, String lztime, String lzname, List<String> ids, List<String> texts, List<String> quotes, List<String> times, List<String> photos, List<String> indexs, List<String> quoteAuthors, List<String> quoteTimes, List<String> quoteIndexs, List<String> names) {
         this.title = title;
         this.totalPage = totalPage;
         this.currentPage = currentPage;
@@ -29,6 +38,11 @@ public class GetAllReplyResponse {
         this.boardName = boardName;
         this.boardID = boardID;
         this.topicID = topicID;
+        this.lzid = lzid;
+        this.lztext = lztext;
+        this.lzphoto = lzphoto;
+        this.lztime = lztime;
+        this.lzname = lzname;
         this.ids = ids;
         this.texts = texts;
         this.quotes = quotes;
@@ -38,6 +52,7 @@ public class GetAllReplyResponse {
         this.quoteAuthors = quoteAuthors;
         this.quoteTimes = quoteTimes;
         this.quoteIndexs = quoteIndexs;
+        this.names = names;
     }
 
     public String getTitle() {
@@ -66,6 +81,26 @@ public class GetAllReplyResponse {
 
     public String getTopicID() {
         return topicID;
+    }
+
+    public String getLzid() {
+        return lzid;
+    }
+
+    public String getLztext() {
+        return lztext;
+    }
+
+    public String getLzphoto() {
+        return lzphoto;
+    }
+
+    public String getLztime() {
+        return lztime;
+    }
+
+    public String getLzname() {
+        return lzname;
     }
 
     public List<String> getIds() {
@@ -102,5 +137,9 @@ public class GetAllReplyResponse {
 
     public List<String> getQuoteIndexs() {
         return quoteIndexs;
+    }
+
+    public List<String> getNames() {
+        return names;
     }
 }

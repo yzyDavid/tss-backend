@@ -1,13 +1,13 @@
 package tss.requests.information.bbs;
 
 public class ReadBbsRetrieveRequest {
-    private long id;
+    private String letterId;
 
-    public long getId() {
-        return id;
+    public String getLetterId() {
+        return letterId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setLetterId(String letterId) {
+        this.letterId = letterId;
     }
 }
