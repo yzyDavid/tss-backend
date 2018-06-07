@@ -190,8 +190,12 @@ public class ClassController {
         List<Boolean> selected = new ArrayList<>();
         List<Integer> numOfStudents = new ArrayList<>();
 
+
         // Error: Program not found
-        ProgramEntity programEntity = programRepository.findByPid(user.getUid()).orElseThrow(ProgramNotFoundException::new);
+        ProgramEntity programEntity = new ProgramEntity();
+        if (user.readTypeName().equals("Student")) {
+            programEntity = programRepository.findByPid(user.getUid()).orElseThrow(ProgramNotFoundException::new);
+        }
 
         // 1. Use ID to search
         if (request.getCourseId() != null) {
