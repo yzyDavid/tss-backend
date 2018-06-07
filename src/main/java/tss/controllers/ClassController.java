@@ -199,7 +199,7 @@ public class ClassController {
             CourseEntity courseEntity;
             courseEntity = courseRepository.findById(request.getCourseId()).orElseThrow(CourseNotFoundException::new);
             // Error 2: Courses not found in program
-            if (!programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity)) {
+            if (user.readTypeName().equals("Student") && !programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity)) {
                 throw new CourseNotFoundInProgramException();
             }
             // Error 3: Classes not found
@@ -208,7 +208,7 @@ public class ClassController {
                 throw new ClazzNotFoundException();
             }
             for (ClassEntity classEntity : classes) {
-                if (classRegistrationRepository.existsByStudentAndClazz(user, classEntity)) {
+                if (user.readTypeName().equals("Student") && classRegistrationRepository.existsByStudentAndClazz(user, classEntity)) {
                     selected.add(Boolean.TRUE);
                 }
                 else
@@ -224,8 +224,9 @@ public class ClassController {
                 classes = new ArrayList<>();
                 List<CourseEntity> courseEntityList = courseRepository.findByNameLike("%"+request.getCourseName()+"%");
 
+
                 for (CourseEntity courseEntity : courseEntityList) {
-                    if (!programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity))
+                    if (user.readTypeName().equals("Student") && !programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity))
                         continue;
 
                     List<ClassEntity> classEntityList = classRepository.findByCourse_IdAndTeacher_NameLike(courseEntity.getId(), request.getTeacherName());
@@ -242,7 +243,7 @@ public class ClassController {
                 List<CourseEntity> courseEntityList = courseRepository.findByNameLike("%"+request.getCourseName()+"%");
 
                 for (CourseEntity courseEntity : courseEntityList) {
-                    if (!programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity))
+                    if (user.readTypeName().equals("Student") && !programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity))
                         continue;
 
                     List<ClassEntity> classEntityList = classRepository.findByCourse_Id(courseEntity.getId());
@@ -267,7 +268,7 @@ public class ClassController {
                 if (courseEntities.contains(courseEntity))
                     continue;
                 courseEntities.add(courseEntity);
-                if (!programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity))
+                if (user.readTypeName().equals("Student") && !programCourseRepository.existsByCourseAndProgram(courseEntity, programEntity))
                     continue;
                 courseEntities1.add(courseEntity);
             }
@@ -288,7 +289,7 @@ public class ClassController {
         }
 
         for (ClassEntity classEntity : classes) {
-            if (classRegistrationRepository.existsByStudentAndClazz(user, classEntity)) {
+            if (user.readTypeName().equals("Student") && classRegistrationRepository.existsByStudentAndClazz(user, classEntity)) {
                 selected.add(Boolean.TRUE);
             }
             else
