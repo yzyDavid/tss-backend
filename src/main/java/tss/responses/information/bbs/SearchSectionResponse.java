@@ -6,7 +6,7 @@ public class SearchSectionResponse {
     private final List<String> boardNames;
     private final List<String> boardIDs;
 
-    public SearchSectionResponse(List<String> boardIDs, List<String> boardNames) {
+    public SearchSectionResponse(List<String> boardNames, List<String> boardIDs) {
         this.boardNames = boardNames;
         this.boardIDs = boardIDs;
     }

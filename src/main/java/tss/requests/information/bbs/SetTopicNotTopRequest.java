@@ -1,6 +1,6 @@
 package tss.requests.information.bbs;
 
-public class DeleteBbsTopicRequest {
+public class SetTopicNotTopRequest {
     private String topicID;
 
     public String getTopicID() {

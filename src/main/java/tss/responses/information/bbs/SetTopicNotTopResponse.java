@@ -2,13 +2,11 @@ package tss.responses.information.bbs;
 
 import org.jetbrains.annotations.Nls;
 
-import java.util.Date;
-
-public class ReadBbsRetrieveResponse {
+public class SetTopicNotTopResponse {
     @Nls
     private final String status;
 
-    public ReadBbsRetrieveResponse(String status) {
+    public SetTopicNotTopResponse(String status) {
         this.status = status;
     }
 

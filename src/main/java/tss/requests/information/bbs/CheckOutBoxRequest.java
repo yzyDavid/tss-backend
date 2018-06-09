@@ -1,16 +1,7 @@
 package tss.requests.information.bbs;
 
-public class GetAllReplyRequest {
-    private String tid;
+public class CheckOutBoxRequest {
     private String page;
-
-    public String getTid() {
-        return tid;
-    }
-
-    public void setTid(String tid) {
-        this.tid = tid;
-    }
 
     public String getPage() {
         return page;
