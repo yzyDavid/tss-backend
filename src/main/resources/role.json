@@ -1,0 +1,87 @@
+{
+  "user_administrator": {
+    "prefix": "user",
+    "paths": [
+      "add",
+      "delete",
+      "reset/pwd",
+      "modify/info",
+      "get/info",
+      "query"
+    ],
+    "belong2": [
+      0
+    ]
+  },
+  "course_administrator": {
+    "prefix": "course",
+    "paths": [
+      "add",
+      "delete",
+      "modify",
+      "query",
+      "get/info"
+    ],
+    "belong2": [
+      0,
+      1
+    ]
+  },
+  "department_administrator": {
+    "prefix": "dept",
+    "paths": [
+      "department/add",
+      "department/delete",
+      "department/get/info",
+      "department/get/list",
+      "department/modify",
+      "major/add",
+      "major/delete",
+      "major/get/info",
+      "major/modify",
+      "class/add",
+      "class/delete",
+      "class/get/info",
+      "class/modify"
+    ],
+    "belong2": [
+      0,
+      1
+    ]
+  },
+  "score_administrator":{
+    "prefix":"grade",
+    "paths":[
+      "getallclass",
+      "getclassstudent",
+      "getclasssgrade",
+      "add",
+      "modify"
+    ],
+    "belong2":[
+      3
+    ]
+  },
+  "scoremodify_adminstrator":
+  {
+    "prefix":"grade",
+    "paths":[
+      "getprocessmodify",
+      "processmodify"
+    ],
+    "belong2":[
+      1,
+      2
+    ]
+  },
+  "score_user":
+  {
+    "prefix":"grade",
+    "paths":[
+      "getclassstudentscore"
+    ],
+    "belong2":[
+      3
+    ]
+  }
+}

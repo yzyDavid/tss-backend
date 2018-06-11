@@ -1,14 +1,13 @@
 package tss.requests.information;
 
 public class DeleteUserRequest {
-    private String uid;
+    private String[] uids;
 
-    public String getUid() {
-        return uid;
+    public String[] getUids() {
+        return uids;
     }
 
-    public String setUid() {
-        return uid;
+    public void setUids(String[] uids) {
+        this.uids = uids;
     }
-
 }

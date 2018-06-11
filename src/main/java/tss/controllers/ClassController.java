@@ -2,209 +2,377 @@ package tss.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.*;
+import tss.exceptions.ClazzNotFoundException;
+import tss.exceptions.CourseNotFoundException;
+import tss.exceptions.TeacherNotFoundException;
+import tss.models.ClassArrangementResult;
+import tss.models.Clazz;
 import tss.repositories.*;
-import tss.requests.information.AddClassRequest;
-import tss.requests.information.DeleteClassesRequest;
-import tss.requests.information.GetInstructorsRequest;
-import tss.requests.information.ModifyClassRequest;
-import tss.responses.information.AddClassResponse;
-import tss.responses.information.DeleteClassesResponse;
-import tss.responses.information.GetInstructorsResponse;
-import tss.responses.information.ModifyClassResponse;
+import tss.responses.information.GetClassesResponse;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-@Controller
-@RequestMapping(path = "/class")
+/**
+ * @author reeve
+ * @author NeverMore2744
+ */
+@RestController
+@RequestMapping()
 public class ClassController {
     private final CourseRepository courseRepository;
-    private final TeachesRepository teachesRepository;
-    private final UserRepository userRepository;
-    private final TakesRepository takesRepository;
     private final ClassRepository classRepository;
+    private final UserRepository userRepository;
+    private final ClassroomRepository classroomRepository;
 
     @Autowired
-    public ClassController(CourseRepository courseRepository, TeachesRepository teachesRepository,
-                           UserRepository userRepository, TakesRepository takesRepository,
-                           ClassRepository classRepository) {
+    public ClassController(CourseRepository courseRepository, ClassRepository classRepository, UserRepository
+            userRepository, ClassroomRepository classroomRepository) {
         this.courseRepository = courseRepository;
-        this.teachesRepository = teachesRepository;
-        this.userRepository = userRepository;
-        this.takesRepository = takesRepository;
         this.classRepository = classRepository;
+        this.userRepository = userRepository;
+        this.classroomRepository = classroomRepository;
     }
 
-    @PutMapping(path = "/add")
-    @Authorization
-    public ResponseEntity<AddClassResponse> addClass(@CurrentUser UserEntity user,
-                                                     @RequestBody AddClassRequest request) {
-        String cid = request.getCid();
+    @PostMapping("/courses/{courseId}/classes")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Clazz insertClass(@PathVariable String courseId, @RequestBody Clazz clazz) {
 
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new AddClassResponse("permission denied"), HttpStatus.FORBIDDEN);
-        }
+        CourseEntity courseEntity = courseRepository.findById(courseId).orElseThrow(CourseNotFoundException::new);
+        UserEntity userEntity = userRepository.findById(clazz.getTeacherId()).orElseThrow
+                (TeacherNotFoundException::new);
 
-        Optional<CourseEntity> ret = courseRepository.findById(cid);
-        if (!ret.isPresent()) {
-            return new ResponseEntity<>(new AddClassResponse("course doesn't exist"), HttpStatus.BAD_REQUEST);
-        }
-        CourseEntity course = ret.get();
-        ClassEntity newClass = new ClassEntity();
-        newClass.setCapacity(request.getCapacity());
-        newClass.setYear(request.getYear());
-        newClass.setCourse(course);
-        classRepository.save(newClass);
-        return new ResponseEntity<>(new AddClassResponse("OK"), HttpStatus.OK);
+        ClassEntity classEntity = new ClassEntity();
+        classEntity.setYear(clazz.getYear());
+        classEntity.setSemester(clazz.getSemester());
+        classEntity.setCapacity(clazz.getCapacity());
+        classEntity.setTeacher(userEntity);
+        classEntity.setCourse(courseEntity);
+
+        classEntity = classRepository.save(classEntity);
+        System.out.println(classEntity.getId());
+        return new Clazz(classEntity);
     }
 
-    @PostMapping(path = "/info")
-    @Authorization
-    public ResponseEntity<ModifyClassResponse> modifyClass(@CurrentUser UserEntity user,
-                                                           @RequestBody ModifyClassRequest request) {
-        Long cid = request.getCid();
+    @GetMapping("/courses/{courseId}/classes")
+    public List<Clazz> listClasses(@PathVariable String courseId) {
 
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new ModifyClassResponse("permission denied"), HttpStatus.FORBIDDEN);
+        CourseEntity courseEntity = courseRepository.findById(courseId).orElseThrow(CourseNotFoundException::new);
+        List<Clazz> classes = new ArrayList<>();
+        for (ClassEntity classEntity : courseEntity.getClasses()) {
+            classes.add(new Clazz(classEntity));
         }
-        Optional<ClassEntity> ret = classRepository.findById(cid);
-        if (!ret.isPresent()) {
-            return new ResponseEntity<>(new ModifyClassResponse("can't find the class"), HttpStatus.BAD_REQUEST);
-        }
-        ClassEntity c = ret.get();
-        if (request.getCapacity() != null) {
-            c.setCapacity(request.getCapacity());
-        }
-        if (request.getYear() != null) {
-            c.setYear(request.getYear());
-        }
-        classRepository.save(c);
-        return new ResponseEntity<>(new ModifyClassResponse("OK"), HttpStatus.OK);
+        return classes;
     }
 
-    @DeleteMapping(path = "/delete")
-    @Authorization
-    public ResponseEntity<DeleteClassesResponse> deleteClasses(@CurrentUser UserEntity user,
-                                                               @RequestBody DeleteClassesRequest request) {
-        List<Long> cids = request.getIds();
+    @GetMapping("/classes/{classId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Clazz getClass(@PathVariable long classId) {
+        ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
+        return new Clazz(classEntity);
+    }
 
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new DeleteClassesResponse("permission denied", null), HttpStatus.FORBIDDEN);
+    @DeleteMapping("/classes/{classId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeClass(@PathVariable long classId) {
+
+        ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
+        classRepository.delete(classEntity);
+    }
+
+    @GetMapping("/classes/search/find-by-course-name-containing-and-year-and-semester")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Clazz> findClassesByCourseNameContainingAndYearAndSemester(@RequestParam String courseName,
+                                                                           @RequestParam int year,
+                                                                           @RequestParam SemesterEnum semester) {
+
+        List<ClassEntity> classEntities = classRepository.findByCourseNameContainingAndYearAndSemester(courseName,
+                year, semester);
+        List<Clazz> classes = new ArrayList<>();
+        for (ClassEntity classEntity : classEntities) {
+            classes.add(new Clazz(classEntity));
         }
+        return classes;
+    }
 
-        List<Long> failIds = new ArrayList<>();
-        for (Long cid : cids) {
-            if (!classRepository.existsById(cid)) {
-                failIds.add(cid);
+    @PutMapping("/auto-arrangement")
+    @ResponseStatus(HttpStatus.OK)
+    @Transactional(rollbackFor = Exception.class)
+    public ClassArrangementResult autoArrangement(@RequestParam int year, @RequestParam SemesterEnum semester) {
+        // Clear old arrangement records.
+        for (ClassroomEntity classroomEntity : classroomRepository.findAll()) {
+            for (TimeSlotEntity timeSlotEntity : classroomEntity.getTimeSlots()) {
+                timeSlotEntity.setClazz(null);
             }
         }
-        if (!failIds.isEmpty()) {
-            return new ResponseEntity<>(new DeleteClassesResponse("Some Class don't exist", failIds), HttpStatus.BAD_REQUEST);
-        }
-        for (Long cid : cids) {
-            classRepository.deleteById(cid);
-        }
-        return new ResponseEntity<>(new DeleteClassesResponse("OK", failIds), HttpStatus.OK);
-    }
 
-    @PostMapping(path = "/getInstructors")
-    @Authorization
-    public ResponseEntity<GetInstructorsResponse> getInstructors(@RequestBody GetInstructorsRequest request) {
-
-        Optional<ClassEntity> ret = classRepository.findById(request.getCid());
-        if (!ret.isPresent()) {
-            return new ResponseEntity<>(new GetInstructorsResponse("class non-exist", null, null, null, null), HttpStatus.BAD_REQUEST);
-        }
-        ClassEntity clazz = ret.get();
-        List<String> tids = new ArrayList<>();
-        List<String> names = new ArrayList<>();
-        List<List<String>> times = new ArrayList<>();
-        List<List<String>> classrooms = new ArrayList<>();
-        for (TeachesEntity teaches : clazz.getTeaches()) {
-            UserEntity teacher = teaches.getTeacher();
-            tids.add(teacher.getUid());
-            names.add(teacher.getName());
-            List<String> time = new ArrayList<>();
-            List<String> location = new ArrayList<>();
-            for (SectionEntity section : clazz.getSections()) {
-                TimeSlotEntity timeSlot = section.getTimeSlot();
-                ClassroomEntity classroom = section.getClassroom();
-                time.add(timeSlot.getDay() + " " + timeSlot.getStart() + "-" + timeSlot.getEnd());
-                times.add(time);
-                location.add(classroom.getBuilding() + " " + classroom.getRoom());
-                classrooms.add(location);
+        // Wrap ClassEntities with ClassItems.
+        List<ClassItem> classItems = new ArrayList<>();
+        for (ClassEntity classEntity : classRepository.findByYearAndSemester(year, semester)) {
+            ClassItem classItem = new ClassItem(classEntity);
+            if (!classItem.hasNoLeftSection()) {
+                classItems.add(classItem);
             }
         }
-        return new ResponseEntity<>(new GetInstructorsResponse("ok", tids, names, times, classrooms), HttpStatus.OK);
-    }
 
-    /*@PutMapping(path = "/instructor")
-    @Authorization
-    public ResponseEntity<AddInstructorsResponse> addInstructors(@CurrentUser UserEntity user,
-                                                                 @RequestBody AddInstructorsRequest request) {
-        String cid = request.getCid();
-        Set<String> uids = request.getUids();
-        if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new AddInstructorsResponse("permission denied", uids), HttpStatus.FORBIDDEN);
-        }
-        Optional<CourseEntity> ret = courseRepository.findById(cid);
+        // Auto-arrange.
+        int count = 0;
+        for (ClassroomEntity classroomEntity : classroomRepository.findAll()) {
+            if (classItems.size() == 0) {
+                break;
+            }
 
-        if (!courseRepository.existsById(cid)) {
-            return new ResponseEntity<>(new AddInstructorsResponse("course doesn't exist", uids), HttpStatus.BAD_REQUEST);
-        }
+            for (TimeSlotEntity timeSlotEntity : classroomEntity.getTimeSlots()) {
+                if (classItems.size() == 0) {
+                    break;
+                }
 
-        Set<String> fail = new HashSet<>();
-        for (String uid : uids) {
-            if (!userRepository.existsById(uid)) {
-                fail.add(uid);
+                final int timeSlotSize = timeSlotEntity.getType().getSize();
+                for (int i = 0; i < classItems.size(); i++) {
+                    ClassItem classItem = classItems.get(i);
+
+                    if (classItem.getNumLeftSectionsOfSize(timeSlotSize) > 0) {
+                        classItem.getClassEntity().addTimeSlot(timeSlotEntity);
+                        classItem.setNumLeftSectionsOfSize(timeSlotSize, classItem.getNumLeftSectionsOfSize(timeSlotSize) - 1);
+                        if (classItem.hasNoLeftSection()) {
+                            Collections.swap(classItems, i, classItems.size() - 1);
+                            classItems.remove(classItems.size() - 1);
+                            count++;
+                        }
+                        break;
+                    }
+                }
             }
         }
-        if (!fail.isEmpty()) {
-            return new ResponseEntity<>(new AddInstructorsResponse("uids don't exist", fail), HttpStatus.BAD_REQUEST);
-        }
 
-        for (String uid : uids) {
-            if (userRepository.findById(uid).get().getType() != UserEntity.TYPE_TEACHER) {
-                fail.add(uid);
-            }
+        // Statics.
+        List<Long> pendingClassIds = new ArrayList<>();
+        for (ClassItem classItem : classItems) {
+            pendingClassIds.add(classItem.getClassId());
         }
-        if (!fail.isEmpty()) {
-            return new ResponseEntity<>(new AddInstructorsResponse("users are not teachers", fail), HttpStatus.BAD_REQUEST);
-        }
-
-        CourseEntity course = courseRepository.findById(cid).get();
-        for (String uid : uids) {
-            TeachesEntity teaches = new TeachesEntity(userRepository.findById(uid).get());
-            teaches
-            teachesRepository.save(teaches);
-        }
-        return new ResponseEntity<>(new AddInstructorsResponse("OK", null), HttpStatus.OK);
+        return new ClassArrangementResult(count, pendingClassIds);
     }
 
-    @DeleteMapping(path = "/instructor")
-    @Authorization
-    public ResponseEntity<DeleteInstructorsResponse> deleteInstructors(@CurrentUser UserEntity user,
-                                                                       @RequestBody DeleteInstructorsRequest request) {
-        String cid = request.getCid();
-        Set<String> uids = request.getUids();
-        if (!courseRepository.existsById(cid)) {
-            return new ResponseEntity<>(new DeleteInstructorsResponse("course doesn't exist"), HttpStatus.BAD_REQUEST);
-        } else if (user.getType() != UserEntity.TYPE_MANAGER) {
-            return new ResponseEntity<>(new DeleteInstructorsResponse("permission denied"), HttpStatus.FORBIDDEN);
+    @GetMapping("/classes/search/findByCourse_NameAndYearAndSemester")
+    @ResponseStatus(HttpStatus.OK)
+    public GetClassesResponse searchClassByName(@RequestParam String courseName,
+                                                @RequestParam(required = false) Integer year,
+                                                @RequestParam(required = false) SemesterEnum semester) {
+        List<ClassEntity> classes;
+        if (year == null || semester == null) {
+            //classes = classRepository.findByCourse_NameLike("%"+courseName+"%");
+            classes = classRepository.findByCourse_Name("%" + courseName + "%");
+        } else {
+            classes = classRepository.findByCourse_NameLikeAndYearAndSemester("%" + courseName + "%", year, semester);
         }
 
-        CourseEntity course = courseRepository.findById(cid).get();
-        for(TeachesEntity teaches: course.getTeaches()) {
-            if(uids.contains(teaches.getTeacher().getUid()))
-                teachesRepository.delete(teaches);
+        if (classes.isEmpty()) {
+            System.out.println("Empty");
         }
-        return new ResponseEntity<>(new DeleteInstructorsResponse("OK"), HttpStatus.OK);
-    }*/
+
+        return new GetClassesResponse(classes);
+    }
+
+    @GetMapping("/classes/search/findByCourse_IdAndYearAndSemester")
+    @ResponseStatus(HttpStatus.OK)
+    public GetClassesResponse searchClassById(@RequestParam String courseId,
+                                              @RequestParam(required = false) Integer year,
+                                              @RequestParam(required = false) SemesterEnum semester) {
+        List<ClassEntity> classes;
+
+        if (year == null || semester == null) {
+            classes = classRepository.findByCourse_Id(courseId);
+        } else {
+            classes = classRepository.findByCourse_IdAndYearAndSemester(courseId, year, semester);
+        }
+        /*
+        if (classes.isEmpty()) {
+            ...
+        }*/
+
+        return new GetClassesResponse(classes);
+    }
+
+    @GetMapping("/classes/search/findByTeacher_NameAndYearAndSemester")
+    @ResponseStatus(HttpStatus.OK)
+    public GetClassesResponse searchClassByTeacher(@RequestParam String teacherName,
+                                                   @RequestParam(required = false) Integer year,
+                                                   @RequestParam(required = false) SemesterEnum semester) {
+
+        List<UserEntity> teachers = userRepository.findByNameLikeAndType_Name("%" + teacherName + "%", "System Administrator");
+        /*
+        if (teachers.isEmpty()) {
+            ...
+        }*/
+
+        List<ClassEntity> classesAll = new ArrayList<>();
+        for (UserEntity teacher : teachers) {
+            List<ClassEntity> classes = teacher.getClassesTeaching();
+            if (year == null || semester == null) {
+                classesAll.addAll(classes);
+                continue;
+            }
+            for (ClassEntity clazz : classes) {
+                if (clazz.getYear().equals(year) && clazz.getSemester().equals(semester)) {
+                    classesAll.add(clazz);
+                }
+            }
+        }
+
+        return new GetClassesResponse(classesAll);
+    }
+
+    @GetMapping("/classes/search/findByBoth")
+    @ResponseStatus(HttpStatus.OK)
+    public GetClassesResponse searchClassByBoth(@RequestParam String courseName,
+                                                @RequestParam String teacherName,
+                                                @RequestParam(required = false) Integer year,
+                                                @RequestParam(required = false) SemesterEnum semester) {
+
+        if (year == null || semester == null) {
+            Set<ClassEntity> classesByCourseName = new HashSet<>(classRepository.findByCourse_NameLike(courseName));
+            List<UserEntity> teachers = userRepository.findByName(teacherName);
+            /* if (classes.isEmpty() || teachers.isEmpty()) { ... } */
+            Set<ClassEntity> classesByTeacherName = new HashSet<>();
+            for (UserEntity teacher : teachers) {
+                if (!teacher.readTypeName().equals("Teacher")) {
+                    continue;
+                }
+                classesByTeacherName.addAll(teacher.getClassesTeaching());
+            }
+            Set<ClassEntity> res = new HashSet<>();
+            res.clear();
+            res.addAll(classesByCourseName);
+            res.retainAll(classesByTeacherName);
+            return new GetClassesResponse(new ArrayList<>(res));
+        }
+
+        Set<ClassEntity> classesByCourseName = new HashSet<>(classRepository.findByCourse_NameLikeAndYearAndSemester(courseName, year, semester));
+        List<UserEntity> teachers = userRepository.findByName(teacherName);
+        Set<ClassEntity> classesByTeacherName = new HashSet<>();
+        for (UserEntity teacher : teachers) {
+            if (!teacher.readTypeName().equals("Teacher")) {
+                continue;
+            }
+            List<ClassEntity> classes = teacher.getClassesTeaching();
+            for (ClassEntity clazz : classes) {
+                if (clazz.getYear().equals(year) && clazz.getSemester().equals(semester)) {
+                    classesByTeacherName.add(clazz);
+                }
+            }
+        }
+        Set<ClassEntity> res = new HashSet<>();
+        res.clear();
+        res.addAll(classesByCourseName);
+        res.retainAll(classesByTeacherName);
+
+        return new GetClassesResponse(new ArrayList<>(res));
+    }
+
+    @PutMapping(path = "/classes/select")
+    @Authorization
+    @ResponseStatus(HttpStatus.OK)
+    public void registerClass(@CurrentUser UserEntity user,
+                              @PathVariable long classId) {
+        ClassEntity classEntity = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
+
+
+    }
+
+
+}
+
+/**
+ * Auxiliary class for auto-arrangement of classes.
+ */
+class ClassItem {
+    private long classId;
+    private int numLeftSectionsOfSizeTwo = 0;
+    private int numLeftSectionsOfSizeThree = 0;
+    private ClassEntity classEntity;
+
+    ClassItem(ClassEntity classEntity) {
+        switch (classEntity.getCourse().getNumLessonsEachWeek()) {
+            case 2:
+                numLeftSectionsOfSizeTwo = 1;
+                break;
+            case 3:
+                numLeftSectionsOfSizeThree = 1;
+                break;
+            case 4:
+                numLeftSectionsOfSizeTwo = 2;
+                break;
+            case 5:
+                numLeftSectionsOfSizeTwo = 1;
+                numLeftSectionsOfSizeThree = 1;
+                break;
+            case 6:
+                numLeftSectionsOfSizeThree = 2;
+                break;
+            case 7:
+                numLeftSectionsOfSizeTwo = 2;
+                numLeftSectionsOfSizeThree = 1;
+                break;
+            default:
+        }
+        classId = classEntity.getId();
+        this.classEntity = classEntity;
+    }
+
+    int getNumLeftSectionsOfSize(int size) {
+        switch (size) {
+            case 2:
+                return numLeftSectionsOfSizeTwo;
+            case 3:
+                return numLeftSectionsOfSizeThree;
+            default:
+                return 0;
+        }
+    }
+
+    void setNumLeftSectionsOfSize(int size, int value) {
+        switch (size) {
+            case 2:
+                numLeftSectionsOfSizeTwo = value;
+                break;
+            case 3:
+                numLeftSectionsOfSizeThree = value;
+                break;
+            default:
+        }
+    }
+
+    boolean hasNoLeftSection() {
+        return numLeftSectionsOfSizeTwo + numLeftSectionsOfSizeThree == 0;
+    }
+
+    long getClassId() {
+        return classId;
+    }
+
+    void setClassId(long classId) {
+        this.classId = classId;
+    }
+
+    ClassEntity getClassEntity() {
+        return classEntity;
+    }
+
+    void setClassEntity(ClassEntity classEntity) {
+        this.classEntity = classEntity;
+    }
+
+    @Override
+    public String toString() {
+        return "ClassItem{" +
+                "classId=" + classId +
+                ", numLeftSectionsOfSizeTwo=" + numLeftSectionsOfSizeTwo +
+                ", numLeftSectionsOfSizeThree=" + numLeftSectionsOfSizeThree +
+                ", classEntity=" + classEntity +
+                '}';
+    }
 }

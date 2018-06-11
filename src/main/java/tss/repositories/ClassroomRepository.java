@@ -1,7 +1,10 @@
 package tss.repositories;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import tss.entities.ClassroomEntity;
 
-public interface ClassroomRepository extends CrudRepository<ClassroomEntity, Short> {
+/**
+ * @author reeve
+ */
+public interface ClassroomRepository extends JpaRepository<ClassroomEntity, Integer> {
 }

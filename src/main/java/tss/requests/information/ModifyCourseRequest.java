@@ -7,9 +7,9 @@ public class ModifyCourseRequest {
     private String cid;
     private String name;
     private Float credit;
-    private String semester;
+    private Integer numLessonsEachWeek;
     private String intro;
-    private String dept;
+    private String department;
 
     public String getCid() {
         return cid;
@@ -35,12 +35,12 @@ public class ModifyCourseRequest {
         this.credit = credit;
     }
 
-    public String getSemester() {
-        return semester;
+    public Integer getNumLessonsEachWeek() {
+        return numLessonsEachWeek;
     }
 
-    public void setSemester(String semester) {
-        this.semester = semester;
+    public void setNumLessonsEachWeek(Integer numLessonsEachWeek) {
+        this.numLessonsEachWeek = numLessonsEachWeek;
     }
 
     public String getIntro() {
@@ -51,11 +51,11 @@ public class ModifyCourseRequest {
         this.intro = intro;
     }
 
-    public String getDept() {
-        return dept;
+    public String getDepartment() {
+        return department;
     }
 
-    public void setDept(String dept) {
-        this.dept = dept;
+    public void setDepartment(String department) {
+        this.department = department;
     }
 }

@@ -1,15 +1,16 @@
 package tss.requests.information;
 
-import org.springframework.lang.Nullable;
-
 public class ModifyUserRequest {
     private String uid;
-    @Nullable
+    private String name;
+    private String gender;
+    private String majorClass;
     private String email;
-    @Nullable
     private String telephone;
-    @Nullable
     private String intro;
+    private String deptName;
+    private String type;
+    private Integer year;
 
     public String getUid() {
         return uid;
@@ -17,6 +18,30 @@ public class ModifyUserRequest {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getMajorClass() {
+        return majorClass;
+    }
+
+    public void setMajorClass(String majorClass) {
+        this.majorClass = majorClass;
     }
 
     public String getTelephone() {
@@ -43,4 +68,27 @@ public class ModifyUserRequest {
         this.intro = intro;
     }
 
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
 };

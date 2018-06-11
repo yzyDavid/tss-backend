@@ -10,11 +10,15 @@ public class AddUserResponse {
     String status;
     private final String uid;
     private final String name;
+    private final String gender;
+    private final String type;
 
-    public AddUserResponse(String status, String uid, String name) {
+    public AddUserResponse(String status, String uid, String name, String gender, String type) {
         this.status = status;
         this.uid = uid;
         this.name = name;
+        this.gender = gender;
+        this.type = type;
     }
 
     public String getStatus() {
@@ -27,5 +31,13 @@ public class AddUserResponse {
 
     public String getName() {
         return name;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public String getType() {
+        return type;
     }
 }

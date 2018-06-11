@@ -18,7 +18,19 @@ public class TakesEntity {
     private Integer year;
     private Character semester;
     private String cid;
-    private ClassEntity _class;
+    private ClassEntity classEntity;
+
+    public TakesEntity() {
+    }
+
+    public TakesEntity(UserEntity student, Integer score, Integer year, Character semester, String cid, ClassEntity classEntity) {
+        this.student = student;
+        this.score = score;
+        this.year = year;
+        this.semester = semester;
+        this.cid = cid;
+        this.classEntity = classEntity;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -62,12 +74,12 @@ public class TakesEntity {
 
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     @JoinColumn(name = "class_id", nullable = false)
-    public ClassEntity get_class() {
-        return _class;
+    public ClassEntity getClassEntity() {
+        return classEntity;
     }
 
-    public void set_class(ClassEntity _class) {
-        this._class = _class;
+    public void setClassEntity(ClassEntity classEntity) {
+        this.classEntity = classEntity;
     }
 
     @Column(name = "semester")
@@ -86,5 +98,19 @@ public class TakesEntity {
 
     public void setCid(String cid) {
         this.cid = cid;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!obj.getClass().equals(this.getClass())) {
+            return false;
+        } else {
+            return (id == ((TakesEntity) obj).id);
+        }
     }
 }
