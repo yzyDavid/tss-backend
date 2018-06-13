@@ -351,7 +351,7 @@ public class ClassController {
 
         classRegistrationRepository.save(classRegistrationEntity);
 
-        return new BasicResponse("Class registered successfully!");
+        return new BasicResponse("选课失败！");
     }
 /*
     @PutMapping(path = "/classes/confirm")
@@ -605,7 +605,7 @@ public class ClassController {
         }
 
         // Error 4: The program doesn't exist
-        ProgramEntity programEntity = programRepository.findByPid(user.getUid()).orElseThrow(ProgramNotFoundException::new);
+        ProgramEntity programEntity = programRepository.findByPid(studentId).orElseThrow(ProgramNotFoundException::new);
 
         CourseEntity courseEntity = clazz.getCourse();
 

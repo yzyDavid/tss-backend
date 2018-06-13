@@ -45,9 +45,9 @@ public class ExportExcelController {
     }
 
     @GetMapping("/download/{courseId}")
-    @Authorization
+    //@Authorization
     @ResponseBody
-    public ResponseEntity<byte[]> downloadExcel(@CurrentUser UserEntity user,
+    public ResponseEntity<byte[]> downloadExcel(// @CurrentUser UserEntity user,
                                                 @PathVariable String courseId) throws Exception
     {
 
@@ -96,15 +96,16 @@ public class ExportExcelController {
     }
 
     @GetMapping("/download/classes/{classId}")
-    @Authorization
+    //@Authorization
     @ResponseBody
-    public ResponseEntity<byte[]> downloadClassExcel(@CurrentUser UserEntity user,
+    public ResponseEntity<byte[]> downloadClassExcel(// @CurrentUser UserEntity user,
             @PathVariable Long classId) throws Exception
     {
-
+/*
         if (user.readTypeName().equals("Student")) {
             throw new PermissionDeniedException();
         }
+       */
 
         ExportUtils<ExportEntityUtils> ee = new ExportUtils<>();
         String[] headerss = {"学号", "姓名", "性别", "学院", "专业班", "电话", "邮件"};
