@@ -50,12 +50,7 @@ public class BbsRetrieveController {
     public ResponseEntity<AddBbsRetrieveResponse> sendRetrieve(//@CurrentUser UserEntity user,
                                                                @RequestBody AddBbsRetrieveRequest request) {
         //UserEntity sender = user;
-        UserEntity sender = new UserEntity();
-        sender.setUid("0101");
-        sender.setName("Iamsender");
-        sender.setHashedPassword("324");
-        sender.setSalt("32");
-
+        UserEntity sender = userRepository.findById("3150102242").get();
 
         Optional<UserEntity> retd = userRepository.findById(request.getDestination());
         if (!retd.isPresent()) {
@@ -97,7 +92,7 @@ public class BbsRetrieveController {
                                                          @RequestBody CheckInBoxRequest request) {
         String currentPage = request.getPage();
 
-        UserEntity user = userRepository.findById("2242").get();
+        UserEntity user = userRepository.findById("3150102242").get();
 
         List<BbsRetrieveEntity> messages = bbsRetrieveRepository.findByReceiver(user);
 
@@ -108,6 +103,8 @@ public class BbsRetrieveController {
         List<String> texts = new ArrayList<>();
         List<String> times = new ArrayList<>();
         List<String> reads = new ArrayList<>();
+        List<String> userIDs = new ArrayList<>();
+        List<String> letterIDs = new ArrayList<>();
 
         int count = 0;
         for(BbsRetrieveEntity mess : messages){
@@ -123,9 +120,11 @@ public class BbsRetrieveController {
             texts.add(mess.getContent());
             times.add(mess.getTime().toString());
             reads.add(String.valueOf(mess.getIsChecked()));
+            userIDs.add(mess.getSender().getUid().toString());
+            letterIDs.add(String.valueOf(mess.getId()));
         }
 
-        return new ResponseEntity<>(new CheckInBoxResponse(currentPage, totalPage, destinations, titles, texts, times, reads), HttpStatus.OK);
+        return new ResponseEntity<>(new CheckInBoxResponse(currentPage, totalPage, destinations, titles, texts, times, reads, userIDs, letterIDs), HttpStatus.OK);
     }
 
 
@@ -142,7 +141,7 @@ public class BbsRetrieveController {
                                                            @RequestBody CheckOutBoxRequest request){
         String currentPage = request.getPage();
 
-        UserEntity user = userRepository.findById("0101").get();
+        UserEntity user = userRepository.findById("3150102242").get();
 
         List<BbsRetrieveEntity> messages = bbsRetrieveRepository.findBySender(user);
 
@@ -152,6 +151,8 @@ public class BbsRetrieveController {
         List<String> titles = new ArrayList<>();
         List<String> texts = new ArrayList<>();
         List<String> times = new ArrayList<>();
+        List<String> userIDs = new ArrayList<>();
+
 
         int count = 0;
         for(BbsRetrieveEntity mess : messages){
@@ -166,9 +167,10 @@ public class BbsRetrieveController {
             titles.add(mess.getTitle());
             texts.add(mess.getContent());
             times.add(mess.getTime().toString());
+            userIDs.add(mess.getReceiver().getUid());
         }
 
-        return new ResponseEntity<>(new CheckOutBoxResponse(currentPage, totalPage, destinations, titles, texts, times), HttpStatus.OK);
+        return new ResponseEntity<>(new CheckOutBoxResponse(currentPage, totalPage, destinations, titles, texts, times, userIDs), HttpStatus.OK);
     }
 
 

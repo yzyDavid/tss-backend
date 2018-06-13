@@ -60,7 +60,7 @@ public class BbsReplyController {
         BbsReplyEntity reply = new BbsReplyEntity();
 
         // FIXME
-        UserEntity user = userRepository.findById("6162").get();
+        UserEntity user = userRepository.findById("3150102222").get();
 
         reply.setAuthor(user);
         reply.setBelongedTopic(topic);
@@ -250,11 +250,6 @@ public class BbsReplyController {
             quoteTimes.add(quoteReply.getTime().toString());
             quoteIndexs.add(quoteReply.getIndex().toString());
         }
-
-        if (ids.isEmpty()) {
-            return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
-        }
-
         return new ResponseEntity<>(new GetAllReplyResponse(title, totalPage, currentPage, postTime, boardName, boardID, topicID, lzid, lztext, lzphoto, lztime, lzname, ids, texts, quotes, times, photos, indexs, quoteAuthors, quoteTimes, quoteIndexs, names), HttpStatus.OK);
     }
 
@@ -289,8 +284,10 @@ public class BbsReplyController {
      * v1.0, done
      */
     @GetMapping(path = "/unread")
-    @Authorization
-    public ResponseEntity<CountUnreadResponse> countUnread(@CurrentUser UserEntity user) {
+    // @Authorization
+    public ResponseEntity<CountUnreadResponse> countUnread() {
+        UserEntity user = userRepository.findById("3150104800").get();
+
         Integer unMeg = 0;
         Integer unReply = 0;
 
@@ -320,7 +317,7 @@ public class BbsReplyController {
     //@Authorization
     public ResponseEntity<ShowReplytoMeResponse> showReplytoMe(//@CurrentUser UserEntity user,
                                                                @RequestBody ShowReplytoMeRequest request) {
-        UserEntity user = userRepository.findById("3150102242").get();
+        UserEntity user = userRepository.findById("3150104800").get();
 
         String currentPage = request.getPage();
         String totalPage;
@@ -330,10 +327,11 @@ public class BbsReplyController {
         List<String> topicIDs = new ArrayList<>();
         List<String> replyPos = new ArrayList<>();
         List<String> reads = new ArrayList<>();
+        List<String> titles = new ArrayList<>();
 
         Optional<List<BbsReplyEntity>> ret = bbsReplyRepository.findByAuthor(user);
         if (!ret.isPresent()) {
-            return new ResponseEntity<>(new ShowReplytoMeResponse(null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ShowReplytoMeResponse(null, null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
         }
 
         List<BbsReplyEntity> replsAsAuthor = ret.get();
@@ -361,11 +359,12 @@ public class BbsReplyController {
                     topicIDs.add(String.valueOf(reply.getBelongedTopic().getId()));
                     replyPos.add(reply.getIndex().toString());
                     reads.add(reply.getStatus().toString());
+                    titles.add(reply.getBelongedTopic().getName());
                 }
             }
         }
         totalPage = String.valueOf(count / 20 + 1);
 
-        return new ResponseEntity<>(new ShowReplytoMeResponse(currentPage, totalPage, times, userIDs, userNames, topicIDs, replyPos, reads), HttpStatus.OK);
+        return new ResponseEntity<>(new ShowReplytoMeResponse(currentPage, totalPage, times, userIDs, userNames, topicIDs, replyPos, reads, titles), HttpStatus.OK);
     }
 }

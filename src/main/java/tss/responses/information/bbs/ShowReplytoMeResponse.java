@@ -11,8 +11,9 @@ public class ShowReplytoMeResponse {
     private final List<String> topicIDs;
     private final List<String> replyPos;
     private final List<String> reads;
+    private final List<String> titles;
 
-    public ShowReplytoMeResponse(String currentPage, String totalPage, List<String> times, List<String> userIDs, List<String> userNames, List<String> topicIDs, List<String> replyPos, List<String> reads) {
+    public ShowReplytoMeResponse(String currentPage, String totalPage, List<String> times, List<String> userIDs, List<String> userNames, List<String> topicIDs, List<String> replyPos, List<String> reads, List<String> titles) {
         this.currentPage = currentPage;
         this.totalPage = totalPage;
         this.times = times;
@@ -21,6 +22,7 @@ public class ShowReplytoMeResponse {
         this.topicIDs = topicIDs;
         this.replyPos = replyPos;
         this.reads = reads;
+        this.titles = titles;
     }
 
     public String getCurrentPage() {
@@ -53,5 +55,9 @@ public class ShowReplytoMeResponse {
 
     public List<String> getReads() {
         return reads;
+    }
+
+    public List<String> getTitles() {
+        return titles;
     }
 }

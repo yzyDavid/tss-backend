@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.configs.Config;
+import tss.controllers.UserController;
 import tss.entities.TypeGroupEntity;
 import tss.entities.UserEntity;
 import tss.entities.bbs.BbsSectionEntity;
@@ -75,7 +76,7 @@ public class BbsTopicController {
         BbsTopicEntity topic = new BbsTopicEntity();
 
         /* FIXME */
-        UserEntity user = userRepository.findById("6162").get();
+        UserEntity user = userRepository.findById("3150103333").get();
 
 
         topic.setAuthor(user);
@@ -172,8 +173,10 @@ public class BbsTopicController {
      * v1.0, done
      */
     @GetMapping(path = "/published")
-    public ResponseEntity<GetUserPublishedResponse> getUserPublished(@CurrentUser UserEntity user,
+    public ResponseEntity<GetUserPublishedResponse> getUserPublished(//@CurrentUser UserEntity user,
                                                                      @RequestParam String page) {
+
+        UserEntity user = userRepository.findById("3150102242").get();
         Optional<List<BbsTopicEntity>> ret = bbsTopicRepository.findByAuthor(user);
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetUserPublishedResponse(null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);

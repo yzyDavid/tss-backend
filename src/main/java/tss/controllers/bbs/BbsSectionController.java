@@ -1,5 +1,6 @@
 package tss.controllers.bbs;
 
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import tss.annotations.session.CurrentUser;
 import tss.configs.Config;
 import tss.entities.UserEntity;
 import tss.entities.bbs.BbsSectionEntity;
+import tss.repositories.UserRepository;
 import tss.repositories.bbs.BbsSectionRepository;
 import tss.requests.information.bbs.AddBbsSectionRequest;
 import tss.requests.information.bbs.AddSectionNoticeRequest;
@@ -28,10 +30,12 @@ import java.util.Optional;
 @RequestMapping(path = "/section")
 public class BbsSectionController {
     private final BbsSectionRepository bbsSectionRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public BbsSectionController(BbsSectionRepository bbsSectionRepository) {
+    public BbsSectionController(BbsSectionRepository bbsSectionRepository, UserRepository userRepository) {
         this.bbsSectionRepository = bbsSectionRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -98,6 +102,7 @@ public class BbsSectionController {
             ids.add(id.toString());
             names.add(name);
         }
+
 
         /* empty in sections */
         if (ids.isEmpty()) {
