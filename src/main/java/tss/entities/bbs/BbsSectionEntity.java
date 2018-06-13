@@ -58,4 +58,5 @@ public class BbsSectionEntity {
     public void setNotice(String notice) {
         this.notice = notice;
     }
+
 }
