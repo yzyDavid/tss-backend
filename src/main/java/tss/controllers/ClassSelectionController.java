@@ -296,7 +296,6 @@ public class ClassSelectionController {
 
     @PutMapping(path = "/classes/fail")
     @Authorization
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<BasicResponse> failClass(@RequestBody ConfirmClassRequest request) {
         String studentId = request.getUid();
         Long classId = request.getClassId();
@@ -404,7 +403,6 @@ public class ClassSelectionController {
 
     @DeleteMapping(path = "/classes/drop")
     @Authorization
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<BasicResponse> dropClass(@CurrentUser UserEntity user, @RequestBody AddClassRegistrationRequest request) {
         String userId = user.getUid();
         Long classId = request.getClassId();
@@ -456,7 +454,6 @@ public class ClassSelectionController {
     // semester = "FIRST" / "SECOND"
     @GetMapping(path = "/classes/get_selected/{year}/{semester}")
     @Authorization
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GetSelectedClassesResponse> getClassesTable(
             @CurrentUser UserEntity user,
             @PathVariable Integer year,
@@ -481,7 +478,6 @@ public class ClassSelectionController {
 
     @PostMapping(path = "/classes/admin_register")
     @Authorization
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<BasicResponse> adminRegisterClass(@CurrentUser UserEntity user, @RequestBody ConfirmClassRequest request) {
         String studentId = request.getUid();
         long classId = request.getClassId();
