@@ -1,4 +1,5 @@
 INSERT INTO class (id, year, semester, capacity, num_student, course_id, teacher_id) VALUES
+
 (10001, 2017, 'SECOND', 100, 0, '211C0020', '2000001001'),
 (10002, 2017, 'SECOND', 100, 0, '211C0020', '2000001002'),
 (10003, 2017, 'SECOND', 100, 0, '211C0020', '2000001003'),

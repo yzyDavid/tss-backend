@@ -57,7 +57,7 @@ public class QuestionController {
     }
 
 
-    @DeleteMapping(path = "/delete")
+    @PostMapping(path = "/delete")
     public ResponseEntity<DeleteQuestionResponse> deleteQuestion(@RequestBody DeleteQuestionRequest request) {
         String qid = request.getQid();
         if (!questionRepository.existsById(qid)) {

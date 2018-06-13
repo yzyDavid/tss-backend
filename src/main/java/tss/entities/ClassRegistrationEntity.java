@@ -1,6 +1,10 @@
 package tss.entities;
 
+import org.apache.catalina.User;
+
 import javax.persistence.*;
+import java.sql.Time;
+import java.sql.Timestamp;
 
 /**
  * @author reeve
@@ -8,9 +12,10 @@ import javax.persistence.*;
 @Entity
 @Table(name = "class_registration")
 public class ClassRegistrationEntity {
-
-    @EmbeddedId
-    private ClassRegistrationId id;
+    //private ClassRegistrationId id;
+    @Id
+    @Column(name = "crid")
+    private String crid;
 
     @Column(name = "score")
     private Integer score;
@@ -22,25 +27,35 @@ public class ClassRegistrationEntity {
     }
 
     @ManyToOne(optional = false)
-    @MapsId("studentId")
+    @JoinColumn(name = "student_id")
     private UserEntity student;
 
     @ManyToOne(optional = false)
-    @MapsId("classId")
+    @JoinColumn(name = "class_id")
     private ClassEntity clazz;
 
-    @Column
+    @Enumerated(EnumType.STRING)
     private ClassStatusEnum status;
 
+    @Column(name = "register_time")
+    private Timestamp selectTime;
+
+    @Column(name = "confirm_time")
+    private Timestamp confirmTime;
+
     public ClassRegistrationEntity() {
+
     }
 
-    public ClassRegistrationEntity(Integer score, UserEntity student, ClassEntity clazz, ClassStatusEnum status) {
-        this.id = new ClassRegistrationId(student.getUid(), clazz.getId());
+    public ClassRegistrationEntity(Integer score, UserEntity student, ClassEntity clazz, String crid, ClassStatusEnum status,
+                                   Timestamp selectTime, Timestamp confirmTime) {
+        this.crid = crid; //= new ClassRegistrationId(student, clazz);
         this.score = score;
+        this.status = status;
         this.student = student;
         this.clazz = clazz;
-        this.status = status;
+        this.selectTime = selectTime;
+        this.confirmTime = confirmTime;
     }
 
     public ClassStatusEnum getStatus() {
@@ -51,12 +66,57 @@ public class ClassRegistrationEntity {
         status = classStatusEnum;
     }
 
+
+    public String getCrid() {
+        return crid;
+    }
+
+    public void setCrid(String crid) {
+        this.crid = crid;
+    }
+
+    /*
+        @EmbeddedId
+        @AttributeOverrides({
+                @AttributeOverride(name = "studentId", column = @Column(name = "student_id", nullable = false)),
+                @AttributeOverride(name = "classId", column = @Column(name = "class_id", nullable = false))}
+        )
+
+
+        public ClassRegistrationId getId() {
+            return this.id;
+        }
+
+    public void setId(ClassRegistrationId id) {
+        this.id = id;
+    }
+
+    public void setStudent(UserEntity student) {
+        this.id.setStudent(student);
+    }
+
+    public void setClazz(ClassEntity clazz) {
+        this.id.setClazz(clazz);
+    }
+
+    public UserEntity getStudent() {
+        return this.id.getStudent();
+    }
+
+    public ClassEntity getClazz() {
+        return this.id.getClazz();
+    }*/
+
     public UserEntity getStudent() {
         return student;
     }
 
+    public void setClazz(ClassEntity clazz) {
+        this.clazz = clazz;
+    }
+
     public void setStudent(UserEntity student) {
-        id.setStudentId(student.getUid());
+
         this.student = student;
     }
 
@@ -64,16 +124,17 @@ public class ClassRegistrationEntity {
         return clazz;
     }
 
-    public void setClazz(ClassEntity clazz) {
-        id.setClassId(clazz.getId());
-        this.clazz = clazz;
+    public Timestamp getSelectTime() {
+        return this.selectTime;
+    }
+    public void setSelectTime(Timestamp selectTime) {
+        this.selectTime = selectTime;
     }
 
-    public ClassRegistrationId getId() {
-        return id;
+    public Timestamp getConfirmTime() {
+        return this.confirmTime;
     }
-
-    public void setId(ClassRegistrationId id) {
-        this.id = id;
+    public void setConfirmTime(Timestamp confirmTime) {
+        this.confirmTime = confirmTime;
     }
 }
