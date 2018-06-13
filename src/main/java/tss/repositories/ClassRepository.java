@@ -2,6 +2,7 @@ package tss.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import tss.entities.ClassEntity;
+import tss.entities.ClassRegistrationEntity;
 import tss.entities.CourseEntity;
 import tss.entities.SemesterEnum;
 
@@ -22,4 +23,9 @@ public interface ClassRepository extends JpaRepository<ClassEntity, Long> {
             semester);
 
     List<ClassEntity> findByYearAndSemester(Integer year, SemesterEnum semester);
+
+    List<ClassEntity> findByCourse_IdAndTeacher_NameLike(String cid, String name);
+
+    List<ClassEntity> findByCourse_NameLikeAndTeacher_NameLike(String courseName, String teacherName);
+    List<ClassEntity> findByTeacher_NameLike(String name);
 }

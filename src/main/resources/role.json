@@ -42,7 +42,8 @@
       "class/add",
       "class/delete",
       "class/get/info",
-      "class/modify"
+      "class/modify",
+      "selection_time/register"
     ],
     "belong2": [
       0,

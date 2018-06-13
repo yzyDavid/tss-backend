@@ -13,7 +13,7 @@ import java.util.List;
 @Table(name = "class")
 public class ClassEntity {
     @Id
-    @GeneratedValue()
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private Integer year;
