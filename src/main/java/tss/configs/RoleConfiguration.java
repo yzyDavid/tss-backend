@@ -45,8 +45,8 @@ public class RoleConfiguration implements CommandLineRunner {
         String ddl_auto = bundle.getString("spring.jpa.hibernate.ddl-auto");
         if (ddl_auto.equals("create")) {
             initRole();
-            /*generateMajorClass();
-            generateUser();*/
+            generateMajorClass();
+            generateUser();
         }
 
         /*String uid = bundle.getString("spring.datasource.username");
@@ -69,7 +69,7 @@ public class RoleConfiguration implements CommandLineRunner {
         }
     }
 
-    /*private void generateMajorClass() {
+    private void generateMajorClass() {
         Random rand = new Random(1000);
         int year = 2015;
         short id = 1;
@@ -126,6 +126,7 @@ public class RoleConfiguration implements CommandLineRunner {
             departmentRepository.save(department);
             user.setMajorClass(majorClass);
             user.setDepartment(department);
+            user.setYear(2015);
             userRepository.save(user);
         }
 
@@ -164,7 +165,7 @@ public class RoleConfiguration implements CommandLineRunner {
         }
 
 
-    }*/
+    }
 
     private void initRole() {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
