@@ -18,7 +18,7 @@ public class ProgramEntity {
     private Set<CourseEntity> courses = new HashSet<>();
 
     @Id
-    @Column(name = "program_id")
+    @Column(name = "program_id", length = 100)
     public String getPid() {
         return pid;
     }

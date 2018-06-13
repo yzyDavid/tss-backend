@@ -28,7 +28,10 @@ import tss.responses.information.bbs.SearchUserResponse;
 
 import java.util.*;
 
-/* search in a certain section */
+/**
+ * search in a certain section
+ */
+
 @Controller
 @RequestMapping(path = "/search")
 public class BbsSearchController {
@@ -46,7 +49,8 @@ public class BbsSearchController {
         this.userRepository = userRepository;
     }
 
-    /* match String function */
+    /** match String function
+     */
     private static boolean contentMatch(String key, String content) {
         int match = 0;
         String[] keys = key.split(" ");
@@ -68,12 +72,13 @@ public class BbsSearchController {
     }
 
 
-    /* search user
+    /**
+     * search user
      * v1.0, done
      */
     @PostMapping(path = "/user")
-    @Authorization
-    public ResponseEntity<SearchUserResponse> searchUser(@CurrentUser UserEntity user,
+    //@Authorization
+    public ResponseEntity<SearchUserResponse> searchUser(//@CurrentUser UserEntity user,
                                                          @RequestBody SearchUserRequest request) {
         List<String> userNames = new ArrayList<>();
         List<String> userIDs = new ArrayList<>();
@@ -82,25 +87,26 @@ public class BbsSearchController {
         Iterator<UserEntity> iterator = userRepository.findAll().iterator();
         while (iterator.hasNext()) {
             UserEntity account = iterator.next();
-            if (contentMatch(request.getKey(), account.getName())) {
+            if (request.getKey().equals(account.getName())) {
                 userNames.add(account.getName());
                 userIDs.add(account.getUid());
-                userIDs.add(account.getPhoto());
+                photoURLs.add(account.getPhoto());
             }
         }
         return new ResponseEntity<>(new SearchUserResponse(userNames, userIDs, photoURLs), HttpStatus.OK);
     }
 
 
-    /* search by content key words for topic
+    /**
+     * search by content key words for topic
      * request: key page
      * permission: in the section?
      * return: see doc
      * v1.0, done
      */
     @PostMapping(path = "/topic")
-    @Authorization
-    public ResponseEntity<SearchInSectionResponse> searchInSection(@CurrentUser UserEntity user,
+    //@Authorization
+    public ResponseEntity<SearchInSectionResponse> searchInSection(//@CurrentUser UserEntity user,
                                                                    @RequestBody SearchInSectionRequest request) {
         String currentPage = request.getPage();
         String totalPage;
@@ -131,7 +137,7 @@ public class BbsSearchController {
                         continue;
                     }
                     if (count > Integer.valueOf(currentPage) * 10) {
-                        continue;
+                        break;
                     }
 
                     topicIDs.add(String.valueOf(t.getId()));
@@ -154,15 +160,14 @@ public class BbsSearchController {
         return new ResponseEntity<>(new SearchInSectionResponse(currentPage, totalPage, titles, authors, times, boardNames, boardIDs, topicIDs, replyNums), HttpStatus.OK);
     }
 
-    /* search for a section by name
+    /**
+     * search for a section by name
      * request: key
      * return see doc
      * v1.0, done
      */
     @PostMapping(path = "/section")
-    @Authorization
-    public ResponseEntity<SearchSectionResponse> searchSection(@CurrentUser UserEntity user,
-                                                               @RequestBody SearchSectionRequest request) {
+    public ResponseEntity<SearchSectionResponse> searchSection(@RequestBody SearchSectionRequest request) {
         List<String> boardNames = new ArrayList<>();
         List<String> boardIDs = new ArrayList<>();
 
@@ -175,18 +180,19 @@ public class BbsSearchController {
             }
         }
 
-        return new ResponseEntity<>(new SearchSectionResponse(boardIDs, boardNames), HttpStatus.OK);
+        return new ResponseEntity<>(new SearchSectionResponse(boardNames, boardIDs), HttpStatus.OK);
     }
 
 
-    /* search for topics published by certain user
+    /**
+     * search for topics published by certain user
      * request: uid, page
      * return: see doc
      * v1.0, done
      */
     @PostMapping(path = "/published")
-    @Authorization
-    public ResponseEntity<SearchTopicPublishedByUidResponse> searchTopicPublishedByUid(@CurrentUser UserEntity cuser,
+    //@Authorization
+    public ResponseEntity<SearchTopicPublishedByUidResponse> searchTopicPublishedByUid(//@CurrentUser UserEntity cuser,
                                                                                        @RequestBody SearchTopicPublishedByUidRequest request) {
         Optional<UserEntity> uret = userRepository.findById(request.getUid());
         if (!uret.isPresent()) {
@@ -205,7 +211,9 @@ public class BbsSearchController {
 
         String userName = user.getName();
         String currentPage = request.getPage();
-        String totalPage = String.valueOf(topics.size() / 20 + 1); // +1?
+
+        /* page + 1 , may be modify */
+        String totalPage = String.valueOf(topics.size() / 20 + 1);
         List<String> titles = new ArrayList<>();
         List<String> times = new ArrayList<>();
         List<String> topicIDs = new ArrayList<>();

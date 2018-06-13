@@ -1,5 +1,6 @@
 package tss.entities.bbs;
 
+import org.apache.catalina.User;
 import tss.entities.UserEntity;
 
 import javax.persistence.*;
@@ -20,11 +21,6 @@ public class BbsTopicEntity {
 
     private int replyNum = 0;
     private Set<BbsReplyEntity> replies;
-
-    public BbsTopicEntity(UserEntity author, BbsSectionEntity belongedSection) {
-        this.author = author;
-        this.belongedSection = belongedSection;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -111,11 +107,13 @@ public class BbsTopicEntity {
     }
 
     @Column(name = "topic_isTop")
-    public boolean isTop() {
+    public boolean getIsTop() {
         return isTop;
     }
 
-    public void setTop(boolean top) {
-        isTop = top;
+    public void setIsTop(boolean top) {
+        this.isTop = top;
     }
+
+
 }

@@ -11,12 +11,15 @@ import tss.exceptions.ClazzNotFoundException;
 import tss.exceptions.TimeSlotTypeNotFoundException;
 import tss.models.Classroom;
 import tss.models.Clazz;
+import tss.models.TimeSlot;
 import tss.models.TimeSlotTypeEnum;
 import tss.repositories.ClassRepository;
 import tss.repositories.ClassroomRepository;
 import tss.repositories.TimeSlotRepository;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,7 +27,7 @@ import java.util.Map;
  * @author reeve
  */
 @RestController
-@RequestMapping("/classrooms")
+@RequestMapping()
 public class ClassroomController {
     private final ClassroomRepository classroomRepository;
     private final ClassRepository classRepository;
@@ -38,7 +41,7 @@ public class ClassroomController {
         this.timeSlotRepository = timeSlotRepository;
     }
 
-    @GetMapping("/{classroomId}")
+    @GetMapping("/classrooms/{classroomId}")
     @ResponseStatus(HttpStatus.OK)
     public Classroom getClassroom(@PathVariable int classroomId) {
         ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
@@ -46,7 +49,7 @@ public class ClassroomController {
         return new Classroom(classroomEntity);
     }
 
-    @DeleteMapping("/{classroomId}")
+    @DeleteMapping("/classrooms/{classroomId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeClassroom(@PathVariable int classroomId) {
         ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
@@ -54,7 +57,7 @@ public class ClassroomController {
         classroomRepository.delete(classroomEntity);
     }
 
-    @PatchMapping("/{classroomId}")
+    @PatchMapping("/classrooms/{classroomId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateClassroom(@PathVariable int classroomId, @RequestBody Classroom classroom) {
         ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
@@ -68,7 +71,7 @@ public class ClassroomController {
         classroomRepository.save(classroomEntity);
     }
 
-    @PutMapping("/{classroomId}/time-slots/{timeSlotType}/clazz")
+    @PutMapping("/classrooms/{classroomId}/time-slots/{timeSlotType}/clazz")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void insertArrangement(@PathVariable int classroomId, @PathVariable TimeSlotTypeEnum timeSlotType,
                                   @RequestParam long classId) {
@@ -84,7 +87,7 @@ public class ClassroomController {
         timeSlotRepository.save(timeSlotEntity);
     }
 
-    @DeleteMapping("/{classroomId}/time-slots/{timeSlotType}/clazz")
+    @DeleteMapping("/classrooms/{classroomId}/time-slots/{timeSlotType}/clazz")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeArrangement(@PathVariable int classroomId, @PathVariable TimeSlotTypeEnum timeSlotType) {
         ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
@@ -98,22 +101,29 @@ public class ClassroomController {
         timeSlotRepository.save(timeSlotEntity);
     }
 
-    @GetMapping("/{classroomId}/schedule")
+    @GetMapping("/classrooms/{classroomId}/time-slots")
     @ResponseStatus(HttpStatus.OK)
-    public Map<TimeSlotTypeEnum, Clazz> getSchedule(@PathVariable int classroomId) {
+    public List<TimeSlot> listTimeSlots(@PathVariable int classroomId) {
         ClassroomEntity classroomEntity = classroomRepository.findById(classroomId).orElseThrow
                 (ClassroomNotFoundException::new);
 
-        Map<TimeSlotTypeEnum, Clazz> schedule = new HashMap<>(TimeSlotTypeEnum.values().length);
+        List<TimeSlot> schedule = new ArrayList<>();
         for (TimeSlotEntity timeSlotEntity : classroomEntity.getTimeSlots()) {
-            Clazz clazz;
-            if (timeSlotEntity.getClazz() == null) {
-                clazz = null;
-            } else {
-                clazz = new Clazz(timeSlotEntity.getClazz());
-            }
-            schedule.put(timeSlotEntity.getType(), clazz);
+            schedule.add(new TimeSlot(timeSlotEntity));
         }
         return schedule;
+    }
+
+    @GetMapping("time-slots/{timeSlotType}/empty-classrooms")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Classroom> findClassroomsNotArrangedOnTimeSlotType(@PathVariable TimeSlotTypeEnum timeSlotType) {
+        List<ClassroomEntity> classroomEntities = classroomRepository.findAll();
+        List<Classroom> classrooms = new ArrayList<>();
+        for (ClassroomEntity classroomEntity : classroomEntities) {
+            if (classroomEntity.getTimeSlotDirectory().get(timeSlotType).getClazz() == null) {
+                classrooms.add(new Classroom(classroomEntity));
+            }
+        }
+        return classrooms;
     }
 }

@@ -1,30 +1,36 @@
 package tss.information.untapped;
 
 import tss.information.PaperResponseStruct;
+import tss.information.QuestionExamResponseStruct;
 
 import java.util.Date;
+import java.util.List;
 
 public class StartExamResponse {
 
     private final String status;
-    private final PaperResponseStruct paperInfo;
-    private final String StartTime;
+    private final String pid;
+    private final List<QuestionExamResponseStruct> questioninfo;
+    private final String starttime;
 
-    public StartExamResponse(String status, PaperResponseStruct paperInfo, String startTime) {
+    public StartExamResponse(String status, String pid, String starttime, List<QuestionExamResponseStruct> questioninfo) {
         this.status = status;
-        this.paperInfo = paperInfo;
-        StartTime = startTime;
+        this.pid= pid;
+        this.starttime = starttime;
+        this.questioninfo = questioninfo;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public PaperResponseStruct getPaperInfo() {
-        return paperInfo;
+    public String getPid() {
+        return pid;
     }
 
-    public String getStartTime() {
-        return StartTime;
+    public String getStarttime() {
+        return starttime;
     }
+
+    public List<QuestionExamResponseStruct> getQuestioninfo() {return questioninfo; }
 }

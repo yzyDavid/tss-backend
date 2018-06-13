@@ -6,6 +6,7 @@ import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.configs.Config;
 import tss.entities.ClassEntity;
+import tss.entities.SemesterEnum;
 import tss.entities.TimeSlotEntity;
 import tss.entities.UserEntity;
 import tss.exceptions.ClazzNotFoundException;
@@ -39,9 +40,6 @@ public class TeacherController {
         this.classRepository = classRepository;
     }
 
-
-
-
     @PutMapping("/{userId}/classes-teaching/{classId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void addClassTeaching(@CurrentUser UserEntity user,
@@ -57,21 +55,23 @@ public class TeacherController {
 
     }
 
-    @GetMapping("/{userId}/schedule")
+    @GetMapping("/{userId}/classes")
     @ResponseStatus(HttpStatus.OK)
-    public List<TimeSlot> getSchedule(@PathVariable String userId) {
+    public List<Clazz> listClassesTeaching(@PathVariable String userId, @RequestParam int year,
+                                              @RequestParam SemesterEnum semester) {
+
         UserEntity teacherEntity = userRepository.findById(userId).orElseThrow(TeacherNotFoundException::new);
+        // TODO: commented for testing.
 //        if (!Config.TYPES[2].equals(teacherEntity.readTypeName())) {
 //            throw new TeacherNotFoundException();
 //        }
 
-        List<TimeSlot> schedule = new ArrayList<>(TimeSlotTypeEnum.values().length);
+        List<Clazz> classes = new ArrayList<>();
         for (ClassEntity classEntity : teacherEntity.getClassesTeaching()) {
-            Clazz clazz = new Clazz(classEntity);
-            for (TimeSlotEntity timeSlotEntity : classEntity.getTimeSlots()) {
-                schedule.add(new TimeSlot(timeSlotEntity));
+            if (classEntity.getYear() == year && semester.equals(classEntity.getSemester())) {
+                classes.add(new Clazz(classEntity));
             }
         }
-        return schedule;
+        return classes;
     }
 }

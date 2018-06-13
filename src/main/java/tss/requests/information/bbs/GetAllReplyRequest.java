@@ -4,11 +4,6 @@ public class GetAllReplyRequest {
     private String tid;
     private String page;
 
-    public GetAllReplyRequest(String tid, String page) {
-        this.tid = tid;
-        this.page = page;
-    }
-
     public String getTid() {
         return tid;
     }

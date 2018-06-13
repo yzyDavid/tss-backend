@@ -5,11 +5,11 @@ import org.jetbrains.annotations.Nls;
 public class AddBbsSectionResponse {
     @Nls
     private final String status;
-    private final long id;
+    private final String id;
     private final String name;
     private final String tname;
 
-    public AddBbsSectionResponse(String status, long id, String name, String tname){
+    public AddBbsSectionResponse(String status, String id, String name, String tname) {
         this.status = status;
         this.id = id;
         this.name = name;
@@ -20,7 +20,7 @@ public class AddBbsSectionResponse {
         return status;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
