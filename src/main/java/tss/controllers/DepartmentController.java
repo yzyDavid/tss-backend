@@ -279,7 +279,7 @@ public class DepartmentController {
         List<String> unames = new ArrayList<>();
         for (UserEntity student : majorClass.getStudents()) {
             uids.add(student.getUid());
-            uids.add(student.getName());
+            unames.add(student.getName());
         }
         return new ResponseEntity<>(new GetMajorClassResponse("ok", majorClass.getName(), majorClass.getMajor().getName(), majorClass.getYear(), uids, unames), HttpStatus.OK);
     }

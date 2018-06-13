@@ -315,7 +315,7 @@ public class UserController {
         }
         Short typeId = null;
         if(request.getType() != null) {
-            Optional<TypeGroupEntity> type = typeGroupRepository.findByName(request.getName());
+            Optional<TypeGroupEntity> type = typeGroupRepository.findByName(request.getType());
             if (!type.isPresent()) {
                 return new ResponseEntity<>(new QueryUsersResponse("Non-exist type", null, null,
                         null, null, null, null), HttpStatus.BAD_REQUEST);
