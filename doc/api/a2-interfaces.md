@@ -162,7 +162,7 @@
 
 ### 教师
 
-- [x] 获取教师课表 `GET /teachers/{userId}/schedule{?year,semester}` => `List<Clazz>`
+- [x] 获取教师课表 `GET /teachers/{userId}/classes{?year,semester}` => `List<Clazz>`
 
 
 ### 教室
