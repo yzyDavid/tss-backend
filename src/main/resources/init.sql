@@ -9,3 +9,4 @@ source course.sql;
 source class.sql;
 source time_slot.sql;
 source testsys.sql;
+source question.sql;

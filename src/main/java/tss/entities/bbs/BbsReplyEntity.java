@@ -17,10 +17,21 @@ public class BbsReplyEntity {
     private String content;
     private Integer quoteIndex;
 
-    public BbsReplyEntity(UserEntity author, BbsTopicEntity belongedTopic) {
-        this.author = author;
-        this.belongedTopic = belongedTopic;
-    }
+    /**
+     * quoted unread count
+     */
+    private Integer unread;
+
+    /**
+     * as quoted, if it has been read
+     * three status
+     * -1: not a quote reply
+     * 0: reply not been read
+     * 1: reply has been read
+     * - when add, set unread to be 0, set the quoted one ++
+     * - when confirm, current reply to be 1, quoted one --
+     */
+    private Integer status;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -85,5 +96,23 @@ public class BbsReplyEntity {
 
     public void setQuoteIndex(Integer quoteIndex) {
         this.quoteIndex = quoteIndex;
+    }
+
+    @Column(name = "quote_unread")
+    public Integer getUnread() {
+        return unread;
+    }
+
+    public void setUnread(Integer unread) {
+        this.unread = unread;
+    }
+
+    @Column(name = "check_status")
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }

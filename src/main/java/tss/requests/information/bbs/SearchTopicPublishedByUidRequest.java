@@ -4,10 +4,6 @@ public class SearchTopicPublishedByUidRequest {
     private String uid;
     private String page;
 
-    public SearchTopicPublishedByUidRequest(String uid, String page) {
-        this.uid = uid;
-        this.page = page;
-    }
 
     public String getUid() {
         return uid;

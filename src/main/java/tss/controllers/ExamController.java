@@ -303,7 +303,8 @@ public class ExamController {
         result.setStudent(user);
         result.setPaper(paper);
         int count = Integer.parseInt(paper.getCount());
-        for(int i=0; i<count;i++){
+        System.out.println("qidlength:"+request.getQid().length);
+        for(int i=0; i<request.getQid().length;i++){
             ret2= questionRepository.findById(request.getQid()[i]);
             if(!ret2.isPresent()){
                 System.out.println("Can't save question "+ i);
@@ -323,9 +324,9 @@ public class ExamController {
     @PostMapping(path = "/submit")
     @Authorization
     public ResponseEntity<DeleteResultResponse> SubmitPaper(@CurrentUser UserEntity user, @RequestBody DeleteResultRequest request){
-// ret: paper     ret2: result  ret3: Question ret4: historygrade
+// ret: paper     ret2: result  ret3: Question ret4: historygrade  ret5:save question
         PapersEntity paper;
-        ResultEntity result;
+
         QuestionEntity question;
         HistoryGradeEntity record;
         int totalscore=0;
@@ -335,9 +336,31 @@ public class ExamController {
             return  new ResponseEntity<>(new DeleteResultResponse("can't submit the paper"), HttpStatus.BAD_REQUEST);
         }
 
-
+        //先保存答案
+        ResultEntity result = new ResultEntity();
+        Optional<QuestionEntity> ret5;
         paper = ret.get();// 取得当前的试卷
-        int count = Integer.parseInt(paper.getCount());
+
+        result.setStudent(user);
+        result.setPaper(paper);
+   //     int count = Integer.parseInt(paper.getCount());
+        System.out.println("qidlength:"+request.getQid().length);
+        for(int i=0; i<request.getQid().length;i++){
+            ret5= questionRepository.findById(request.getQid()[i]);
+            if(!ret5.isPresent()){
+                System.out.println("Can't save question "+ i);
+                return new ResponseEntity<>(new DeleteResultResponse("submit question error"), HttpStatus.BAD_REQUEST);
+            }
+            question = ret5.get();
+            result.setQuestion(question);
+            result.setAns(request.getAns()[i]);
+            result.setRid(paper.getPid()+user.getUid()+question.getQid());
+            resultRepository.save(result);
+        }
+
+
+
+
         PaperContainsQuestionEntity contain;
         Optional<ResultEntity> ret2;
         Optional<QuestionEntity> ret3;
@@ -348,27 +371,34 @@ public class ExamController {
         while(contain_find.hasNext()){ //对卷子中的每一道题，查找result中相应的结果， 更新 qustion库中的question
 
             contain = contain_find.next();//contain 是当前卷子中的题目
-            ret2 = resultRepository.findById(paper.getPid()+user.getUid()+contain.getQuestion().getQid());
-            if(!ret2.isPresent()){
-                System.out.println("submit question error");
-                return new ResponseEntity<>(new DeleteResultResponse("submit question error"), HttpStatus.BAD_REQUEST);
-            }
-            result = ret2.get();
 
+            //增加答题数
             ret3 = questionRepository.findById(contain.getQuestion().getQid());
             if(!ret3.isPresent()){
-                System.out.println("submit question error");
+                System.out.println("question does not exist");
                 return new ResponseEntity<>(new DeleteResultResponse("submit question error"), HttpStatus.BAD_REQUEST);
             }
             question = ret3.get();
-
             question.setAnswerednum(question.getAnswerednum()+1);//修改题目的答题数
-            if(question.getQanswer().equals(result.getAns())){
-                totalscore = totalscore+ Integer.parseInt(contain.getScore());
-                question.setCorrect(question.getCorrect()+1);//修改正确的题目数量
+
+            //判断是否正确
+            ret2 = resultRepository.findById(paper.getPid()+user.getUid()+contain.getQuestion().getQid());
+            if(!ret2.isPresent()){  //没有作答
+              //  System.out.println("result does not exist");
+               // return new ResponseEntity<>(new DeleteResultResponse("submit question error"), HttpStatus.BAD_REQUEST);
+
             }
+            else{       //作答
+                result = ret2.get();
+                if(question.getQanswer().equals(result.getAns())){
+                    totalscore = totalscore+ Integer.parseInt(contain.getScore());
+                    question.setCorrect(question.getCorrect()+1);//修改正确的题目数量
+                }
+                resultRepository.deleteById(paper.getPid()+user.getUid()+contain.getQuestion().getQid());
+            }
+
             questionRepository.save(question);//存回修改了的题目信息
-            resultRepository.deleteById(paper.getPid()+user.getUid()+contain.getQuestion().getQid());
+
         }
 
         ret4 = historyGradeRepository.findById(user.getUid()+paper.getPid());

@@ -6,19 +6,19 @@ import java.util.List;
 
 public class GetInfoBbsSectionResponse {
 
-    private final List<String> ids;
-    private final List<String> names;
+    private final List<String> boardIDs;
+    private final List<String> boardNames;
 
-    public GetInfoBbsSectionResponse(List<String> ids, List<String> names){
-        this.ids = ids;
-        this.names = names;
+    public GetInfoBbsSectionResponse(List<String> boardIDs, List<String> boardNames) {
+        this.boardIDs = boardIDs;
+        this.boardNames = boardNames;
     }
 
-    public List<String> getIds() {
-        return ids;
+    public List<String> getBoardIDs() {
+        return boardIDs;
     }
 
-    public List<String> getNames() {
-        return names;
+    public List<String> getBoardNames() {
+        return boardNames;
     }
 }
