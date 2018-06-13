@@ -1,13 +1,13 @@
 package tss.requests.information.bbs;
 
 public class DeleteBbsTopicRequest {
-    private long id;
+    private String topicID;
 
-    public long getId() {
-        return id;
+    public String getTopicID() {
+        return topicID;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setTopicID(String topicID) {
+        this.topicID = topicID;
     }
 }

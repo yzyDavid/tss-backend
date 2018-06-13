@@ -22,7 +22,7 @@ public class QuestionEntity{
 
 
     @Id
-    @Column(name = "question_qid")
+    @Column(name = "question_qid", length = 100)
     public String getQid() {
         return  qid;
     }

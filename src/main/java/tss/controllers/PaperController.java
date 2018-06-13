@@ -127,7 +127,7 @@ public class PaperController {
             for(int i = 0; i < n; i++){
                 if(it.hasNext()){
                     index = (int)it.next();
-                //    System.out.println(i +"th: "+index);
+
                     PaperContainsQuestionEntity contain = new PaperContainsQuestionEntity();
 
                     int tempid = Integer.valueOf(request.getPid()) * 10000 + i;
@@ -138,7 +138,8 @@ public class PaperController {
                     contain.setScore(String.valueOf(tempscore));
 
                     //添加question
-                    QuestionEntity question = (QuestionEntity)questions.get(i);
+                    QuestionEntity question = (QuestionEntity)questions.get(index);
+                 //   System.out.println(i +"th: "+index + " qid:"+question.getQid());
                     contain.setQuestion(question);
 
           //          System.out.println("qid:"+question.getQid());
@@ -147,7 +148,8 @@ public class PaperController {
                 }
                 else{
                     System.out.println("Set is not full! "+i);
-                    break;
+                    return new ResponseEntity<>(new AddPaperResponse("not enough questions!", paper.getPid()), HttpStatus.BAD_REQUEST);
+
                 }
             }
         }

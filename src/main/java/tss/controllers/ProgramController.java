@@ -23,73 +23,41 @@ import java.util.*;
 @RequestMapping(path = "program")
 public class ProgramController {
     private final ClassRegistrationRepository classRegistrationRepository;
-    private final ProgramRepository programRepository;
     private final ProgramCourseRepository programCourseRepository;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
 
     @Autowired
-    public ProgramController(ClassRegistrationRepository classRegistrationRepository, ProgramRepository programRepository,
+    public ProgramController(ClassRegistrationRepository classRegistrationRepository,
                              ProgramCourseRepository programCourseRepository, UserRepository userRepository,
                              CourseRepository courseRepository) {
         this.classRegistrationRepository = classRegistrationRepository;
-        this.programRepository = programRepository;
         this.programCourseRepository = programCourseRepository;
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
     }
 
-    @PutMapping
+    @PutMapping(path = "/course")
     @Authorization
-    public ResponseEntity<AddProgramResponse> addProgram(@CurrentUser UserEntity user,
-                                                         @RequestBody AddProgramRequest request)
-    {
-
-        if (!user.readTypeName().equals("Student")) {
-            return new ResponseEntity<>(new AddProgramResponse("Permission denied: You are not a student"), HttpStatus.FORBIDDEN);
-        }
-
-        ProgramEntity program = new ProgramEntity();
-
-        program.setUid(user.getUid());
-        program.setPid(user.getUid());
-        UserEntity user_i = userRepository.findById(user.getUid()).get();
-        HashSet<UserEntity> users = new HashSet<>();
-        users.add(user_i);
-        program.setStudents(users);
-        programRepository.save(program);
-
-        return new ResponseEntity<>(new AddProgramResponse("ok"), HttpStatus.CREATED);
-
-    }
-
-    @PutMapping(path = "course")
-    @Authorization
-    public ResponseEntity<AddCourseinProgramResponse> addCourseinProgram(@CurrentUser UserEntity user,
+    public ResponseEntity<BasicResponse> addCourseinProgram(@CurrentUser UserEntity user,
                                                                          @RequestBody AddCourseinProgramRequest request)
     {
         if (!user.readTypeName().equals("Student")) {
-            return new ResponseEntity<>(new AddCourseinProgramResponse("Permission denied: You are not a student"), HttpStatus.FORBIDDEN);
+            throw new PermissionDeniedException();
         }
 
         Optional<CourseEntity> courseEntityOptional = courseRepository.findById(request.getCid());
         if (!courseEntityOptional.isPresent()) {
-            return new ResponseEntity<>(new AddCourseinProgramResponse("no such course"), HttpStatus.FORBIDDEN);
-        }
-        Optional<ProgramEntity> programEntityOptional = programRepository.findByPid(user.getUid());
-        if (!programEntityOptional.isPresent()) {
-            return new ResponseEntity<>(new AddCourseinProgramResponse("no such student"), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(new BasicResponse("课程不存在！"), HttpStatus.FORBIDDEN);
         }
 
         CourseEntity courseEntity = courseEntityOptional.get();
-        ProgramEntity programEntity = programEntityOptional.get();
 
-        if (programCourseRepository.existsByCourse(courseEntity)
-                && programCourseRepository.existsByProgram(programEntity))
+        if (programCourseRepository.existsByCourseAndStudent(courseEntity, user))
         {
-            return new ResponseEntity<>(new AddCourseinProgramResponse("duplicate insert"), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(new BasicResponse("该课程已存在！"), HttpStatus.FORBIDDEN);
         }
-        ProgramCourseEntity programcourse = new ProgramCourseEntity();
+        ProgramCourseEntity programCourseEntity = new ProgramCourseEntity();
 
         // Modified by ljh
         MajorEntity major = user.getMajorClass().getMajor();
@@ -98,22 +66,22 @@ public class ProgramController {
         Set<CourseEntity> coursesPublic = major.getSetOfPublic();
 
         if (coursesCompulsory.contains(courseEntity)) {
-            programcourse.setType(ProgramCourseEntity.COMPULSORY_COURSE);
+            programCourseEntity.setType(ProgramCourseEntity.COMPULSORY_COURSE);
         }
         else if (coursesSelective.contains(courseEntity)) {
-            programcourse.setType(ProgramCourseEntity.MAJOR_SELECTIVE_COURSE);
+            programCourseEntity.setType(ProgramCourseEntity.MAJOR_SELECTIVE_COURSE);
         }
         else if (coursesPublic.contains(courseEntity)) {
-            programcourse.setType(ProgramCourseEntity.PUBLIC_SELECTIVE_COURSE);
+            programCourseEntity.setType(ProgramCourseEntity.PUBLIC_SELECTIVE_COURSE);
         }
         else
-            return new ResponseEntity<>(new AddCourseinProgramResponse("course not in major programs"), HttpStatus.FORBIDDEN);
+            return new ResponseEntity<>(new BasicResponse("专业计划中没有此课程！"), HttpStatus.FORBIDDEN);
 
-        programcourse.setCourse(courseEntity);
-        programcourse.setProgram(programEntity);
-        programCourseRepository.save(programcourse);
+        programCourseEntity.setCourse(courseEntity);
+        programCourseEntity.setStudent(user);
+        programCourseRepository.save(programCourseEntity);
 
-        return new ResponseEntity<>(new AddCourseinProgramResponse("ok"), HttpStatus.CREATED);
+        return new ResponseEntity<>(new BasicResponse("插入成功！"), HttpStatus.CREATED);
 
     }
 
@@ -123,43 +91,33 @@ public class ProgramController {
                                                              @RequestBody DeleteCourseinProgramRequest request)
     {
         if (!user.readTypeName().equals("Student")) {
-            return new ResponseEntity<>(new DeleteCourseinProgramResponse("Permission denied: You are not a student",
-                    null, null, null), HttpStatus.FORBIDDEN);
+            throw new PermissionDeniedException();
         }
 
-        String pid = user.getUid();
         String cid = request.getCid();
-
-        Optional<ProgramEntity> ret = programRepository.findByPid(pid);
-        if (!ret.isPresent())
-        {
-            return new ResponseEntity<>(new DeleteCourseinProgramResponse("non-existent program id",
-                    null,null,null), HttpStatus.BAD_REQUEST);
-        }
-
         Optional<CourseEntity> ret2 = courseRepository.findById(cid);
         if (!ret2.isPresent())
         {
-            return new ResponseEntity<>(new DeleteCourseinProgramResponse("non-existent course id",
+            return new ResponseEntity<>(new DeleteCourseinProgramResponse("课程不存在！",
                     null,null,null), HttpStatus.BAD_REQUEST);
         }
 
-
-        ProgramEntity program = ret.get();
         CourseEntity course = ret2.get();
         String cname = course.getName();
 
-        Optional<ProgramCourseEntity> ret3 = programCourseRepository.findByCourseAndProgram(course, program);
+        Optional<ProgramCourseEntity> ret3 = programCourseRepository.findByCourseAndStudent(course, user);
         if (!ret3.isPresent())
         {
-            return new ResponseEntity<>(new DeleteCourseinProgramResponse("this course is not in the program",cid,cname,pid), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new DeleteCourseinProgramResponse("此课程在培养方案中不存在，无法删除！",
+                    cid,cname,user.getUid()), HttpStatus.BAD_REQUEST);
         }
 
         ProgramCourseEntity programcourse = ret3.get();
 
         programCourseRepository.delete(programcourse);
 
-        return new ResponseEntity<>(new DeleteCourseinProgramResponse("ok", cid, cname,pid), HttpStatus.OK);
+        return new ResponseEntity<>(new DeleteCourseinProgramResponse("ok", cid, cname, user.getUid()),
+                HttpStatus.OK);
     }
 
     @GetMapping("/status")
@@ -170,12 +128,6 @@ public class ProgramController {
         if (!user.readTypeName().equals("Student")) {
             throw new PermissionDeniedException();
         }
-
-        Optional<ProgramEntity> programEntity = programRepository.findByPid(user.getUid());
-        if (!programEntity.isPresent()) {
-            throw new ProgramNotFoundException();
-        }
-        ProgramEntity program = programEntity.get();
 
         MajorEntity major = user.getMajorClass().getMajor();
         Set<CourseEntity> coursesCompulsory = major.getSetOfCompulsory();
@@ -193,7 +145,8 @@ public class ProgramController {
             if (crs.isPresent())
                 courses_status.add(crs.get().getStatus());
             else {
-                Optional<ProgramCourseEntity> programCourseEntityOptional = programCourseRepository.findByCourseAndProgram(course, program);
+                Optional<ProgramCourseEntity> programCourseEntityOptional =
+                        programCourseRepository.findByCourseAndStudent(course, user);
                 if (programCourseEntityOptional.isPresent()) {
                     courses_status.add(ClassStatusEnum.NOT_SELECTED);
                 }
@@ -206,7 +159,8 @@ public class ProgramController {
             courses_type.add(CourseTypeEnum.SELECTIVE);
             Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
             if (!crs.isPresent()) {
-                Optional<ProgramCourseEntity> programCourseEntityOptional = programCourseRepository.findByCourseAndProgram(course, program);
+                Optional<ProgramCourseEntity> programCourseEntityOptional =
+                        programCourseRepository.findByCourseAndStudent(course, user);
                 if (programCourseEntityOptional.isPresent()) {
                     courses_status.add(ClassStatusEnum.NOT_SELECTED);
                 }
@@ -221,7 +175,8 @@ public class ProgramController {
             courses_type.add(CourseTypeEnum.PUBLIC);
             Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
             if (!crs.isPresent()) {
-                Optional<ProgramCourseEntity> programCourseEntityOptional = programCourseRepository.findByCourseAndProgram(course, program);
+                Optional<ProgramCourseEntity> programCourseEntityOptional =
+                        programCourseRepository.findByCourseAndStudent(course, user);
                 if (programCourseEntityOptional.isPresent()) {
                     courses_status.add(ClassStatusEnum.NOT_SELECTED);
                 }
@@ -231,7 +186,8 @@ public class ProgramController {
                 courses_status.add(crs.get().getStatus());
         }
 
-        return new ResponseEntity<>(new GetProgramCoursesResponse(courses_final, courses_type, courses_status), HttpStatus.OK);
+        return new ResponseEntity<>(new GetProgramCoursesResponse("显示成功！",
+                courses_final, courses_type, courses_status), HttpStatus.OK);
     }
 
     @GetMapping("/status/in_program")
@@ -243,12 +199,6 @@ public class ProgramController {
             throw new PermissionDeniedException();
         }
 
-        Optional<ProgramEntity> programEntity = programRepository.findByPid(user.getUid());
-        if (!programEntity.isPresent()) {
-            throw new ProgramNotFoundException();
-        }
-        ProgramEntity program = programEntity.get();
-
         MajorEntity major = user.getMajorClass().getMajor();
         Set<CourseEntity> coursesCompulsory = major.getSetOfCompulsory();
         Set<CourseEntity> coursesSelective = major.getSetOfSelective();
@@ -259,7 +209,7 @@ public class ProgramController {
         List<ClassStatusEnum> courses_status = new ArrayList<>();
 
         for (CourseEntity course : coursesCompulsory) {
-            if (programCourseRepository.existsByCourseAndProgram(course, program)) {
+            if (programCourseRepository.existsByCourseAndStudent(course, user)) {
                 courses_final.add(course);
                 courses_type.add(CourseTypeEnum.COMPULSORY);
                 Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
@@ -273,7 +223,7 @@ public class ProgramController {
         }
 
         for (CourseEntity course : coursesSelective) {
-            if (programCourseRepository.existsByCourseAndProgram(course, program)) {
+            if (programCourseRepository.existsByCourseAndStudent(course, user)) {
                 courses_final.add(course);
                 courses_type.add(CourseTypeEnum.SELECTIVE);
                 Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
@@ -287,7 +237,7 @@ public class ProgramController {
         }
 
         for (CourseEntity course : coursesPublic) {
-            if (programCourseRepository.existsByCourseAndProgram(course, program)) {
+            if (programCourseRepository.existsByCourseAndStudent(course, user)) {
                 courses_final.add(course);
                 courses_type.add(CourseTypeEnum.PUBLIC);
                 Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
@@ -300,7 +250,8 @@ public class ProgramController {
             }
         }
 
-        return new ResponseEntity<>(new GetProgramCoursesResponse(courses_final, courses_type, courses_status), HttpStatus.OK);
+        return new ResponseEntity<>(new GetProgramCoursesResponse("显示成功！",
+                courses_final, courses_type, courses_status), HttpStatus.OK);
     }
 
     @GetMapping("/status/not_in_program")
@@ -312,12 +263,6 @@ public class ProgramController {
             throw new PermissionDeniedException();
         }
 
-        Optional<ProgramEntity> programEntity = programRepository.findByPid(user.getUid());
-        if (!programEntity.isPresent()) {
-            throw new ProgramNotFoundException();
-        }
-        ProgramEntity program = programEntity.get();
-
         MajorEntity major = user.getMajorClass().getMajor();
         Set<CourseEntity> coursesCompulsory = major.getSetOfCompulsory();
         Set<CourseEntity> coursesSelective = major.getSetOfSelective();
@@ -328,26 +273,26 @@ public class ProgramController {
         List<ClassStatusEnum> courses_status = new ArrayList<>();
 
         for (CourseEntity course : coursesCompulsory) {
-            if (programCourseRepository.existsByCourseAndProgram(course, program)) continue;
+            if (programCourseRepository.existsByCourseAndStudent(course, user)) continue;
             courses_final.add(course);
             courses_type.add(CourseTypeEnum.COMPULSORY);
             courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
         }
 
         for (CourseEntity course : coursesSelective) {
-            if (programCourseRepository.existsByCourseAndProgram(course, program)) continue;
+            if (programCourseRepository.existsByCourseAndStudent(course, user)) continue;
             courses_final.add(course);
             courses_type.add(CourseTypeEnum.SELECTIVE);
             courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
         }
 
         for (CourseEntity course : coursesPublic) {
-            if (programCourseRepository.existsByCourseAndProgram(course, program)) continue;
+            if (programCourseRepository.existsByCourseAndStudent(course, user)) continue;
             courses_final.add(course);
             courses_type.add(CourseTypeEnum.PUBLIC);
             courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
         }
 
-        return new ResponseEntity<>(new GetProgramCoursesResponse(courses_final, courses_type, courses_status), HttpStatus.OK);
+        return new ResponseEntity<>(new GetProgramCoursesResponse("显示成功！", courses_final, courses_type, courses_status), HttpStatus.OK);
     }
 }

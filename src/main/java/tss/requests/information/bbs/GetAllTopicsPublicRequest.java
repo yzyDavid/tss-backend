@@ -3,9 +3,6 @@ package tss.requests.information.bbs;
 public class GetAllTopicsPublicRequest {
     private String boardID;
 
-    public GetAllTopicsPublicRequest(String boardID) {
-        this.boardID = boardID;
-    }
 
     public String getBoardID() {
         return boardID;

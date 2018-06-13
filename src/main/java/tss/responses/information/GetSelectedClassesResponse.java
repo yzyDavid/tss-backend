@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetSelectedClassesResponse {
+    private String status;
     private List<ClassSelectedInfo> classes;
 
     class ClassSelectedInfo {
@@ -99,7 +100,8 @@ public class GetSelectedClassesResponse {
         }
     }
 
-    public GetSelectedClassesResponse(List<ClassEntity> classes) {
+    public GetSelectedClassesResponse(String status, List<ClassEntity> classes) {
+        this.status = status;
         this.classes = new ArrayList<>();
         for (ClassEntity clazz : classes)
             this.classes.add(new ClassSelectedInfo(clazz));
@@ -107,5 +109,17 @@ public class GetSelectedClassesResponse {
 
     public List<ClassSelectedInfo> getClasses() {
         return this.classes;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setClasses(List<ClassSelectedInfo> classes) {
+        this.classes = classes;
     }
 }

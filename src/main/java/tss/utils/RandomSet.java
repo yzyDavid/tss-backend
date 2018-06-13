@@ -6,15 +6,14 @@ import java.util.HashSet;
 public class RandomSet {
 
     public static void randomSet(int min, int max, int n, HashSet<Integer> set) {
-        if (n > (max - min) || max < min) {
+        if (n > (max - min + 1) || max < min) {
             System.out.println("Not enough num.");
             return;
         }
         while(set.size() < n){
             // 调用Math.random()方法
-            int num = (int) (Math.random() * (max - min)) + min;
+            int num = (int) (Math.random() * (max - min + 0.4)) + min;      //防止因为random达不到1而造成无法取得max
             set.add(num);// 将不同的数存入HashSet中
-
         }
         /*
         for (int i = 0; i < n; i++) {

@@ -6,7 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetProgramCoursesResponse {
+    private String status;
     private List<CourseInfo> courses;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     class CourseInfo {
         private String courseId;  // courseId
@@ -80,7 +89,8 @@ public class GetProgramCoursesResponse {
         this.courses = courses;
     }
 
-    public GetProgramCoursesResponse(List<CourseEntity> courses, List<CourseTypeEnum> types, List<ClassStatusEnum> status) {
+    public GetProgramCoursesResponse(String s, List<CourseEntity> courses, List<CourseTypeEnum> types, List<ClassStatusEnum> status) {
+        this.status = s;
         this.courses = new ArrayList<>();
         for (int i=0; i<courses.size(); i++) {
             this.courses.add(new CourseInfo(courses.get(i), types.get(i), status.get(i)));

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetClassesResponse {
+    private String status;
     private final List<ClassInfo> classes;
 
     class ClassInfo {
@@ -20,6 +21,8 @@ public class GetClassesResponse {
         private SemesterEnum semester;
         private Integer capacity;
         private Integer numStudent;
+        private Float credit;
+        private String intro;
         private String courseId;
         private String courseName;
         private String teacherName;
@@ -30,20 +33,38 @@ public class GetClassesResponse {
         public ClassInfo() {
         }
 
-        public ClassInfo(Long id, Integer year, SemesterEnum semester, Integer capacity,
-                         Integer numStudent, String courseId, String courseName,
-                         String teacherName, String timeSlot, String classroom, String status) {
+        public ClassInfo(Long id, Integer year, SemesterEnum semester, Integer capacity, Integer numStudent,
+                         Float credit, String intro, String courseId, String courseName, String teacherName,
+                         String timeSlot, String classroom, String status) {
             this.id = id;
             this.year = year;
             this.semester = semester;
             this.capacity = capacity;
             this.numStudent = numStudent;
+            this.credit = credit;
+            this.intro = intro;
             this.courseId = courseId;
             this.courseName = courseName;
             this.teacherName = teacherName;
             this.timeSlot = timeSlot;
             this.classroom = classroom;
             this.status = status;
+        }
+
+        public Float getCredit() {
+            return credit;
+        }
+
+        public void setCredit(Float credit) {
+            this.credit = credit;
+        }
+
+        public String getIntro() {
+            return intro;
+        }
+
+        public void setIntro(String intro) {
+            this.intro = intro;
         }
 
         public Long getId() {
@@ -130,6 +151,8 @@ public class GetClassesResponse {
             semester = clazz.getSemester();
             capacity = clazz.getCapacity();
             numStudent = numOfStudents;
+            credit = clazz.getCourse().getCredit();
+            intro = clazz.getCourse().getIntro();
             courseId = clazz.getCourse().getId();
             courseName = clazz.getCourse().getName();
             teacherName = clazz.getTeacher().getName();
@@ -150,7 +173,8 @@ public class GetClassesResponse {
         }
     }
 
-    public GetClassesResponse(List<ClassEntity> classes, List<Boolean> selected, List<Integer> numOfStudents) {
+    public GetClassesResponse(String status, List<ClassEntity> classes, List<Boolean> selected, List<Integer> numOfStudents) {
+        this.status = status;
         this.classes = new ArrayList<>();
         for (int i=0; i<classes.size(); i++)
             this.classes.add(new ClassInfo(classes.get(i), selected.get(i), numOfStudents.get(i)));

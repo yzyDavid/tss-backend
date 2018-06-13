@@ -43,7 +43,7 @@ public class ExportExcelController {
         this.classes = classes;
         this.classRepository = classRepository;
     }
-
+/*
     @GetMapping("/download/{courseId}")
     //@Authorization
     @ResponseBody
@@ -70,7 +70,7 @@ public class ExportExcelController {
                 //students.add(cr.getStudent());
                 exportentities.add(exp);
             }
-        }
+        }*/
 //
 //        Workbook wb = new HSSFWorkbook();
 //        ResponseEntity<byte []> excelresponse;
@@ -90,10 +90,10 @@ public class ExportExcelController {
 //        ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
 //        wb.write(outByteStream);
 //        return new ResponseEntity<byte[]>(outByteStream.toByteArray(), headers, HttpStatus.OK);
-        return ee.exportExcel(headerss, exportentities, "students.xls");
+/*        return ee.exportExcel(headerss, exportentities, "students.xls");
 
 
-    }
+    }*/
 
     @GetMapping("/download/classes/{classId}")
     //@Authorization
@@ -125,7 +125,7 @@ public class ExportExcelController {
             //students.add(cr.getStudent());
             exportentities.add(exp);
         }
-        return ee.exportExcel(headerss, exportentities, "students.xls");
+        return ee.exportExcel(headerss, exportentities, cl.getCourse().getName() + ".xls");
 
 
     }

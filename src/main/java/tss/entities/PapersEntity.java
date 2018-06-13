@@ -16,13 +16,13 @@ public class PapersEntity{
     private String papername;
     private boolean isauto;
 
-    private Set<PaperContainsQuestionEntity> paperquestion = new HashSet<>();
-
-
     private long answerednum;
     private double average;
+
+    private Set<PaperContainsQuestionEntity> paperquestion = new HashSet<>();
+
     @Id
-    @Column(name = "paper_pid", length = 10)
+    @Column(name = "paper_pid", length = 100)
     public String getPid() {
         return pid;
     }

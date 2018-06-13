@@ -4,28 +4,27 @@ Program and class selection APIs
 
 ### 1. 培养方案制定功能
 
-|  方法  |              uri               |           请求参数(json)           |                        返回参数(json)                        |             说明             |
-| :----: | :----------------------------: | :--------------------------------: | :----------------------------------------------------------: | :--------------------------: |
-|  PUT   |        /program/course         | cid<br>pid<br>uid<br>type(Integer) |                            status                            |       培养方案添加课程       |
-| DELETE |        /program/course         |             cid<br>pid             |                status<br>cid<br>cname<br>uid                 |       培养方案删除课程       |
-|  GET   |        /program/status         |                 无                 | **List of:**<br>courseId<br>courseName<br>credit(Float)<br>type<br>status |    查看培养方案中课程状态    |
-|  GET   |   /program/status/in_program   |                 无                 |                             同上                             | 查看已选进培养方案的课程状态 |
-|  GET   | /program/status/not_in_program |                 无                 |                             同上                             | 查看未选进培养方案的课程状态 |
+|  方法  |              uri               | 请求参数 |                  返回参数<br>除了status以外                  |             说明             |
+| :----: | :----------------------------: | :------: | :----------------------------------------------------------: | :--------------------------: |
+|  PUT   |        /program/course         |   cid    |                              -                               |       培养方案添加课程       |
+| DELETE |        /program/course         |   cid    |                     cid<br>cname<br>uid                      |       培养方案删除课程       |
+|  GET   |        /program/status         |    -     | **List of:**<br>courseId<br>courseName<br>credit(Float)<br>type<br>status |    查看培养方案中课程状态    |
+|  GET   |   /program/status/in_program   |    -     |                             同上                             | 查看已选进培养方案的课程状态 |
+|  GET   | /program/status/not_in_program |    -     |                             同上                             | 查看未选进培养方案的课程状态 |
 
 + 在培养方案中添加课程
   + url: `PUT /program/course`
-  + request: `{"cid", "pid", "uid", "type"}`
-    + **type**: Integer(0-compulsory, 1-selective, 2-public)
+  + request: `{"cid"}`
   + response: `{"status"}`
 + 在培养方案中删除课程
   + url: `DELETE /program/course`
-  + request: `{"cid", "pid"}`
+  + request: `{"cid"}`
   + response: `{"status", "cid", "cname", "uid"}`
     + cname-课程名称, uid-用户id
 + 查看培养方案中课程的状态（哪些课程已选，哪些没选，……）
   + url: `GET /program/status`
   + request: 无
-  + response: `{"courses:[{"courseId", "courseName", "credit", "type", "status"}, {..}, ...]"}`
+  + response: `{"status",courses:[{"courseId", "courseName", "credit", "type", "status"}, {..}, ...]"}`
     + **credit**: Float
     + **type**: String, 为`COMPULSORY/SELECTIVE/PUBLIC`，表示课程类型
     + **status**: String, 为`NOT_SELECTED/SELECTED/FINISHED/FAILED`，表示课程状态
@@ -39,7 +38,7 @@ Program and class selection APIs
 
 ### 2. 选课相关（学生）
 
-|  方法  |                     uri                     | 请求参数(json) |                返回参数(json)<br>不包括status                |              说明              |
+|  方法  |                     uri                     |    请求参数    |                   返回参数<br>不包括status                   |              说明              |
 | :----: | :-----------------------------------------: | :------------: | :----------------------------------------------------------: | :----------------------------: |
 |  POST  |               /classes/search               | 四选一（见下） | **List of**:<br>id(Long)<br>year(Integer)<br>semester<br>capacity(Integer)<br>numStudent(Integer)<br>courseId<br>courseName<br>teachearName<br>timeSlot<br>classroom |          搜索可选课程          |
 |  POST  |              /classes/register              | classId(Long)  |                              -                               |              选课              |

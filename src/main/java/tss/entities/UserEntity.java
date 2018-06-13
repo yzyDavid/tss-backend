@@ -74,6 +74,9 @@ public class UserEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", orphanRemoval = true)
     private List<ClassRegistrationEntity> classRegistrations = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "student", orphanRemoval = true)
+    private List<ProgramCourseEntity> programCourses = new ArrayList<>();
+
     public String getGender() {
         return gender;
     }
@@ -240,6 +243,14 @@ public class UserEntity {
     public void addClassRegistration(ClassRegistrationEntity classRegistrationEntity) {
         classRegistrations.add(classRegistrationEntity);
         classRegistrationEntity.setStudent(this);
+    }
+
+    public List<ProgramCourseEntity> getProgramCourses() {
+        return programCourses;
+    }
+
+    public void setProgramCourses(List<ProgramCourseEntity> programCourses) {
+        this.programCourses = programCourses;
     }
 
     @Override

@@ -64,7 +64,7 @@ public class SelectionTimeController {
         }
         selectionTimeRepository.save(selectionTimeEntity);
 
-        return new BasicResponse("Set register time successfully.");
+        return new BasicResponse("设置选课时间成功。");
     }
 
     @PostMapping("/selection_time/complement")
@@ -91,7 +91,7 @@ public class SelectionTimeController {
 
         selectionTimeRepository.save(selectionTimeEntity);
 
-        return new BasicResponse("Set complement time successfully.");
+        return new BasicResponse("设置补选时间成功。");
     }
 
     @PostMapping("/selection_time/drop")
@@ -118,7 +118,7 @@ public class SelectionTimeController {
 
         selectionTimeRepository.save(selectionTimeEntity);
 
-        return new BasicResponse("Set drop time successfully.");
+        return new BasicResponse("设置退课时间成功。");
     }
 
     @GetMapping("/selection_time/show")

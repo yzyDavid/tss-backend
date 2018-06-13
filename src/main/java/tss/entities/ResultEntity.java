@@ -3,67 +3,66 @@ package tss.entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Results", indexes = {
-        @Index(name = "StudentID_Index", columnList = "StudentID"),
-        @Index(name = "PaperID_Index", columnList = "PaperID"),
-        @Index(name = "QuestionID_Index", columnList = "QuestionID"),
+@Table(name = "Results")
+      //  @Index(name = "StudentID_Index", columnList = "StudentID"),
+       // @Index(name = "PaperID_Index", columnList = "PaperID"),
+       // @Index(name = "QuestionID_Index", columnList = "QuestionID"),
 
-})
 public class ResultEntity {
 
-    private String Rid;
-    private UserEntity Student;
-    private PapersEntity Paper;
-    private QuestionEntity Question;
-    private String Ans;
+    private String rid;
+    private UserEntity student;
+    private PapersEntity paper;
+    private QuestionEntity question;
+    private String ans;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "Resultid", length = 100)
     public String getRid() {
-        return Rid;
+        return rid;
     }
 
     public void setRid(String rid) {
-        Rid = rid;
+        this.rid = rid;
     }
 
     @JoinColumn(name = "StudentID")
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     public UserEntity getStudent() {
-        return Student;
+        return student;
     }
 
     public void setStudent(UserEntity student) {
-        Student = student;
+        this.student = student;
     }
 
     @JoinColumn(name = "PaperID")
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     public PapersEntity getPaper() {
-        return Paper;
+        return paper;
     }
 
     public void setPaper(PapersEntity paper) {
-        Paper = paper;
+        this.paper = paper;
     }
 
     @JoinColumn(name = "QuestionID")
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, optional = false)
     public QuestionEntity getQuestion() {
-        return Question;
+        return question;
     }
 
     public void setQuestion(QuestionEntity question) {
-        Question = question;
+        this.question = question;
     }
 
     @Column(name = "Answer")
     public String getAns() {
-        return Ans;
+        return ans;
     }
 
     public void setAns(String ans) {
-        Ans = ans;
+        this.ans = ans;
     }
 
 
@@ -78,30 +77,30 @@ public class ResultEntity {
     }
 
 
-    public UserEntity getSid() {
-        return Sid;
+    public UserEntity getStudent() {
+        return Student;
     }
 
-    public void setSid(UserEntity sid) {
-        Sid = sid;
-    }
-
-
-    public PapersEntity getPid() {
-        return Pid;
-    }
-
-    public void setPid(PapersEntity pid) {
-        Pid = pid;
+    public void setStudent(UserEntity student) {
+        Student = student;
     }
 
 
-    public QuestionEntity getQid() {
-        return Qid;
+    public PapersEntity getPaper() {
+        return Paper;
     }
 
-    public void setQid(QuestionEntity qid) {
-        Qid = qid;
+    public void setPaper(PapersEntity paper) {
+        Paper = paper;
+    }
+
+
+    public QuestionEntity getQuestion() {
+        return Question;
+    }
+
+    public void setQuestion(QuestionEntity question) {
+        Question = question;
     }
 
 
@@ -112,8 +111,9 @@ public class ResultEntity {
     public void setAns(String ans) {
         Ans = ans;
     }
-<<<<<<< HEAD
-
 */
+
+
+
 
 }
