@@ -165,8 +165,9 @@ public class ExamController {
                     Date ddldate = sdf.parse(ddl);
                     String[] lasttime = last.split(":");
                     Integer[] lastnum = new Integer[lasttime.length];
-                    for(int i = 0; i < lasttime.length; i++)
+                    for(int i = 0; i < lasttime.length; i++) {
                         lastnum[i] = Integer.parseInt(lasttime[i]);
+                    }
 
                     Calendar startc = Calendar.getInstance();
                     startc.clear();

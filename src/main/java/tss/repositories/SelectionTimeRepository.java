@@ -14,6 +14,7 @@ import java.util.Optional;
 public interface SelectionTimeRepository extends CrudRepository<SelectionTimeEntity, Integer> {
     Optional<SelectionTimeEntity> findByStartAndEnd(Timestamp start, Timestamp end);
 
+    @SuppressWarnings("AliMissingOverrideAnnotation")
     List<SelectionTimeEntity> findAll();
 
 

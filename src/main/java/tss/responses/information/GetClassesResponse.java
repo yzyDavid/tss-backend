@@ -176,8 +176,9 @@ public class GetClassesResponse {
     public GetClassesResponse(String status, List<ClassEntity> classes, List<Boolean> selected, List<Integer> numOfStudents) {
         this.status = status;
         this.classes = new ArrayList<>();
-        for (int i=0; i<classes.size(); i++)
+        for (int i=0; i<classes.size(); i++) {
             this.classes.add(new ClassInfo(classes.get(i), selected.get(i), numOfStudents.get(i)));
+        }
     }
 
     public List<ClassInfo> getClasses() {

@@ -1,6 +1,6 @@
 package tss.controllers;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.util.BEncoderStream;
+// import com.sun.xml.internal.messaging.saaj.packaging.mime.util.BEncoderStream;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -85,8 +85,9 @@ public class ClassSelectionController {
                         classRegistrationRepository.existsByStudentAndClazz(user, classEntity)) {
                     selected.add(Boolean.TRUE);
                 }
-                else
+                else {
                     selected.add(Boolean.FALSE);
+                }
                 numOfStudents.add(classRegistrationRepository.countByClazz(classEntity));
             }
             return new ResponseEntity<>(new GetClassesResponse("搜索成功！", classes, selected, numOfStudents),
@@ -102,8 +103,9 @@ public class ClassSelectionController {
 
                 for (CourseEntity courseEntity : courseEntityList) {
                     if (user != null && user.readTypeName().equals("Student") &&
-                            !programCourseRepository.existsByCourseAndStudent(courseEntity, user))
+                            !programCourseRepository.existsByCourseAndStudent(courseEntity, user)) {
                         continue;
+                    }
 
                     List<ClassEntity> classEntityList = classRepository.findByCourse_IdAndTeacher_NameLike(courseEntity.getId(),
                             request.getTeacherName());
@@ -123,8 +125,9 @@ public class ClassSelectionController {
 
                 for (CourseEntity courseEntity : courseEntityList) {
                     if (user != null && user.readTypeName().equals("Student") &&
-                            !programCourseRepository.existsByCourseAndStudent(courseEntity, user))
+                            !programCourseRepository.existsByCourseAndStudent(courseEntity, user)) {
                         continue;
+                    }
 
                     List<ClassEntity> classEntityList = classRepository.findByCourse_Id(courseEntity.getId());
                     classes.addAll(classEntityList);
@@ -147,12 +150,14 @@ public class ClassSelectionController {
             Set<CourseEntity> courseEntities1 = new HashSet<>();  // courses in program
             for (ClassEntity classEntity : classesList) {
                 CourseEntity courseEntity = classEntity.getCourse();
-                if (courseEntities.contains(courseEntity))
+                if (courseEntities.contains(courseEntity)) {
                     continue;
+                }
                 courseEntities.add(courseEntity);
                 if (user != null && user.readTypeName().equals("Student") &&
-                        !programCourseRepository.existsByCourseAndStudent(courseEntity, user))
+                        !programCourseRepository.existsByCourseAndStudent(courseEntity, user)) {
                     continue;
+                }
                 courseEntities1.add(courseEntity);
             }
 
@@ -178,8 +183,9 @@ public class ClassSelectionController {
                     classRegistrationRepository.existsByStudentAndClazz(user, classEntity)) {
                 selected.add(Boolean.TRUE);
             }
-            else
+            else {
                 selected.add(Boolean.FALSE);
+            }
             numOfStudents.add(classRegistrationRepository.countByClazz(classEntity));
         }
         return new ResponseEntity<>(new GetClassesResponse("搜索成功！", classes, selected, numOfStudents), HttpStatus.OK);
@@ -232,9 +238,10 @@ public class ClassSelectionController {
                         classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
 
         // Error 6: Classroom is full of students
-        if (classRegistrationRepository.countByClazz(clazz) >= clazz.getCapacity())
+        if (classRegistrationRepository.countByClazz(clazz) >= clazz.getCapacity()) {
             return new ResponseEntity<>(new BasicResponse("该教学班人数已满！"),
                     HttpStatus.BAD_REQUEST);
+        }
         classRepository.save(clazz);
 
         classRegistrationRepository.save(classRegistrationEntity);
@@ -281,9 +288,10 @@ public class ClassSelectionController {
         // Error 5: Status errors
         ClassStatusEnum status = classRegistration.getStatus();
         if (!status.equals(ClassStatusEnum.SELECTED)) {
-            if (status.equals(ClassStatusEnum.FINISHED) || status.equals(ClassStatusEnum.FAILED))
+            if (status.equals(ClassStatusEnum.FINISHED) || status.equals(ClassStatusEnum.FAILED)) {
                 return new ResponseEntity<>(new BasicResponse("该课程已经结束！"),
                         HttpStatus.BAD_REQUEST);
+            }
         }
 
         classRegistration.setStatus(ClassStatusEnum.FINISHED);
@@ -333,9 +341,10 @@ public class ClassSelectionController {
         // Error 5: Status errors
         ClassStatusEnum status = classRegistration.getStatus();
         if (!status.equals(ClassStatusEnum.SELECTED)) {
-            if (status.equals(ClassStatusEnum.FINISHED) || status.equals(ClassStatusEnum.FAILED))
+            if (status.equals(ClassStatusEnum.FINISHED) || status.equals(ClassStatusEnum.FAILED)) {
                 return new ResponseEntity<>(new BasicResponse("该课程已经结束！"),
                         HttpStatus.BAD_REQUEST);
+            }
         }
 
         classRegistration.setStatus(ClassStatusEnum.FAILED);
@@ -391,9 +400,10 @@ public class ClassSelectionController {
                         classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
 
         // Error 6: Classroom is full of students
-        if (classRegistrationRepository.countByClazz(clazz) >= clazz.getCapacity())
+        if (classRegistrationRepository.countByClazz(clazz) >= clazz.getCapacity()) {
             return new ResponseEntity<>(new BasicResponse("该教学班人数已满！"),
                     HttpStatus.BAD_REQUEST);
+        }
         classRepository.save(clazz);
 
         classRegistrationRepository.save(classRegistrationEntity);
@@ -469,8 +479,9 @@ public class ClassSelectionController {
 
         for (ClassRegistrationEntity cr : classesRegistered) {
             ClassEntity clazz = cr.getClazz();
-            if (!clazz.getYear().equals(year) || !clazz.getSemester().equals(semester))
+            if (!clazz.getYear().equals(year) || !clazz.getSemester().equals(semester)) {
                 continue;
+            }
             classesSelected.add(clazz);
         }
         return new ResponseEntity<>(new GetSelectedClassesResponse("课表显示成功！", classesSelected), HttpStatus.OK);
@@ -525,9 +536,10 @@ public class ClassSelectionController {
                         classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
 
         // Error 6: Classroom is full of students
-        if (classRegistrationRepository.countByClazz(clazz) >= clazz.getCapacity())
+        if (classRegistrationRepository.countByClazz(clazz) >= clazz.getCapacity()) {
             return new ResponseEntity<>(new BasicResponse("该教学班人数已满！"),
                     HttpStatus.BAD_REQUEST);
+        }
         clazz.setNumStudent(classRegistrationRepository.countByClazz(clazz)+1);
         classRepository.save(clazz);
 

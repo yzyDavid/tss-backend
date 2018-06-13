@@ -103,8 +103,9 @@ public class GetSelectedClassesResponse {
     public GetSelectedClassesResponse(String status, List<ClassEntity> classes) {
         this.status = status;
         this.classes = new ArrayList<>();
-        for (ClassEntity clazz : classes)
+        for (ClassEntity clazz : classes) {
             this.classes.add(new ClassSelectedInfo(clazz));
+        }
     }
 
     public List<ClassSelectedInfo> getClasses() {
