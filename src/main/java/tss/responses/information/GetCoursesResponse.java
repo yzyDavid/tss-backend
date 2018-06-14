@@ -55,8 +55,9 @@ public class GetCoursesResponse {
 
     public GetCoursesResponse(List<CourseEntity> courses) {
         this.courses = new ArrayList<>();
-        for (CourseEntity clazz : courses)
+        for (CourseEntity clazz : courses) {
             this.courses.add(new CourseInfo(clazz));
+        }
     }
 
     public List<CourseInfo> getCourses() {

@@ -109,8 +109,9 @@ public class ScoreController {
             return new ResponseEntity<>(new GetClassGradeResponse("no such class"),HttpStatus.BAD_REQUEST);
         }
         ClassEntity classEntity = ret.get();
-        for(ClassRegistrationEntity classRegistrationEntity:classEntity.getClassRegistrations())
+        for(ClassRegistrationEntity classRegistrationEntity:classEntity.getClassRegistrations()) {
             socres.add(classRegistrationEntity.getScore());
+        }
         return new ResponseEntity<>(new GetClassGradeResponse("ok",socres),HttpStatus.OK);
     }
     @PutMapping(path="/add")
@@ -194,12 +195,15 @@ public class ScoreController {
         if (request.getAgree().equals("true")) {
             Long cid = request.getCids();
             Optional<ClassEntity> ret = classRepository.findById(cid);
-            if (!ret.isPresent())
+            if (!ret.isPresent()) {
                 return new ResponseEntity<>(new ProcessModifyResponse("no such class"), HttpStatus.BAD_REQUEST);
+            }
             ClassEntity classEntity = ret.get();
-            for(ClassRegistrationEntity classRegistrationEntity:classEntity.getClassRegistrations())
-                if(classRegistrationEntity.getStudent().getUid().equals(request.getUids()))
+            for(ClassRegistrationEntity classRegistrationEntity:classEntity.getClassRegistrations()) {
+                if(classRegistrationEntity.getStudent().getUid().equals(request.getUids())) {
                     classRegistrationEntity.setScore(request.getScore());
+                }
+            }
             classRepository.save(classEntity);
         }
         Optional<ModifyEntity> ret =modifyRepository.findById(request.getId());
