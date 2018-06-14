@@ -1,4 +1,4 @@
-version '0.3.0'
+version '0.4.0'
 
 buildscript {
     repositories {
@@ -17,7 +17,7 @@ apply plugin: 'io.spring.dependency-management'
 
 bootJar {
     baseName = 'tss-backend-rest-service'
-    version = '0.3.0'
+    version = '0.4.0'
 }
 
 repositories {
