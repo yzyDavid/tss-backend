@@ -49,8 +49,9 @@ public class RoleConfiguration implements CommandLineRunner {
     public void run(String... args) throws Exception {
         ResourceBundle bundle = ResourceBundle.getBundle("application");
         String ddlAuto = bundle.getString("spring.jpa.hibernate.ddl-auto");
+        initRole();
         if ("create".equals(ddlAuto)) {
-            initRole();
+            //initRole();
             /*generateMajorClass();
             generateUser();*/
         }
@@ -171,6 +172,9 @@ public class RoleConfiguration implements CommandLineRunner {
 
 
     private void initRole() {
+        if(typeGroupRepository.findByName("Teacher").isPresent()) {
+            return;
+        }
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         InputStream inputStream = classloader.getResourceAsStream("role.json");
         try {
