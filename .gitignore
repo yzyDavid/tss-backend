@@ -107,3 +107,5 @@ src/main/resources/application.properties
 .settings/
 
 .DS_Store
+
+logback-spring.xml
