@@ -43,8 +43,8 @@ public class CourseController {
     @Authorization
     public ResponseEntity<AddCourseResponse> addCourse(@RequestBody AddCourseRequest request) {
         String cid = request.getCid();
-        if(cid == null || cid.length() != 10) {
-            return new ResponseEntity<>(new AddCourseResponse("cid must have 10 characters", cid, null,
+        if(cid == null || cid.length() != 8) {
+            return new ResponseEntity<>(new AddCourseResponse("cid must have 8 characters", cid, null,
                     null, null, null), HttpStatus.BAD_REQUEST);
         }
         if (courseRepository.existsById(cid)) {
