@@ -167,7 +167,7 @@ public class CourseController {
             deptId = dept.get().getId();
         }
 
-        List<CourseEntity> ret = queryService.queryCourses(request.getCid(), request.getDepartment(), deptId);
+        List<CourseEntity> ret = queryService.queryCourses(request.getCid(), request.getName(), deptId);
         for (CourseEntity course : ret) {
             course = courseRepository.findById(course.getId()).get();
             cids.add(course.getId());

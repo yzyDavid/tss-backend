@@ -101,8 +101,8 @@ public class QueryService {
 
     public List<CourseEntity> queryCourses(String cid, String name, Short deptId) {
         NameValuePair[] pairs = new NameValuePair[3];
-        pairs[0] = new NameValuePair("course_id", cid, Operators.LIKE);
-        pairs[1] = new NameValuePair("course_name", name, Operators.LIKE);
+        pairs[0] = new NameValuePair("id", cid, Operators.LIKE);
+        pairs[1] = new NameValuePair("name", name, Operators.LIKE);
         pairs[2] = new NameValuePair("department_id", deptId, Operators.EQ);
         return query(CourseEntity.class, pairs);
     }
