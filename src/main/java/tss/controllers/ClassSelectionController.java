@@ -521,7 +521,7 @@ public class ClassSelectionController {
         }
 
         ClassRegistrationEntity classRegistrationEntity =
-                new ClassRegistrationEntity(0, user, clazz, crid,
+                new ClassRegistrationEntity(0, student, clazz, crid,
                         classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
 
         // Error 6: Classroom is full of students
