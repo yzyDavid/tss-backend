@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import tss.configs.Config;
 import tss.entities.DepartmentEntity;
 import tss.entities.MajorClassEntity;
@@ -27,9 +26,8 @@ import tss.services.QueryService;
 
 import tss.utils.SecurityUtils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -352,18 +350,60 @@ public class UserController {
                                                            @RequestBody ModifyPhotoRequest request) {
         File file = new File(Config.USER_RESOURCE_DIR + user.getUid());
         if (!file.exists() || !file.isDirectory()) {
-            if (!file.mkdir()) {
+            if (!file.mkdirs()) {
                 return new ResponseEntity<>(new ModifyPhotoResponse("Cannot open user's resource file"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
+        FileOutputStream fout = null;
         try {
-            FileOutputStream fout = new FileOutputStream(String.format(Config.USER_PHOTO_DIR_PATTERN, user.getUid()));
+            fout = new FileOutputStream(String.format(Config.USER_PHOTO_DIR_PATTERN, user.getUid()));
             fout.write(request.getFile());
         } catch (IOException e) {
             e.printStackTrace();
             return new ResponseEntity<>(new ModifyPhotoResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } finally {
+            try {
+                if (fout != null) {
+                    fout.close();
+                }
+            } catch (IOException e) {
+
+            }
         }
         return new ResponseEntity<>(new ModifyPhotoResponse("OK"), HttpStatus.CREATED);
+    }
+
+    @GetMapping(path = "{uid}/photo")
+    // @Authorization
+    public void getPhoto(@PathVariable String uid, HttpServletResponse response) {
+        File file = new File(String.format(Config.USER_PHOTO_DIR_PATTERN, uid));
+        FileInputStream fin = null;
+        OutputStream stream = null;
+        if (file.exists()) {
+            try {
+                fin = new FileInputStream(file);
+                byte[] data = new byte[fin.available()];
+                fin.read(data);
+                response.setContentType("image/jpg");
+                stream = response.getOutputStream();
+                stream.write(data);
+                stream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (fin != null) {
+                        fin.close();
+                    }
+                    if(stream != null) {
+                        stream.close();
+                    }
+                } catch (IOException e) {
+
+                }
+            }
+        }
+
     }
 
 
