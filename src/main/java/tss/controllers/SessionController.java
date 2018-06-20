@@ -60,10 +60,9 @@ public class SessionController {
 
         Optional<SessionEntity> ret = sqlSessionRepository.findByUid(login.getUid());
         SessionEntity session;
-        if(ret.isPresent()) {
+        if (ret.isPresent()) {
             session = ret.get();
-        }
-        else {
+        } else {
             session = new SessionEntity();
             session.setUid(login.getUid());
         }

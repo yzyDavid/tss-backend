@@ -20,7 +20,7 @@ import java.util.Iterator;
  */
 
 public class ExportUtils<T> {
-    public ResponseEntity<byte []> exportExcel(String[] headers, Collection<T> dataset, String filename) {
+    public ResponseEntity<byte[]> exportExcel(String[] headers, Collection<T> dataset, String filename) {
         // WorkBook declaration
         HSSFWorkbook wb = new HSSFWorkbook();
         // Generate a sheet
@@ -54,7 +54,7 @@ public class ExportUtils<T> {
                     Object value = getMethod.invoke(t, new Object[]{});
                     String textValue = null;
                     // 其它数据类型都当作字符串简单处理
-                    if(value != null && value != ""){
+                    if (value != null && value != "") {
                         textValue = value.toString();
                     }
                     if (textValue != null) {
@@ -69,8 +69,7 @@ public class ExportUtils<T> {
             ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
             wb.write(outByteStream);
             return new ResponseEntity<byte[]>(outByteStream.toByteArray(), header, HttpStatus.OK);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return new ResponseEntity<byte[]>(null, null, null);

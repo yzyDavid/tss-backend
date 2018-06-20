@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-public interface BbsReplyRepository extends CrudRepository<BbsReplyEntity, Long>{
+public interface BbsReplyRepository extends CrudRepository<BbsReplyEntity, Long> {
     BbsReplyEntity findByBelongedTopicAndIndex(BbsTopicEntity topicEntity, Integer index);
+
     List<BbsReplyEntity> findByBelongedTopic(BbsTopicEntity topicEntity);
+
     Optional<List<BbsReplyEntity>> findByAuthor(UserEntity userEntity);
 }

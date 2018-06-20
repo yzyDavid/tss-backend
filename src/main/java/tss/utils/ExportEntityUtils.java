@@ -10,8 +10,7 @@ public class ExportEntityUtils {
     private String email;
 
     public ExportEntityUtils(String uid, String name, String gender, String departmentname,
-                             String majorclassname, String telephone, String email)
-    {
+                             String majorclassname, String telephone, String email) {
         this.uid = uid;
         this.name = name;
         this.gender = gender;

@@ -92,7 +92,7 @@ public class GetProgramCoursesResponse {
     public GetProgramCoursesResponse(String s, List<CourseEntity> courses, List<CourseTypeEnum> types, List<ClassStatusEnum> status) {
         this.status = s;
         this.courses = new ArrayList<>();
-        for (int i=0; i<courses.size(); i++) {
+        for (int i = 0; i < courses.size(); i++) {
             this.courses.add(new CourseInfo(courses.get(i), types.get(i), status.get(i)));
         }
     }

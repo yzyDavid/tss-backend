@@ -8,7 +8,7 @@ public class QuestionExamResponseStruct {
     private String myanswer;
 
     public String getQid() {
-        return  qid;
+        return qid;
     }
 
     public void setQid(String qid) {
@@ -20,8 +20,9 @@ public class QuestionExamResponseStruct {
         return question;
     }
 
-    public void setQuestion(String question) { this.question = question; }
-
+    public void setQuestion(String question) {
+        this.question = question;
+    }
 
 
     public String getQtype() {
@@ -42,8 +43,12 @@ public class QuestionExamResponseStruct {
     }
 
 
-    public String getMyanswer() {return  myanswer;}
+    public String getMyanswer() {
+        return myanswer;
+    }
 
-    public void setMyanswer(String myanswer) {this.myanswer = myanswer; }
+    public void setMyanswer(String myanswer) {
+        this.myanswer = myanswer;
+    }
 
 }

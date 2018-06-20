@@ -58,7 +58,7 @@ public class TeacherController {
     @GetMapping("/{userId}/classes")
     @ResponseStatus(HttpStatus.OK)
     public List<Clazz> listClassesTeaching(@PathVariable String userId, @RequestParam int year,
-                                              @RequestParam SemesterEnum semester) {
+                                           @RequestParam SemesterEnum semester) {
 
         UserEntity teacherEntity = userRepository.findById(userId).orElseThrow(TeacherNotFoundException::new);
         // TODO: commented for testing.

@@ -6,10 +6,10 @@ import java.sql.Timestamp;
 
 public class AddSelectionTimeRequest {
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp start;
 
-    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp end;
 
     public Timestamp getStart() {

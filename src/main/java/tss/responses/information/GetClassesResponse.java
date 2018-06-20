@@ -70,6 +70,7 @@ public class GetClassesResponse {
         public Long getId() {
             return id;
         }
+
         public void setId(Long id) {
             this.id = id;
         }
@@ -77,6 +78,7 @@ public class GetClassesResponse {
         public Integer getYear() {
             return year;
         }
+
         public void setYear(Integer year) {
             this.year = year;
         }
@@ -84,6 +86,7 @@ public class GetClassesResponse {
         public SemesterEnum getSemester() {
             return semester;
         }
+
         public void setSemester(SemesterEnum semester) {
             this.semester = semester;
         }
@@ -91,6 +94,7 @@ public class GetClassesResponse {
         public Integer getCapacity() {
             return capacity;
         }
+
         public void setCapacity(Integer capacity) {
             this.capacity = capacity;
         }
@@ -98,6 +102,7 @@ public class GetClassesResponse {
         public Integer getNumStudent() {
             return numStudent;
         }
+
         public void setNumStudent(Integer numStudent) {
             this.numStudent = numStudent;
         }
@@ -105,6 +110,7 @@ public class GetClassesResponse {
         public String getCourseId() {
             return courseId;
         }
+
         public void setCourseId(String courseId) {
             this.courseId = courseId;
         }
@@ -112,6 +118,7 @@ public class GetClassesResponse {
         public String getCourseName() {
             return courseName;
         }
+
         public void setCourseName(String courseName) {
             this.courseName = courseName;
         }
@@ -119,6 +126,7 @@ public class GetClassesResponse {
         public String getTeacherName() {
             return teacherName;
         }
+
         public void setTeacherName(String teacherName) {
             this.teacherName = teacherName;
         }
@@ -126,6 +134,7 @@ public class GetClassesResponse {
         public String getTimeSlot() {
             return timeSlot;
         }
+
         public void setTimeSlot(String timeSlot) {
             this.timeSlot = timeSlot;
         }
@@ -133,6 +142,7 @@ public class GetClassesResponse {
         public String getClassroom() {
             return classroom;
         }
+
         public void setClassroom(String classroom) {
             this.classroom = classroom;
         }
@@ -176,8 +186,9 @@ public class GetClassesResponse {
     public GetClassesResponse(String status, List<ClassEntity> classes, List<Boolean> selected, List<Integer> numOfStudents) {
         this.status = status;
         this.classes = new ArrayList<>();
-        for (int i=0; i<classes.size(); i++)
+        for (int i = 0; i < classes.size(); i++) {
             this.classes.add(new ClassInfo(classes.get(i), selected.get(i), numOfStudents.get(i)));
+        }
     }
 
     public List<ClassInfo> getClasses() {

@@ -15,7 +15,7 @@ public class StartExamResponse {
 
     public StartExamResponse(String status, String pid, String starttime, List<QuestionExamResponseStruct> questioninfo) {
         this.status = status;
-        this.pid= pid;
+        this.pid = pid;
         this.starttime = starttime;
         this.questioninfo = questioninfo;
     }
@@ -32,5 +32,7 @@ public class StartExamResponse {
         return starttime;
     }
 
-    public List<QuestionExamResponseStruct> getQuestioninfo() {return questioninfo; }
+    public List<QuestionExamResponseStruct> getQuestioninfo() {
+        return questioninfo;
+    }
 }

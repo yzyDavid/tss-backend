@@ -4,10 +4,10 @@ import org.jetbrains.annotations.Nls;
 
 public class AddResultResponse {
     @Nls
-    private  final String status;
+    private final String status;
 
-    public  AddResultResponse(String status) {
-        this.status= status;
+    public AddResultResponse(String status) {
+        this.status = status;
     }
 
     public String getStatus() {

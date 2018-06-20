@@ -37,15 +37,15 @@ public class PaperController {
     private final PaperContainsQuestionRepository paperContainsQuestionRepository;
 
     @Autowired
-    public PaperController(PaperRepository paperRepository, QuestionRepository questionRepository, PaperContainsQuestionRepository paperContainsQuestionRepository){
+    public PaperController(PaperRepository paperRepository, QuestionRepository questionRepository, PaperContainsQuestionRepository paperContainsQuestionRepository) {
         this.paperRepository = paperRepository;
         this.questionRepository = questionRepository;
         this.paperContainsQuestionRepository = paperContainsQuestionRepository;
     }
 
     @PostMapping(path = "/insert")
-    public ResponseEntity<AddPaperResponse> addPaper(@RequestBody AddPaperRequest request){  //用jason传过来的请求体
-        if(paperRepository.existsById(request.getPid())){
+    public ResponseEntity<AddPaperResponse> addPaper(@RequestBody AddPaperRequest request) {  //用jason传过来的请求体
+        if (paperRepository.existsById(request.getPid())) {
             System.out.println("Duplicate pid");
             return new ResponseEntity<>(new AddPaperResponse("Failed with duplicate pid", ""), HttpStatus.BAD_REQUEST);
         }//处理重复pid的问题
@@ -53,7 +53,6 @@ public class PaperController {
         //如果不重复就创建新的paper
         PapersEntity paper = new PapersEntity();
         Set<PaperContainsQuestionEntity> paperQuestions = new HashSet<>();
-
 
 
         paper.setPid(request.getPid());
@@ -69,10 +68,10 @@ public class PaperController {
         paper.setAnswerednum(0);
         paper.setAverage(0.0);
 
-        if(!request.getIsauto()){// 如果不是自动生成试卷
+        if (!request.getIsauto()) {// 如果不是自动生成试卷
             paper.setCount(request.getCount());
 
-            for(int i = 0; i < Integer.valueOf(request.getCount()); i++){
+            for (int i = 0; i < Integer.valueOf(request.getCount()); i++) {
                 PaperContainsQuestionEntity contain = new PaperContainsQuestionEntity();
 
                 //request中的pid和score本身是字符串，每次读取相应的id和score，id需要进行一下计算
@@ -83,7 +82,7 @@ public class PaperController {
 
                 //setQuestion
                 Optional<QuestionEntity> ret = questionRepository.findById(request.getQid()[i]);
-                if(!ret.isPresent()){
+                if (!ret.isPresent()) {
                     System.out.println("non-exist qid");
                     return new ResponseEntity<>(new AddPaperResponse("non-exist qid", paper.getPid()), HttpStatus.BAD_REQUEST);
                 }
@@ -95,20 +94,19 @@ public class PaperController {
                 paperContainsQuestionRepository.save(contain);
 
             }
-        }else{
+        } else {
             paper.setCount(request.getPcount());
-
 
 
             //将该单元的题目库一一对应
             HashMap questions = new HashMap();
-            Iterable<QuestionEntity>question_find = questionRepository.findAll();
+            Iterable<QuestionEntity> question_find = questionRepository.findAll();
             int count_t = 0;
-            for(QuestionEntity question: question_find){
-               // questions.add(question);
-                if(question.getQunit().equals(request.getPunit())){
+            for (QuestionEntity question : question_find) {
+                // questions.add(question);
+                if (question.getQunit().equals(request.getPunit())) {
                     questions.put(count_t, question);
-                    count_t ++;
+                    count_t++;
                 }
             }
 
@@ -119,14 +117,14 @@ public class PaperController {
             int n = Integer.valueOf(request.getPcount());
             RandomSet.randomSet(0, max, n, set);
 
-            System.out.println("setsize:"+set.size());
-            System.out.println("n:"+n);
+            System.out.println("setsize:" + set.size());
+            System.out.println("n:" + n);
             //对每一个随机数添加进contain表格
             Iterator it = set.iterator();
             int index;
-            for(int i = 0; i < n; i++){
-                if(it.hasNext()){
-                    index = (int)it.next();
+            for (int i = 0; i < n; i++) {
+                if (it.hasNext()) {
+                    index = (int) it.next();
 
                     PaperContainsQuestionEntity contain = new PaperContainsQuestionEntity();
 
@@ -134,20 +132,19 @@ public class PaperController {
                     contain.setId(String.valueOf(tempid));
                     contain.setPaper(paper);
 
-                    int tempscore = 100/n;
+                    int tempscore = 100 / n;
                     contain.setScore(String.valueOf(tempscore));
 
                     //添加question
-                    QuestionEntity question = (QuestionEntity)questions.get(index);
-                 //   System.out.println(i +"th: "+index + " qid:"+question.getQid());
+                    QuestionEntity question = (QuestionEntity) questions.get(index);
+                    //   System.out.println(i +"th: "+index + " qid:"+question.getQid());
                     contain.setQuestion(question);
 
-          //          System.out.println("qid:"+question.getQid());
+                    //          System.out.println("qid:"+question.getQid());
                     paperQuestions.add(contain);
                     paperContainsQuestionRepository.save(contain);
-                }
-                else{
-                    System.out.println("Set is not full! "+i);
+                } else {
+                    System.out.println("Set is not full! " + i);
                     return new ResponseEntity<>(new AddPaperResponse("not enough questions!", paper.getPid()), HttpStatus.BAD_REQUEST);
 
                 }
@@ -159,16 +156,16 @@ public class PaperController {
 
 
         paperRepository.save(paper);
-        System.out.println("insert paper"+request.getPid());
+        System.out.println("insert paper" + request.getPid());
 
         return new ResponseEntity<>(new AddPaperResponse("ok", paper.getPid()), HttpStatus.CREATED);
 
     }
 
-    @PostMapping (path = "/delete")
-    public ResponseEntity<DeletePaperResponse>deletePaper(@RequestBody DeletePaperRequest request){
+    @PostMapping(path = "/delete")
+    public ResponseEntity<DeletePaperResponse> deletePaper(@RequestBody DeletePaperRequest request) {
         String pid = request.getPid();
-        if(!paperRepository.existsById(pid)){
+        if (!paperRepository.existsById(pid)) {
             return new ResponseEntity<>(new DeletePaperResponse("Paper does not exist"), HttpStatus.BAD_REQUEST);
         }
         paperRepository.deleteById(pid);
@@ -178,22 +175,22 @@ public class PaperController {
 
 
     @PostMapping(path = "/update")
-    public ResponseEntity<ModifyPaperResponse>modifyPaper(@RequestBody ModifyPaperRequest request){
+    public ResponseEntity<ModifyPaperResponse> modifyPaper(@RequestBody ModifyPaperRequest request) {
         String pid = request.getPid();
         Optional<PapersEntity> ret = paperRepository.findById(pid);
-        if(!ret.isPresent()){
-            System.out.println("Paper does not exist:"+request.getPid());
+        if (!ret.isPresent()) {
+            System.out.println("Paper does not exist:" + request.getPid());
             return new ResponseEntity<>(new ModifyPaperResponse("Paper does not exist", request.pid), HttpStatus.BAD_REQUEST);
         }
         PapersEntity paper = ret.get();//先判断是否存在卷子，如果存在，就把找到的paper从option放回 entity类型
 
 
-   //     paperContainsQuestionRepository.deleteByPaper(paper);
+        //     paperContainsQuestionRepository.deleteByPaper(paper);
 
         //删除旧的
         List<PaperContainsQuestionEntity> contain_find = paperContainsQuestionRepository.findByPaper(paper);
-        for(PaperContainsQuestionEntity contain_t : contain_find){
-           paperContainsQuestionRepository.deleteById(contain_t.getId());
+        for (PaperContainsQuestionEntity contain_t : contain_find) {
+            paperContainsQuestionRepository.deleteById(contain_t.getId());
         }
 
         Set<PaperContainsQuestionEntity> paperquestions = new HashSet<>();
@@ -209,10 +206,10 @@ public class PaperController {
         paper.setAnswerednum(0);
         paper.setAverage(0.0);
 
-        System.out.println("count:"+request.getCount());
+        System.out.println("count:" + request.getCount());
 
 
-        for(int i = 0; i < Integer.valueOf(request.getCount()); i++){
+        for (int i = 0; i < Integer.valueOf(request.getCount()); i++) {
             PaperContainsQuestionEntity contain = new PaperContainsQuestionEntity();
 
             int tempid = Integer.valueOf(request.getPid()) * 10000 + i;
@@ -222,7 +219,7 @@ public class PaperController {
 
             //setQuestion
             Optional<QuestionEntity> ret2 = questionRepository.findById(request.getQid()[i]);
-            if(!ret2.isPresent()){
+            if (!ret2.isPresent()) {
                 return new ResponseEntity<>(new ModifyPaperResponse("non-exist qid", paper.getPid()), HttpStatus.BAD_REQUEST);
             }
             QuestionEntity question = ret2.get();
@@ -237,14 +234,14 @@ public class PaperController {
         paper.setPaperquestion(paperquestions);
 
         paperRepository.save(paper);
-        System.out.println("update paper"+request.getPid());
+        System.out.println("update paper" + request.getPid());
 
 
         return new ResponseEntity<>(new ModifyPaperResponse("ok", request.pid), HttpStatus.OK);
     }
 
     @PostMapping(path = "/search")
-    public ResponseEntity<GetPaperResponse>searchPaper(@RequestBody GetPaperRequest request){
+    public ResponseEntity<GetPaperResponse> searchPaper(@RequestBody GetPaperRequest request) {
         List<PaperResponseStruct> papers = new ArrayList<>();
 
         String type = request.getDirection();
@@ -252,9 +249,9 @@ public class PaperController {
         String[] qid;
         String[] score;
 
-        if(type.equals("all")){
+        if (type.equals("all")) {
             Iterable<PapersEntity> paper_find = paperRepository.findAll();
-            for(PapersEntity paper : paper_find){
+            for (PapersEntity paper : paper_find) {
                 PaperResponseStruct paper_return = new PaperResponseStruct();
                 paper_return.setPid(paper.getPid());
                 paper_return.setBegin(paper.getBegin());
@@ -272,12 +269,12 @@ public class PaperController {
                 qid = new String[contain_find.size()];
                 score = new String[contain_find.size()];
 
-                for(PaperContainsQuestionEntity contain:contain_find){
-                     qid[count] = contain.getQuestion().getQid();
-                     score[count] = contain.getScore();
-                     count++;
-             //   System.out.println(contain.getId());
-              //  System.out.println(contain.getQuestion().getQid());
+                for (PaperContainsQuestionEntity contain : contain_find) {
+                    qid[count] = contain.getQuestion().getQid();
+                    score[count] = contain.getScore();
+                    count++;
+                    //   System.out.println(contain.getId());
+                    //  System.out.println(contain.getQuestion().getQid());
                 }
 
                 paper_return.setQid(qid);
@@ -293,7 +290,7 @@ public class PaperController {
         }
 
 
-        System.out.println("search: "+type);
+        System.out.println("search: " + type);
         return new ResponseEntity<>(new GetPaperResponse("ok", papers), HttpStatus.OK);
     }
 }

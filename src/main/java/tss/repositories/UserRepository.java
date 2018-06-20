@@ -20,6 +20,7 @@ public interface UserRepository extends CrudRepository<UserEntity, String> {
     Optional<UserEntity> findByUid(String uid);
 
     List<UserEntity> findByNameAndType_Name(String name, String typeName);
+
     List<UserEntity> findByNameLikeAndType_Name(String name, String typeName);
 
 }

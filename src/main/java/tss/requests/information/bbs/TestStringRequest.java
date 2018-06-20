@@ -7,7 +7,7 @@ public class TestStringRequest {
         return data;
     }
 
-    public void setData(String data){
+    public void setData(String data) {
         this.data = data;
     }
 }

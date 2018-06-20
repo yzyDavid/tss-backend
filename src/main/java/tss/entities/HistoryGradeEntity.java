@@ -6,7 +6,7 @@ import java.util.Date;
 @Entity
 @Table(name = "HistoryGrade", indexes = {
         @Index(name = "StudentID_Index", columnList = "StudentID")
-       // @Index(name = "PaperID_Index", columnList = "PaperID")
+        // @Index(name = "PaperID_Index", columnList = "PaperID")
 })
 public class HistoryGradeEntity {
     private String hid;

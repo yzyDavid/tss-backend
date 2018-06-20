@@ -6,7 +6,7 @@ public class AddProgramResponse {
     private @Nls
     final String status;
 
-    public AddProgramResponse(String status){
+    public AddProgramResponse(String status) {
         this.status = status;
     }
 

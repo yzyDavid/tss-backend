@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface PaperContainsQuestionRepository extends CrudRepository<PaperContainsQuestionEntity, String> {
     List<PaperContainsQuestionEntity> findByPaper(PapersEntity paper);
+
     void deleteByPaper(PapersEntity paper);
 }

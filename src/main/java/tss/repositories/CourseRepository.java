@@ -8,5 +8,6 @@ import java.util.Optional;
 
 public interface CourseRepository extends CrudRepository<CourseEntity, String> {
     List<CourseEntity> findByName(String name);
+
     List<CourseEntity> findByNameLike(String name);
 }

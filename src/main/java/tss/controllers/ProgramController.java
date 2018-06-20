@@ -40,8 +40,7 @@ public class ProgramController {
     @PutMapping(path = "/course")
     @Authorization
     public ResponseEntity<BasicResponse> addCourseinProgram(@CurrentUser UserEntity user,
-                                                                         @RequestBody AddCourseinProgramRequest request)
-    {
+                                                            @RequestBody AddCourseinProgramRequest request) {
         if (!user.readTypeName().equals("Student")) {
             throw new PermissionDeniedException();
         }
@@ -53,8 +52,7 @@ public class ProgramController {
 
         CourseEntity courseEntity = courseEntityOptional.get();
 
-        if (programCourseRepository.existsByCourseAndStudent(courseEntity, user))
-        {
+        if (programCourseRepository.existsByCourseAndStudent(courseEntity, user)) {
             return new ResponseEntity<>(new BasicResponse("该课程已存在！"), HttpStatus.FORBIDDEN);
         }
         ProgramCourseEntity programCourseEntity = new ProgramCourseEntity();
@@ -67,15 +65,13 @@ public class ProgramController {
 
         if (coursesCompulsory.contains(courseEntity)) {
             programCourseEntity.setType(ProgramCourseEntity.COMPULSORY_COURSE);
-        }
-        else if (coursesSelective.contains(courseEntity)) {
+        } else if (coursesSelective.contains(courseEntity)) {
             programCourseEntity.setType(ProgramCourseEntity.MAJOR_SELECTIVE_COURSE);
-        }
-        else if (coursesPublic.contains(courseEntity)) {
+        } else if (coursesPublic.contains(courseEntity)) {
             programCourseEntity.setType(ProgramCourseEntity.PUBLIC_SELECTIVE_COURSE);
-        }
-        else
+        } else {
             return new ResponseEntity<>(new BasicResponse("专业计划中没有此课程！"), HttpStatus.FORBIDDEN);
+        }
 
         programCourseEntity.setCourse(courseEntity);
         programCourseEntity.setStudent(user);
@@ -88,28 +84,25 @@ public class ProgramController {
     @DeleteMapping(path = "/course")
     @Authorization
     public ResponseEntity<DeleteCourseinProgramResponse> deleCourseinProgram(@CurrentUser UserEntity user,
-                                                             @RequestBody DeleteCourseinProgramRequest request)
-    {
+                                                                             @RequestBody DeleteCourseinProgramRequest request) {
         if (!user.readTypeName().equals("Student")) {
             throw new PermissionDeniedException();
         }
 
         String cid = request.getCid();
         Optional<CourseEntity> ret2 = courseRepository.findById(cid);
-        if (!ret2.isPresent())
-        {
+        if (!ret2.isPresent()) {
             return new ResponseEntity<>(new DeleteCourseinProgramResponse("课程不存在！",
-                    null,null,null), HttpStatus.BAD_REQUEST);
+                    null, null, null), HttpStatus.BAD_REQUEST);
         }
 
         CourseEntity course = ret2.get();
         String cname = course.getName();
 
         Optional<ProgramCourseEntity> ret3 = programCourseRepository.findByCourseAndStudent(course, user);
-        if (!ret3.isPresent())
-        {
+        if (!ret3.isPresent()) {
             return new ResponseEntity<>(new DeleteCourseinProgramResponse("此课程在培养方案中不存在，无法删除！",
-                    cid,cname,user.getUid()), HttpStatus.BAD_REQUEST);
+                    cid, cname, user.getUid()), HttpStatus.BAD_REQUEST);
         }
 
         ProgramCourseEntity programcourse = ret3.get();
@@ -142,15 +135,16 @@ public class ProgramController {
             courses_final.add(course);
             courses_type.add(CourseTypeEnum.COMPULSORY);
             Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
-            if (crs.isPresent())
+            if (crs.isPresent()) {
                 courses_status.add(crs.get().getStatus());
-            else {
+            } else {
                 Optional<ProgramCourseEntity> programCourseEntityOptional =
                         programCourseRepository.findByCourseAndStudent(course, user);
                 if (programCourseEntityOptional.isPresent()) {
                     courses_status.add(ClassStatusEnum.NOT_SELECTED);
+                } else {
+                    courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
                 }
-                else courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
             }
         }
 
@@ -163,11 +157,12 @@ public class ProgramController {
                         programCourseRepository.findByCourseAndStudent(course, user);
                 if (programCourseEntityOptional.isPresent()) {
                     courses_status.add(ClassStatusEnum.NOT_SELECTED);
+                } else {
+                    courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
                 }
-                else courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
-            }
-            else
+            } else {
                 courses_status.add(crs.get().getStatus());
+            }
         }
 
         for (CourseEntity course : coursesPublic) {
@@ -179,11 +174,12 @@ public class ProgramController {
                         programCourseRepository.findByCourseAndStudent(course, user);
                 if (programCourseEntityOptional.isPresent()) {
                     courses_status.add(ClassStatusEnum.NOT_SELECTED);
+                } else {
+                    courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
                 }
-                else courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
-            }
-            else
+            } else {
                 courses_status.add(crs.get().getStatus());
+            }
         }
 
         return new ResponseEntity<>(new GetProgramCoursesResponse("显示成功！",
@@ -215,8 +211,7 @@ public class ProgramController {
                 Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
                 if (crs.isPresent()) {
                     courses_status.add(crs.get().getStatus());
-                }
-                else {
+                } else {
                     courses_status.add(ClassStatusEnum.NOT_SELECTED);
                 }
             }
@@ -229,8 +224,7 @@ public class ProgramController {
                 Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
                 if (crs.isPresent()) {
                     courses_status.add(crs.get().getStatus());
-                }
-                else {
+                } else {
                     courses_status.add(ClassStatusEnum.NOT_SELECTED);
                 }
             }
@@ -243,8 +237,7 @@ public class ProgramController {
                 Optional<ClassRegistrationEntity> crs = classRegistrationRepository.findByStudentAndClazz_Course(user, course);
                 if (crs.isPresent()) {
                     courses_status.add(crs.get().getStatus());
-                }
-                else {
+                } else {
                     courses_status.add(ClassStatusEnum.NOT_SELECTED);
                 }
             }
@@ -273,21 +266,27 @@ public class ProgramController {
         List<ClassStatusEnum> courses_status = new ArrayList<>();
 
         for (CourseEntity course : coursesCompulsory) {
-            if (programCourseRepository.existsByCourseAndStudent(course, user)) continue;
+            if (programCourseRepository.existsByCourseAndStudent(course, user)) {
+                continue;
+            }
             courses_final.add(course);
             courses_type.add(CourseTypeEnum.COMPULSORY);
             courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
         }
 
         for (CourseEntity course : coursesSelective) {
-            if (programCourseRepository.existsByCourseAndStudent(course, user)) continue;
+            if (programCourseRepository.existsByCourseAndStudent(course, user)) {
+                continue;
+            }
             courses_final.add(course);
             courses_type.add(CourseTypeEnum.SELECTIVE);
             courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);
         }
 
         for (CourseEntity course : coursesPublic) {
-            if (programCourseRepository.existsByCourseAndStudent(course, user)) continue;
+            if (programCourseRepository.existsByCourseAndStudent(course, user)) {
+                continue;
+            }
             courses_final.add(course);
             courses_type.add(CourseTypeEnum.PUBLIC);
             courses_status.add(ClassStatusEnum.NOT_IN_PROGRAM);

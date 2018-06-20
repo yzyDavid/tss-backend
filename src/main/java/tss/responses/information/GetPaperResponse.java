@@ -10,9 +10,9 @@ public class GetPaperResponse {
     @Nls
     public final String status;
 
-    public final List<PaperResponseStruct>paperlist;        //和QuestionEntity不一样
+    public final List<PaperResponseStruct> paperlist;        //和QuestionEntity不一样
 
-    public GetPaperResponse(String status, List<PaperResponseStruct> paperlist){
+    public GetPaperResponse(String status, List<PaperResponseStruct> paperlist) {
 
         this.status = status;
         this.paperlist = paperlist;
@@ -23,6 +23,8 @@ public class GetPaperResponse {
     }
 
 
-    public List<PaperResponseStruct> getPaperlist() {return paperlist; }
+    public List<PaperResponseStruct> getPaperlist() {
+        return paperlist;
+    }
 
 }

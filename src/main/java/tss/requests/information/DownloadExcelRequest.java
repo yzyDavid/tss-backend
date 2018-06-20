@@ -1,7 +1,7 @@
 package tss.requests.information;
 
 public class DownloadExcelRequest {
-    private String cid ;
+    private String cid;
 
     public String getCid() {
         return cid;

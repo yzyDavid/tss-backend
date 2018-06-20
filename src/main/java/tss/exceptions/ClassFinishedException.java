@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 
 @ResponseStatus(value = HttpStatus.CONFLICT, reason = "Class has finished")
-public class ClassFinishedException extends RuntimeException{
+public class ClassFinishedException extends RuntimeException {
 }
