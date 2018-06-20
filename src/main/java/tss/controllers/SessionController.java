@@ -22,6 +22,7 @@ import tss.utils.SecurityUtils;
 import tss.utils.SessionUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -69,6 +70,7 @@ public class SessionController {
         }
         session.setToken(SessionUtils.getToken());
         session.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+        session.setOpt(Timestamp.valueOf(LocalDateTime.now()));    // by A3 ljh
         sqlSessionRepository.save(session);
 
         return new ResponseEntity<>(new LoginResponse(login.getUid(), session.getToken(), user.readTypeName(), "OK"), HttpStatus.OK);

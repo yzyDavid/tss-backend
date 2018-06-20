@@ -11,10 +11,10 @@ public class SelectionTimeEntity {
     private Long id;
     private Timestamp start;
     private Timestamp end;
-    private boolean register; // registrationPermissive
-    private boolean drop; // dropPerm
+    private Boolean register; // registrationPermissive
+    private Boolean drop; // dropPerm
     //private boolean lowcredit; // lowCreditRegistrationPermissive
-    private boolean complement; // complementPermissive
+    private Boolean complement; // complementPermissive
 
 
     @Id

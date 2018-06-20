@@ -53,6 +53,10 @@ public class ClassSelectionController {
         List<Boolean> selected = new ArrayList<>();
         List<Integer> numOfStudents = new ArrayList<>();
 
+        if (user != null && user.readTypeName().equals("Student")) {
+
+        }
+
         // 1. Use ID to search
         if (request.getCourseId() != null) {
             // Error 1: Course not found
