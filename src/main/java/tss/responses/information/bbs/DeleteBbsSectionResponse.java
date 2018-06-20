@@ -8,7 +8,7 @@ public class DeleteBbsSectionResponse {
     private long id;
     private String name;
 
-    public DeleteBbsSectionResponse(String status, long id, String name){
+    public DeleteBbsSectionResponse(String status, long id, String name) {
         this.status = status;
         this.id = id;
         this.name = name;

@@ -15,9 +15,13 @@ import java.util.Optional;
 
 public interface ProgramCourseRepository extends CrudRepository<ProgramCourseEntity, Short> {
     boolean existsByCourse(CourseEntity course);
+
     boolean existsByStudent(UserEntity student);
+
     boolean existsByCourseAndStudent(CourseEntity course, UserEntity student);
+
     List<CourseEntity> findById(Integer pid);
+
     Optional<ProgramCourseEntity> findByCourseAndStudent(CourseEntity course, UserEntity student);
 
 }

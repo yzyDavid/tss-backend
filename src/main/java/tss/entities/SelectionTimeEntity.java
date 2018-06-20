@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "selection_time", indexes = {
-    @Index(name = "selection_time_index", columnList = "id")
+        @Index(name = "selection_time_index", columnList = "id")
 })
 public class SelectionTimeEntity {
     private Long id;
@@ -36,7 +36,6 @@ public class SelectionTimeEntity {
     public void setStart(Timestamp start) {
         this.start = start;
     }
-
 
 
     @Column(name = "end_time", nullable = false)

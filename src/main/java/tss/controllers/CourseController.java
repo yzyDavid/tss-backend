@@ -43,7 +43,7 @@ public class CourseController {
     @Authorization
     public ResponseEntity<AddCourseResponse> addCourse(@RequestBody AddCourseRequest request) {
         String cid = request.getCid();
-        if(cid == null || cid.length() != 8) {
+        if (cid == null || cid.length() != 8) {
             return new ResponseEntity<>(new AddCourseResponse("cid must have 8 characters", cid, null,
                     null, null, null), HttpStatus.BAD_REQUEST);
         }
@@ -64,14 +64,14 @@ public class CourseController {
         }
         CourseEntity course = new CourseEntity();
         course.setId(request.getCid());
-        if(request.getName() == null || request.getName().length() == 0) {
+        if (request.getName() == null || request.getName().length() == 0) {
             return new ResponseEntity<>(new AddCourseResponse("Course name mustn't be empty", cid, null,
                     null, null, null), HttpStatus.BAD_REQUEST);
         }
         course.setName(request.getName());
         course.setCredit(request.getCredit());
         course.setNumLessonsEachWeek(request.getNumLessonsEachWeek());
-        if(dept != null) {
+        if (dept != null) {
             course.setDepartment(dept);
         }
         courseRepository.save(course);
@@ -118,18 +118,18 @@ public class CourseController {
             course.setDepartment(retd.get());
         }
 
-        if(request.getName() != null) {
+        if (request.getName() != null) {
             course.setName(request.getName());
         }
-        if(request.getCredit() != null) {
+        if (request.getCredit() != null) {
             course.setCredit(request.getCredit());
         }
 
-        if(request.getNumLessonsEachWeek() != null) {
+        if (request.getNumLessonsEachWeek() != null) {
             course.setNumLessonsEachWeek(request.getNumLessonsEachWeek());
 
         }
-        if(request.getIntro() != null) {
+        if (request.getIntro() != null) {
             course.setIntro(request.getIntro());
         }
         courseRepository.save(course);
@@ -159,7 +159,7 @@ public class CourseController {
         List<String> names = new ArrayList<>();
         List<String> departments = new ArrayList<>();
         Short deptId = null;
-        if(request.getDepartment() != null) {
+        if (request.getDepartment() != null) {
             Optional<DepartmentEntity> dept = departmentRepository.findByName(request.getDepartment());
             if (!dept.isPresent()) {
                 return new ResponseEntity<>(new QueryCoursesResponse("Non-exist department", null, null, null), HttpStatus.OK);
@@ -184,6 +184,6 @@ public class CourseController {
 
     @PostMapping("/search")
     public ResponseEntity<GetCoursesResponse> searchCourseByName(@RequestBody BasicStringRequest request) {
-        return new ResponseEntity<>(new GetCoursesResponse(courseRepository.findByNameLike("%"+request.getContent()+"%")), HttpStatus.OK);
+        return new ResponseEntity<>(new GetCoursesResponse(courseRepository.findByNameLike("%" + request.getContent() + "%")), HttpStatus.OK);
     }
 }

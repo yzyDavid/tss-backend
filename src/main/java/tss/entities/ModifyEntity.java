@@ -3,7 +3,7 @@ package tss.entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name="ManageScore")
+@Table(name = "ManageScore")
 public class ModifyEntity {
     private Long id;
     private String uid;
@@ -17,7 +17,6 @@ public class ModifyEntity {
     }
 
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -29,22 +28,25 @@ public class ModifyEntity {
         this.id = id;
     }
 
-    @Column(name = "studentid",length = 10)
+    @Column(name = "studentid", length = 10)
     public String getUid() {
         return uid;
     }
+
     public void setUid(String uid) {
         this.uid = uid;
     }
+
     @Column(name = "classid")
     public long getCid() {
         return cid;
     }
+
     public void setCid(long cid) {
         this.cid = cid;
     }
 
-    @Column(name="score")
+    @Column(name = "score")
     public int getScore() {
         return score;
     }
@@ -53,7 +55,7 @@ public class ModifyEntity {
         this.score = score;
     }
 
-    @Column(name="reasons",length = 255)
+    @Column(name = "reasons", length = 255)
     public String getReasons() {
         return reasons;
     }
@@ -62,7 +64,7 @@ public class ModifyEntity {
         this.reasons = reasons;
     }
 
-    @Column(name="agree")
+    @Column(name = "agree")
     public Boolean getAgree() {
         return agree;
     }
@@ -72,7 +74,7 @@ public class ModifyEntity {
     }
 
 
-    @Column(name="process")
+    @Column(name = "process")
 
     public Boolean getProcess() {
         return process;

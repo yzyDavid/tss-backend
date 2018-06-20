@@ -1,6 +1,7 @@
 package tss.responses.information;
 
 import tss.entities.SelectionTimeEntity;
+
 import java.util.List;
 
 public class GetSelectionTimeResponse {

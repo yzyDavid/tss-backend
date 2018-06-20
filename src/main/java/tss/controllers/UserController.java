@@ -27,6 +27,8 @@ import tss.services.QueryService;
 
 import tss.utils.SecurityUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -85,11 +87,11 @@ public class UserController {
 
         for (int i = 0; i < uids.length; i++) {
             UserEntity user = users[i] = new UserEntity();
-            if(uids[i] == null || uids[i].length() != 10) {
+            if (uids[i] == null || uids[i].length() != 10) {
                 return new ResponseEntity<>(new AddUserResponse("Uid must have 10 characters", uids[i], names[i], genders[i], type), HttpStatus.BAD_REQUEST);
             }
             user.setUid(uids[i]);
-            if(names[i] == null || names[i].length() == 0) {
+            if (names[i] == null || names[i].length() == 0) {
                 return new ResponseEntity<>(new AddUserResponse("Name mustn't be empty", uids[i], names[i], genders[i], type), HttpStatus.BAD_REQUEST);
             }
             user.setName(names[i]);
@@ -101,7 +103,7 @@ public class UserController {
             } else {
                 password = Config.INIT_PWD;
             }
-            if(password.length() < 6) {
+            if (password.length() < 6) {
                 return new ResponseEntity<>(new AddUserResponse("password must have at least 6 characters", uids[i], names[i], genders[i], type), HttpStatus.BAD_REQUEST);
             }
             String hashedPassword = getHashedPasswordByPasswordAndSalt(password, salt);
@@ -113,7 +115,7 @@ public class UserController {
                 }
                 user.setType(typeGroup.get());
             }
-            if(!genders[i].equals("男") && !genders[i].equals("女")) {
+            if (!genders[i].equals("男") && !genders[i].equals("女")) {
                 return new ResponseEntity<>(new AddUserResponse("No such gender", uids[i], names[i], genders[i], type), HttpStatus.BAD_REQUEST);
             }
             user.setGender(genders[i]);
@@ -131,7 +133,7 @@ public class UserController {
     @Authorization
     public ResponseEntity<DeleteUserResponse> deleteUser(@RequestBody DeleteUserRequest request) {
         String[] uids = request.getUids();
-        if(uids == null) {
+        if (uids == null) {
             return new ResponseEntity<>(new DeleteUserResponse("Invalid request", null), HttpStatus.BAD_REQUEST);
         }
 
@@ -163,8 +165,7 @@ public class UserController {
         String name = user.getName();
         if (!user.getHashedPassword().equals(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getOldPwd(), user.getSalt()))) {
             return new ResponseEntity<>(new ModifyPwdResponse("incorrect password", user.getUid(), name), HttpStatus.UNAUTHORIZED);
-        }
-        else if(request.getNewPwd().length() < 6) {
+        } else if (request.getNewPwd().length() < 6) {
             return new ResponseEntity<>(new ModifyPwdResponse("password must have at least 6 characters", user.getUid(), name), HttpStatus.UNAUTHORIZED);
         }
         user.setHashedPassword(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getNewPwd(), user.getSalt()));
@@ -235,7 +236,7 @@ public class UserController {
         if (request.getIntro() != null) {
             user.setIntro(request.getIntro());
         }
-        if(request.getYear() != null) {
+        if (request.getYear() != null) {
             user.setYear(request.getYear());
         }
 
@@ -305,7 +306,7 @@ public class UserController {
     @Transactional(rollbackFor = {})
     public ResponseEntity<QueryUsersResponse> queryUsers(@RequestBody QueryUsersRequest request) {
         Short departmentId = null;
-        if(request.getDepartment() != null) {
+        if (request.getDepartment() != null) {
             Optional<DepartmentEntity> dept = departmentRepository.findByName(request.getDepartment());
             if (!dept.isPresent()) {
                 return new ResponseEntity<>(new QueryUsersResponse("Non-exist department", null, null,
@@ -314,7 +315,7 @@ public class UserController {
             departmentId = dept.get().getId();
         }
         Short typeId = null;
-        if(request.getType() != null) {
+        if (request.getType() != null) {
             Optional<TypeGroupEntity> type = typeGroupRepository.findByName(request.getType());
             if (!type.isPresent()) {
                 return new ResponseEntity<>(new QueryUsersResponse("Non-exist type", null, null,
@@ -344,46 +345,25 @@ public class UserController {
         return new ResponseEntity<>(new QueryUsersResponse("OK", uids, names, depts, genders, types, years), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/modify/photo")
+
+    @PutMapping(path = "/photo")
     @Authorization
     public ResponseEntity<ModifyPhotoResponse> modifyPhoto(@CurrentUser UserEntity user,
                                                            @RequestBody ModifyPhotoRequest request) {
-        MultipartFile file = request.getFile();
-        if (!file.isEmpty()) {
-            try {
-                String fName = file.getOriginalFilename();
-                Files.copy(file.getInputStream(), Paths.get(Config.PHOTO_ROOT_DIR, fName));
-                user.setPhoto(fName);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return new ResponseEntity<>(new ModifyPhotoResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        File file = new File(Config.USER_RESOURCE_DIR + user.getUid());
+        if (!file.exists() || !file.isDirectory()) {
+            if (!file.mkdir()) {
+                return new ResponseEntity<>(new ModifyPhotoResponse("Cannot open user's resource file"), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        } else {
-            return new ResponseEntity<>(new ModifyPhotoResponse("empty file"), HttpStatus.BAD_REQUEST);
         }
-
-
-        return new ResponseEntity<>(new ModifyPhotoResponse("OK"), HttpStatus.CREATED);
-    }
-
-    @PostMapping(path = "/get/photo")
-    @Authorization
-    public ResponseEntity<GetPhotoResponse> getPhoto(@CurrentUser UserEntity user,
-                                                     @RequestBody GetPhotoRequest request) {
-        String uid = (request.getUid() == null) ? user.getUid() : request.getUid();
-        Optional<UserEntity> ret = userRepository.findById(uid);
-        if (!ret.isPresent()) {
-            return new ResponseEntity<>(new GetPhotoResponse("non-existent uid", null), HttpStatus.BAD_REQUEST);
-        }
-        UserEntity tar = ret.get();
         try {
-            return new ResponseEntity<>(new GetPhotoResponse("OK",
-                    resourceLoader.getResource("file:" + Paths.get(Config.PHOTO_ROOT_DIR, tar.getPhoto()))), HttpStatus.OK);
-        } catch (Exception e) {
+            FileOutputStream fout = new FileOutputStream(String.format(Config.USER_PHOTO_DIR_PATTERN, user.getUid()));
+            fout.write(request.getFile());
+        } catch (IOException e) {
             e.printStackTrace();
-            return new ResponseEntity<>(new GetPhotoResponse(e.getMessage(), null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ModifyPhotoResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
+        return new ResponseEntity<>(new ModifyPhotoResponse("OK"), HttpStatus.CREATED);
     }
 
 

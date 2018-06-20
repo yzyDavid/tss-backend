@@ -13,11 +13,11 @@ public class GetProcessResponse {
 
     public GetProcessResponse(String status) {
         this.status = status;
-        this.cids=null;
-        this.ids=null;
-        this.scores=null;
-        this.reasons=null;
-        this.uids=null;
+        this.cids = null;
+        this.ids = null;
+        this.scores = null;
+        this.reasons = null;
+        this.uids = null;
     }
 
     public GetProcessResponse(String status, List<Long> ids, List<String> reasons, List<Integer> scores, List<String> uids, List<Long> cids) {

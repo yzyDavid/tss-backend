@@ -44,14 +44,13 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
             return true;
         }
         Method method = ((HandlerMethod) handler).getMethod();
-        if(method.getAnnotation(Authorization.class) == null) {
+        if (method.getAnnotation(Authorization.class) == null) {
             return true;
         }
 
         if (checkTimestamp(request) && authorizationService.checkMethodAccessAuthority()) {
             return true;
-        }
-        else {
+        } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
@@ -61,16 +60,15 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         String token = request.getHeader(Config.AUTH_HEADER);
         if (token != null) {
             Optional<SessionEntity> ret = sqlSessionRepository.findByToken(token);
-            if(ret.isPresent()) {
+            if (ret.isPresent()) {
                 Date date = new Date();
                 SessionEntity session = ret.get();
-                if(date.getTime() - session.getTimestamp().getTime() < Config.TOKEN_EXPIRE_TIME) {
+                if (date.getTime() - session.getTimestamp().getTime() < Config.TOKEN_EXPIRE_TIME) {
                     request.setAttribute(Config.CURRENT_UID_ATTRIBUTE, session.getUid());
                     session.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
                     sqlSessionRepository.save(session);
                     return true;
-                }
-                else {
+                } else {
                     sqlSessionRepository.delete(session);
                     return false;
                 }

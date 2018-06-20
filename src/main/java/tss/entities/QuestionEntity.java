@@ -10,7 +10,7 @@ import java.util.Set;
         @Index(name = "question_qtype_index", columnList = "question_qtype"),
         @Index(name = "question_qunit_index", columnList = "question_qunit"),
 })
-public class QuestionEntity{
+public class QuestionEntity {
     private String qid;
     private String question;
     private String qanswer;
@@ -24,7 +24,7 @@ public class QuestionEntity{
     @Id
     @Column(name = "question_qid", length = 100)
     public String getQid() {
-        return  qid;
+        return qid;
     }
 
     public void setQid(String qid) {
@@ -36,7 +36,9 @@ public class QuestionEntity{
         return question;
     }
 
-    public void setQuestion(String question) { this.question = question; }
+    public void setQuestion(String question) {
+        this.question = question;
+    }
 
     @Column(name = "question_qanswer", length = 200)
     public String getQanswer() {
@@ -82,8 +84,6 @@ public class QuestionEntity{
     public void setCorrect(double correct) {
         this.correct = correct;
     }
-
-
 
 
 }

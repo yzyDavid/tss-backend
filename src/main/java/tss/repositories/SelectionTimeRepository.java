@@ -22,7 +22,10 @@ public interface SelectionTimeRepository extends CrudRepository<SelectionTimeEnt
     //List<SelectionTimeEntity> findBy
 
     boolean existsByStartLessThanEqualAndEndGreaterThanEqualAndRegisterTrue(Timestamp start, Timestamp end);
+
     boolean existsByStartLessThanEqualAndEndGreaterThanEqualAndDropTrue(Timestamp start, Timestamp end);
+
     boolean existsByStartLessThanEqualAndEndGreaterThanEqualAndComplementTrue(Timestamp start, Timestamp end);
+
     boolean existsById(Long id);
 }

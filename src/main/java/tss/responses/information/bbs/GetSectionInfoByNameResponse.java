@@ -13,7 +13,7 @@ public class GetSectionInfoByNameResponse {
     private final int userNum;
     private final Set<String> topics;
 
-    public GetSectionInfoByNameResponse(String status, long id, String name, int userNum, Set<String> topics){
+    public GetSectionInfoByNameResponse(String status, long id, String name, int userNum, Set<String> topics) {
         this.status = status;
         this.id = id;
         this.name = name;

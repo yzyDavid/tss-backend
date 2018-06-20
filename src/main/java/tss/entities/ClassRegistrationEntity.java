@@ -19,9 +19,11 @@ public class ClassRegistrationEntity {
 
     @Column(name = "score")
     private Integer score;
+
     public Integer getScore() {
         return score;
     }
+
     public void setScore(Integer score) {
         this.score = score;
     }
@@ -127,6 +129,7 @@ public class ClassRegistrationEntity {
     public Timestamp getSelectTime() {
         return this.selectTime;
     }
+
     public void setSelectTime(Timestamp selectTime) {
         this.selectTime = selectTime;
     }
@@ -134,6 +137,7 @@ public class ClassRegistrationEntity {
     public Timestamp getConfirmTime() {
         return this.confirmTime;
     }
+
     public void setConfirmTime(Timestamp confirmTime) {
         this.confirmTime = confirmTime;
     }

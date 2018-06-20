@@ -52,9 +52,9 @@ public class ExamController {
     }
 
     @PostMapping(path = "/getpaperlist")
-    public ResponseEntity<GetPaperResponse> ShowPapers(@RequestBody ShowPapersRequest request){
-       // List<PaperResponseStruct> papers = new ArrayList<>();
-        Date nowdate= new Date();
+    public ResponseEntity<GetPaperResponse> ShowPapers(@RequestBody ShowPapersRequest request) {
+        // List<PaperResponseStruct> papers = new ArrayList<>();
+        Date nowdate = new Date();
         List<PaperResponseStruct> papers = new ArrayList<>();
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -62,7 +62,7 @@ public class ExamController {
         Date dateend = new Date();
 
         Iterable<PapersEntity> paper_find = paperRepository.findAll();
-        for(PapersEntity paper : paper_find){
+        for (PapersEntity paper : paper_find) {
             PaperResponseStruct paper_return = new PaperResponseStruct();
             paper_return.setPid(paper.getPid());
             paper_return.setBegin(paper.getBegin());
@@ -81,25 +81,24 @@ public class ExamController {
                 e.printStackTrace();
             }
 
-            if(nowdate.after(datebegin)&& nowdate.before(dateend)){
-                System.out.println("tt:"+paper_return.getPid());
-               papers.add(paper_return);    //
+            if (nowdate.after(datebegin) && nowdate.before(dateend)) {
+                System.out.println("tt:" + paper_return.getPid());
+                papers.add(paper_return);    //
             }
         }
-  //      System.out.println("test:"+pid);
+        //      System.out.println("test:"+pid);
         return new ResponseEntity<>(new GetPaperResponse("ok", papers), HttpStatus.OK);
     }
 
 
-
     @PostMapping(path = "/getpaper")
-    public ResponseEntity<SelectPaperResponse> SelectPaper(@RequestBody SelectPaperRequest request){
+    public ResponseEntity<SelectPaperResponse> SelectPaper(@RequestBody SelectPaperRequest request) {
         PaperResponseStruct paper_return;
         paper_return = new PaperResponseStruct();
 
-        Optional<PapersEntity> ret= paperRepository.findById(request.getPid());
-        if(!ret.isPresent()){
-            System.out.println("Paper does not exist:"+request.getPid());
+        Optional<PapersEntity> ret = paperRepository.findById(request.getPid());
+        if (!ret.isPresent()) {
+            System.out.println("Paper does not exist:" + request.getPid());
             return new ResponseEntity<>(new SelectPaperResponse("Paper does not exist", null), HttpStatus.BAD_REQUEST);
         }
         PapersEntity paper = ret.get();
@@ -121,18 +120,18 @@ public class ExamController {
 
     @PostMapping(path = "/getquestions")
     @Authorization
-    public ResponseEntity<StartExamResponse> StartExam(@CurrentUser UserEntity user, @RequestBody StartExamRequest request){
+    public ResponseEntity<StartExamResponse> StartExam(@CurrentUser UserEntity user, @RequestBody StartExamRequest request) {
         PaperResponseStruct paper_return;
-        HistoryGradeEntity graderecord=new HistoryGradeEntity();
+        HistoryGradeEntity graderecord = new HistoryGradeEntity();
 
         paper_return = new PaperResponseStruct();
-        Date nowdate =new Date();
+        Date nowdate = new Date();
         String[] qid;
         String[] score;
         boolean exist;
 
 
-        Optional<PapersEntity> ret2= paperRepository.findById(request.getPid());
+        Optional<PapersEntity> ret2 = paperRepository.findById(request.getPid());
         PapersEntity paper = ret2.get();
 /*
         paper_return = new PaperResponseStruct();
@@ -145,27 +144,26 @@ public class ExamController {
         paper_return.setPapername(paper.getPapername());
 */
 
-        Optional<HistoryGradeEntity> ret= historyGradeRepository.findById(user.getUid()+request.getPid());
-        exist=ret.isPresent();
-        if(exist){      //还要改！！！
+        Optional<HistoryGradeEntity> ret = historyGradeRepository.findById(user.getUid() + request.getPid());
+        exist = ret.isPresent();
+        if (exist) {      //还要改！！！
             graderecord = ret.get();
-            if(graderecord.getGrade()!=-1){ //已经完成改试卷
-                String starttime= graderecord.getStarttime().toString();
+            if (graderecord.getGrade() != -1) { //已经完成改试卷
+                String starttime = graderecord.getStarttime().toString();
                 System.out.println("the paper expired");
-                return new ResponseEntity<>(new StartExamResponse("the paper expired", request.getPid(), starttime, null),HttpStatus.BAD_REQUEST);
-            }
-            else{   //断网重连
-                String starttime= graderecord.getStarttime().toString();
+                return new ResponseEntity<>(new StartExamResponse("the paper expired", request.getPid(), starttime, null), HttpStatus.BAD_REQUEST);
+            } else {   //断网重连
+                String starttime = graderecord.getStarttime().toString();
                 String last = paper.getLast();
                 String ddl = paper.getEnd();
 
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                try{
+                try {
                     Date startdate = graderecord.getStarttime();
                     Date ddldate = sdf.parse(ddl);
                     String[] lasttime = last.split(":");
                     Integer[] lastnum = new Integer[lasttime.length];
-                    for(int i = 0; i < lasttime.length; i++) {
+                    for (int i = 0; i < lasttime.length; i++) {
                         lastnum[i] = Integer.parseInt(lasttime[i]);
                     }
 
@@ -178,7 +176,7 @@ public class ExamController {
                     alter.add(Calendar.MINUTE, lastnum[2]);
 
                     String finaldate = sdf.format(alter.getTime());
-                    System.out.println("altertime: "+ finaldate);
+                    System.out.println("altertime: " + finaldate);
 
 
                     Calendar ddlc = Calendar.getInstance();
@@ -186,10 +184,10 @@ public class ExamController {
                     ddlc.setTime(ddldate);
 
                     Calendar nowc = Calendar.getInstance();
-                    if(nowc.getTimeInMillis() > alter.getTimeInMillis() || nowc.getTimeInMillis() > ddlc.getTimeInMillis()){    //超过试卷时间或考试已结束
+                    if (nowc.getTimeInMillis() > alter.getTimeInMillis() || nowc.getTimeInMillis() > ddlc.getTimeInMillis()) {    //超过试卷时间或考试已结束
                         System.out.println("the paper expired");
-                        return new ResponseEntity<>(new StartExamResponse("the paper expired", request.getPid(), starttime, null),HttpStatus.BAD_REQUEST);
-                    }else{      //尚在考试之中
+                        return new ResponseEntity<>(new StartExamResponse("the paper expired", request.getPid(), starttime, null), HttpStatus.BAD_REQUEST);
+                    } else {      //尚在考试之中
                         int count2 = 0;
 
                         List<PaperContainsQuestionEntity> contain_find = paperContainsQuestionRepository.findByPaper(paper);
@@ -198,7 +196,7 @@ public class ExamController {
 
 
                         QuestionEntity question_temp;
-                        for(PaperContainsQuestionEntity contain:contain_find){
+                        for (PaperContainsQuestionEntity contain : contain_find) {
 
                             question_temp = contain.getQuestion();
 
@@ -210,14 +208,13 @@ public class ExamController {
 
                             // qreturn.setMyanswer(null);
                             if (result_find.size() != 0) {
-                                for(ResultEntity result:result_find){
-                                    if(result.getQuestion().getQid().equals(question_temp.getQid())){
+                                for (ResultEntity result : result_find) {
+                                    if (result.getQuestion().getQid().equals(question_temp.getQid())) {
                                         qreturn.setMyanswer(result.getAns());
                                     }
                                 }
 
                             }
-
 
 
                             questionInfo.add(qreturn);
@@ -229,7 +226,7 @@ public class ExamController {
                     }
 
 
-                }catch(ParseException e) {
+                } catch (ParseException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
 
@@ -239,17 +236,15 @@ public class ExamController {
         }
 
 
-
-
         int count = 0;
 
         List<PaperContainsQuestionEntity> contain_find = paperContainsQuestionRepository.findByPaper(paper);
         List<QuestionExamResponseStruct> questionInfo = new ArrayList<>();
-      //  qid = new String[contain_find.size()];
-       // score = new String[contain_find.size()];
+        //  qid = new String[contain_find.size()];
+        // score = new String[contain_find.size()];
 
         QuestionEntity question_temp;
-        for(PaperContainsQuestionEntity contain:contain_find){
+        for (PaperContainsQuestionEntity contain : contain_find) {
             /*
             qid[count] = contain.getQuestion().getQid();
             score[count] = contain.getScore();
@@ -273,48 +268,48 @@ public class ExamController {
         paper_return.setScore(score);
         */
 
-        if(!exist) {
+        if (!exist) {
             graderecord.setGrade(-1);
             graderecord.setPaper(paper);
             graderecord.setStudent(user);
-            graderecord.setHid(user.getUid()+paper.getPid());
+            graderecord.setHid(user.getUid() + paper.getPid());
             graderecord.setStarttime(nowdate);
 
             historyGradeRepository.save(graderecord);
         }
 
-        System.out.println("ok:"+ questionInfo.size());
+        System.out.println("ok:" + questionInfo.size());
         return new ResponseEntity<>(new StartExamResponse("ok", request.getPid(), nowdate.toString(), questionInfo), HttpStatus.OK);
 
     }
 
     @PostMapping(path = "/save")
     @Authorization
-    public ResponseEntity<AddResultResponse> SavePaper(@CurrentUser UserEntity user, @RequestBody AddResultRequest request){
-        ResultEntity result= new ResultEntity();
+    public ResponseEntity<AddResultResponse> SavePaper(@CurrentUser UserEntity user, @RequestBody AddResultRequest request) {
+        ResultEntity result = new ResultEntity();
         QuestionEntity question;
         System.out.println("pid:" + request.getPid());
-        Optional<PapersEntity> ret= paperRepository.findById(request.getPid());
+        Optional<PapersEntity> ret = paperRepository.findById(request.getPid());
         Optional<QuestionEntity> ret2;
-        if(!ret.isPresent()){
+        if (!ret.isPresent()) {
             System.out.println("can't save the paper");
-            return  new ResponseEntity<>(new AddResultResponse("can't save the paper"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AddResultResponse("can't save the paper"), HttpStatus.BAD_REQUEST);
         }
         PapersEntity paper = ret.get();
         result.setStudent(user);
         result.setPaper(paper);
         int count = Integer.parseInt(paper.getCount());
-        System.out.println("qidlength:"+request.getQid().length);
-        for(int i=0; i<request.getQid().length;i++){
-            ret2= questionRepository.findById(request.getQid()[i]);
-            if(!ret2.isPresent()){
-                System.out.println("Can't save question "+ i);
-                return  new ResponseEntity<>(new AddResultResponse("can't save question "+i), HttpStatus.BAD_REQUEST);
+        System.out.println("qidlength:" + request.getQid().length);
+        for (int i = 0; i < request.getQid().length; i++) {
+            ret2 = questionRepository.findById(request.getQid()[i]);
+            if (!ret2.isPresent()) {
+                System.out.println("Can't save question " + i);
+                return new ResponseEntity<>(new AddResultResponse("can't save question " + i), HttpStatus.BAD_REQUEST);
             }
             question = ret2.get();
             result.setQuestion(question);
             result.setAns(request.getAns()[i]);
-            result.setRid(paper.getPid()+user.getUid()+question.getQid());
+            result.setRid(paper.getPid() + user.getUid() + question.getQid());
             resultRepository.save(result);
         }
         System.out.println("Save success.");
@@ -324,17 +319,17 @@ public class ExamController {
 
     @PostMapping(path = "/submit")
     @Authorization
-    public ResponseEntity<DeleteResultResponse> SubmitPaper(@CurrentUser UserEntity user, @RequestBody DeleteResultRequest request){
+    public ResponseEntity<DeleteResultResponse> SubmitPaper(@CurrentUser UserEntity user, @RequestBody DeleteResultRequest request) {
 // ret: paper     ret2: result  ret3: Question ret4: historygrade  ret5:save question
         PapersEntity paper;
 
         QuestionEntity question;
         HistoryGradeEntity record;
-        int totalscore=0;
+        int totalscore = 0;
         Optional<PapersEntity> ret = paperRepository.findById(request.getPid());
-        if(!ret.isPresent()){
+        if (!ret.isPresent()) {
             System.out.println("can't submit the paper");
-            return  new ResponseEntity<>(new DeleteResultResponse("can't submit the paper"), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new DeleteResultResponse("can't submit the paper"), HttpStatus.BAD_REQUEST);
         }
 
         //先保存答案
@@ -344,22 +339,20 @@ public class ExamController {
 
         result.setStudent(user);
         result.setPaper(paper);
-   //     int count = Integer.parseInt(paper.getCount());
-        System.out.println("qidlength:"+request.getQid().length);
-        for(int i=0; i<request.getQid().length;i++){
-            ret5= questionRepository.findById(request.getQid()[i]);
-            if(!ret5.isPresent()){
-                System.out.println("Can't save question "+ i);
+        //     int count = Integer.parseInt(paper.getCount());
+        System.out.println("qidlength:" + request.getQid().length);
+        for (int i = 0; i < request.getQid().length; i++) {
+            ret5 = questionRepository.findById(request.getQid()[i]);
+            if (!ret5.isPresent()) {
+                System.out.println("Can't save question " + i);
                 return new ResponseEntity<>(new DeleteResultResponse("submit question error"), HttpStatus.BAD_REQUEST);
             }
             question = ret5.get();
             result.setQuestion(question);
             result.setAns(request.getAns()[i]);
-            result.setRid(paper.getPid()+user.getUid()+question.getQid());
+            result.setRid(paper.getPid() + user.getUid() + question.getQid());
             resultRepository.save(result);
         }
-
-
 
 
         PaperContainsQuestionEntity contain;
@@ -369,41 +362,40 @@ public class ExamController {
 
         Iterator<PaperContainsQuestionEntity> contain_find = paper.getPaperquestion().iterator();
 
-        while(contain_find.hasNext()){ //对卷子中的每一道题，查找result中相应的结果， 更新 qustion库中的question
+        while (contain_find.hasNext()) { //对卷子中的每一道题，查找result中相应的结果， 更新 qustion库中的question
 
             contain = contain_find.next();//contain 是当前卷子中的题目
 
             //增加答题数
             ret3 = questionRepository.findById(contain.getQuestion().getQid());
-            if(!ret3.isPresent()){
+            if (!ret3.isPresent()) {
                 System.out.println("question does not exist");
                 return new ResponseEntity<>(new DeleteResultResponse("submit question error"), HttpStatus.BAD_REQUEST);
             }
             question = ret3.get();
-            question.setAnswerednum(question.getAnswerednum()+1);//修改题目的答题数
+            question.setAnswerednum(question.getAnswerednum() + 1);//修改题目的答题数
 
             //判断是否正确
-            ret2 = resultRepository.findById(paper.getPid()+user.getUid()+contain.getQuestion().getQid());
-            if(!ret2.isPresent()){  //没有作答
-              //  System.out.println("result does not exist");
-               // return new ResponseEntity<>(new DeleteResultResponse("submit question error"), HttpStatus.BAD_REQUEST);
+            ret2 = resultRepository.findById(paper.getPid() + user.getUid() + contain.getQuestion().getQid());
+            if (!ret2.isPresent()) {  //没有作答
+                //  System.out.println("result does not exist");
+                // return new ResponseEntity<>(new DeleteResultResponse("submit question error"), HttpStatus.BAD_REQUEST);
 
-            }
-            else{       //作答
+            } else {       //作答
                 result = ret2.get();
-                if(question.getQanswer().equals(result.getAns())){
-                    totalscore = totalscore+ Integer.parseInt(contain.getScore());
-                    question.setCorrect(question.getCorrect()+1);//修改正确的题目数量
+                if (question.getQanswer().equals(result.getAns())) {
+                    totalscore = totalscore + Integer.parseInt(contain.getScore());
+                    question.setCorrect(question.getCorrect() + 1);//修改正确的题目数量
                 }
-                resultRepository.deleteById(paper.getPid()+user.getUid()+contain.getQuestion().getQid());
+                resultRepository.deleteById(paper.getPid() + user.getUid() + contain.getQuestion().getQid());
             }
 
             questionRepository.save(question);//存回修改了的题目信息
 
         }
 
-        ret4 = historyGradeRepository.findById(user.getUid()+paper.getPid());
-        if(!ret4.isPresent()){
+        ret4 = historyGradeRepository.findById(user.getUid() + paper.getPid());
+        if (!ret4.isPresent()) {
             System.out.println("cannot grading");
             return new ResponseEntity<>(new DeleteResultResponse("cannot grading"), HttpStatus.BAD_REQUEST);
         }
@@ -413,25 +405,12 @@ public class ExamController {
 
         double oldavg = paper.getAverage();
         long oldanswered = paper.getAnswerednum();
-        paper.setAverage((oldanswered*oldavg+totalscore)/(oldanswered+1));
-        paper.setAnswerednum(oldanswered+1);
+        paper.setAverage((oldanswered * oldavg + totalscore) / (oldanswered + 1));
+        paper.setAnswerednum(oldanswered + 1);
         paperRepository.save(paper);
 
-        return  new ResponseEntity<>(new DeleteResultResponse("Submit Ok"),HttpStatus.OK);
+        return new ResponseEntity<>(new DeleteResultResponse("Submit Ok"), HttpStatus.OK);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

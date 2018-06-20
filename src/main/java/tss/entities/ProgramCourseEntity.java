@@ -22,8 +22,11 @@ public class ProgramCourseEntity {
     private Integer type;
 
     @Column(length = 3)
-    public Integer getType() {return type;}
-    public void setType (Integer type) {
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
         if (type <= COURSE_TYPE_NUM && type >= 0) {
             this.type = type;
         }
@@ -45,7 +48,9 @@ public class ProgramCourseEntity {
     @JoinColumn(name = "course_id")
     private CourseEntity course;
 
-    public CourseEntity getCourse() {return course;}
+    public CourseEntity getCourse() {
+        return course;
+    }
 
     public void setCourse(CourseEntity course) {
         this.course = course;

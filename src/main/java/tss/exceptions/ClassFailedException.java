@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 
 @ResponseStatus(value = HttpStatus.CONFLICT, reason = "Class failed, please drop it first")
-public class ClassFailedException extends RuntimeException{
+public class ClassFailedException extends RuntimeException {
 }

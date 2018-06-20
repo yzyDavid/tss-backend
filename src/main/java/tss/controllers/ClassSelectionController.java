@@ -1,6 +1,7 @@
 package tss.controllers;
 
 // import com.sun.xml.internal.messaging.saaj.packaging.mime.util.BEncoderStream;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -48,7 +49,7 @@ public class ClassSelectionController {
     @PostMapping("/classes/search")
     @Authorization
     public ResponseEntity<GetClassesResponse> searchClasses(@CurrentUser UserEntity user,
-                                        @RequestBody GetClassesForSelectionRequest request) {
+                                                            @RequestBody GetClassesForSelectionRequest request) {
         List<ClassEntity> classes;
         List<Boolean> selected = new ArrayList<>();
         List<Integer> numOfStudents = new ArrayList<>();
@@ -84,8 +85,7 @@ public class ClassSelectionController {
                 if (user != null && user.readTypeName().equals("Student") &&
                         classRegistrationRepository.existsByStudentAndClazz(user, classEntity)) {
                     selected.add(Boolean.TRUE);
-                }
-                else {
+                } else {
                     selected.add(Boolean.FALSE);
                 }
                 numOfStudents.add(classRegistrationRepository.countByClazz(classEntity));
@@ -98,7 +98,7 @@ public class ClassSelectionController {
             if (request.getTeacherName() != null) {
                 // 2. Use courseName and teacherName
                 classes = new ArrayList<>();
-                List<CourseEntity> courseEntityList = courseRepository.findByNameLike("%"+request.getCourseName()+"%");
+                List<CourseEntity> courseEntityList = courseRepository.findByNameLike("%" + request.getCourseName() + "%");
 
 
                 for (CourseEntity courseEntity : courseEntityList) {
@@ -117,11 +117,10 @@ public class ClassSelectionController {
                             new ArrayList<>(), new ArrayList<>(), new ArrayList<>()),
                             HttpStatus.BAD_REQUEST);
                 }
-            }
-            else {
+            } else {
                 // 3. Use only courseName to search
                 classes = new ArrayList<>();
-                List<CourseEntity> courseEntityList = courseRepository.findByNameLike("%"+request.getCourseName()+"%");
+                List<CourseEntity> courseEntityList = courseRepository.findByNameLike("%" + request.getCourseName() + "%");
 
                 for (CourseEntity courseEntity : courseEntityList) {
                     if (user != null && user.readTypeName().equals("Student") &&
@@ -139,12 +138,11 @@ public class ClassSelectionController {
                             HttpStatus.BAD_REQUEST);
                 }
             }
-        }
-        else if (request.getTeacherName() != null) {
+        } else if (request.getTeacherName() != null) {
             // 4. Use only teacher name to search
             classes = new ArrayList<>();
 
-            List<ClassEntity> classesList = classRepository.findByTeacher_NameLike("%"+request.getTeacherName()+"%");
+            List<ClassEntity> classesList = classRepository.findByTeacher_NameLike("%" + request.getTeacherName() + "%");
 
             Set<CourseEntity> courseEntities = new HashSet<>(); // Temporary
             Set<CourseEntity> courseEntities1 = new HashSet<>();  // courses in program
@@ -164,7 +162,7 @@ public class ClassSelectionController {
             for (CourseEntity courseEntity : courseEntities1) {
                 List<ClassEntity> classEntityList = classRepository.findByCourse_IdAndTeacher_NameLike(
                         courseEntity.getId(),
-                        "%"+request.getTeacherName()+"%");
+                        "%" + request.getTeacherName() + "%");
                 classes.addAll(classEntityList);
             }
 
@@ -173,8 +171,7 @@ public class ClassSelectionController {
                         new ArrayList<>(), new ArrayList<>(), new ArrayList<>()),
                         HttpStatus.BAD_REQUEST);
             }
-        }
-        else {
+        } else {
             throw new ClassSearchInvalidException();
         }
 
@@ -182,8 +179,7 @@ public class ClassSelectionController {
             if (user != null && user.readTypeName().equals("Student") &&
                     classRegistrationRepository.existsByStudentAndClazz(user, classEntity)) {
                 selected.add(Boolean.TRUE);
-            }
-            else {
+            } else {
                 selected.add(Boolean.FALSE);
             }
             numOfStudents.add(classRegistrationRepository.countByClazz(classEntity));
@@ -210,7 +206,7 @@ public class ClassSelectionController {
                     HttpStatus.FORBIDDEN);
         }
         ClassStatusEnum classStatusEnum = ClassStatusEnum.SELECTED;
-        String crid = user.getUid()+"CR"+classId;
+        String crid = user.getUid() + "CR" + classId;
 
         // Error 3: The class has been registered
         if (classRegistrationRepository.existsByStudentAndClazz_Course(user, clazz.getCourse())) {
@@ -246,7 +242,7 @@ public class ClassSelectionController {
 
         classRegistrationRepository.save(classRegistrationEntity);
 
-        return new ResponseEntity<>(new BasicResponse("选课成功！"+courseEntity.getName()), HttpStatus.OK);
+        return new ResponseEntity<>(new BasicResponse("选课成功！" + courseEntity.getName()), HttpStatus.OK);
     }
 
     @PutMapping(path = "/classes/finish")
@@ -372,7 +368,7 @@ public class ClassSelectionController {
                     HttpStatus.FORBIDDEN);
         }
         ClassStatusEnum classStatusEnum = ClassStatusEnum.SELECTED;
-        String crid = user.getUid()+"CR"+classId;
+        String crid = user.getUid() + "CR" + classId;
 
         // Error 3: The class has been registered
         if (classRegistrationRepository.existsByStudentAndClazz_Course(user, clazz.getCourse())) {
@@ -408,7 +404,7 @@ public class ClassSelectionController {
 
         classRegistrationRepository.save(classRegistrationEntity);
 
-        return new ResponseEntity<>(new BasicResponse("补选成功！"+courseEntity.getName()), HttpStatus.OK);
+        return new ResponseEntity<>(new BasicResponse("补选成功！" + courseEntity.getName()), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/classes/drop")
@@ -430,7 +426,7 @@ public class ClassSelectionController {
             return new ResponseEntity<>(new BasicResponse("你不是学生，无法退课！"),
                     HttpStatus.FORBIDDEN);
         }
-        String crid = user.getUid() + "CR"+classId;
+        String crid = user.getUid() + "CR" + classId;
 
         // Error 3: The class hasn't been registered
         Optional<ClassRegistrationEntity> classRegistrationEntityOptional = classRegistrationRepository.findByCrid(crid);
@@ -455,7 +451,7 @@ public class ClassSelectionController {
         }
 
         classRegistrationRepository.delete(cr);
-        clazz.setNumStudent(clazz.getNumStudent()-1);
+        clazz.setNumStudent(clazz.getNumStudent() - 1);
         classRepository.save(clazz);
 
         return new ResponseEntity<>(new BasicResponse("退课成功！"), HttpStatus.OK);
@@ -507,7 +503,7 @@ public class ClassSelectionController {
                     HttpStatus.FORBIDDEN);
         }
         ClassStatusEnum classStatusEnum = ClassStatusEnum.SELECTED;
-        String crid = user.getUid()+"CR"+classId;
+        String crid = user.getUid() + "CR" + classId;
 
         // Error 3: The object is not a student
         Optional<UserEntity> userEntityOptional = userRepository.findByUid(studentId);
@@ -540,11 +536,11 @@ public class ClassSelectionController {
             return new ResponseEntity<>(new BasicResponse("该教学班人数已满！"),
                     HttpStatus.BAD_REQUEST);
         }
-        clazz.setNumStudent(classRegistrationRepository.countByClazz(clazz)+1);
+        clazz.setNumStudent(classRegistrationRepository.countByClazz(clazz) + 1);
         classRepository.save(clazz);
 
         classRegistrationRepository.save(classRegistrationEntity);
 
-        return new ResponseEntity<>(new BasicResponse("管理员选课成功！"+courseEntity.getName()), HttpStatus.OK);
+        return new ResponseEntity<>(new BasicResponse("管理员选课成功！" + courseEntity.getName()), HttpStatus.OK);
     }
 }

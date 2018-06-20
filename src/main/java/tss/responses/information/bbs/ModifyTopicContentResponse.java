@@ -12,7 +12,7 @@ public class ModifyTopicContentResponse {
     private final String content;
     private final Date time;
 
-    public ModifyTopicContentResponse(String status, long id, String name, String content, Date time){
+    public ModifyTopicContentResponse(String status, long id, String name, String content, Date time) {
         this.status = status;
         this.id = id;
         this.name = name;

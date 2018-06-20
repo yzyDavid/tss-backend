@@ -57,8 +57,7 @@ public class SelectionTimeController {
             selectionTimeEntity.setRegister(true);
             selectionTimeEntity.setStart(startTime);
             selectionTimeEntity.setEnd(endTime);
-        }
-        else {
+        } else {
             selectionTimeEntity = selectionTimeEntityOptional.get();
             selectionTimeEntity.setRegister(true);
         }
@@ -83,8 +82,7 @@ public class SelectionTimeController {
             selectionTimeEntity.setRegister(false);
             selectionTimeEntity.setStart(startTime);
             selectionTimeEntity.setEnd(endTime);
-        }
-        else {
+        } else {
             selectionTimeEntity = selectionTimeEntityOptional.get();
             selectionTimeEntity.setComplement(true);
         }
@@ -110,8 +108,7 @@ public class SelectionTimeController {
             selectionTimeEntity.setRegister(false);
             selectionTimeEntity.setStart(startTime);
             selectionTimeEntity.setEnd(endTime);
-        }
-        else {
+        } else {
             selectionTimeEntity = selectionTimeEntityOptional.get();
             selectionTimeEntity.setDrop(true);
         }

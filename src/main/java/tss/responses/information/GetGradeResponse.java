@@ -46,8 +46,12 @@ public class GetGradeResponse {
         return score;
     }
 
-    public List<String> getDate() {return date;}
+    public List<String> getDate() {
+        return date;
+    }
 
-    public List<QuestionEntity> getQuestions() {return questions;}
+    public List<QuestionEntity> getQuestions() {
+        return questions;
+    }
 }
 

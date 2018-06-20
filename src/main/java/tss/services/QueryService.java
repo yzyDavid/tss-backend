@@ -49,7 +49,7 @@ public class QueryService {
     }
 
     public <T> List<T> query(Class<T> entity, NameValuePair[] pairs) {
-        if(entity.getAnnotation(Entity.class) == null) {
+        if (entity.getAnnotation(Entity.class) == null) {
             return null;
         }
         List<String> whereClauses = new ArrayList<>();
@@ -57,7 +57,7 @@ public class QueryService {
         String tableName;
 
         Table tableAnnotaion = entity.getAnnotation(Table.class);
-        if(tableAnnotaion != null && tableAnnotaion.name().length() > 0) {
+        if (tableAnnotaion != null && tableAnnotaion.name().length() > 0) {
             tableName = tableAnnotaion.name();
         } else {
             tableName = entity.getSimpleName();
@@ -69,8 +69,8 @@ public class QueryService {
             }
             whereClauses.add(pair.name + opMap.get(pair.op) + "?");
             Object value;
-            if(pair.op.equals(Operators.LIKE) && pair.value instanceof String) {
-                value = "%"+(pair.value).toString()+"%";
+            if (pair.op.equals(Operators.LIKE) && pair.value instanceof String) {
+                value = "%" + (pair.value).toString() + "%";
             } else {
                 value = pair.value;
             }
@@ -119,16 +119,16 @@ class RowMapperFactory {
         EntityRowMapper(Class<T> entityClass) {
             this.entityClass = entityClass;
             Field[] fields = entityClass.getDeclaredFields();
-            for(Field field : fields) {
-                if(field.getType().equals(Set.class) || field.getType().equals(List.class)) {
+            for (Field field : fields) {
+                if (field.getType().equals(Set.class) || field.getType().equals(List.class)) {
                     continue;
                 }
                 String fName = field.getName();
                 String cName = fName;
                 Column column = field.getAnnotation(Column.class);
                 JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
-                if(column == null && joinColumn == null) {
-                    String getterName = "get"+fName.substring(0, 1).toUpperCase()+fName.substring(1, fName.length());
+                if (column == null && joinColumn == null) {
+                    String getterName = "get" + fName.substring(0, 1).toUpperCase() + fName.substring(1, fName.length());
                     try {
                         Method getter = entityClass.getMethod(getterName);
                         column = getter.getAnnotation(Column.class);
@@ -137,9 +137,9 @@ class RowMapperFactory {
                         e.printStackTrace();
                     }
                 }
-                if(column != null && column.name().length() > 0) {
+                if (column != null && column.name().length() > 0) {
                     cName = column.name();
-                } else if(joinColumn != null && joinColumn.name().length() > 0){
+                } else if (joinColumn != null && joinColumn.name().length() > 0) {
                     cName = joinColumn.name();
                     foreignKeys.add(cName);
                 }
@@ -154,9 +154,9 @@ class RowMapperFactory {
             try {
                 entity = entityClass.newInstance();
                 Field[] fields = entityClass.getDeclaredFields();
-                for(Field field : fields) {
+                for (Field field : fields) {
                     String cName = nameMap.get(field.getName());
-                    if(cName != null && !foreignKeys.contains(cName)) {
+                    if (cName != null && !foreignKeys.contains(cName)) {
                         field.setAccessible(true);
                         try {
                             field.set(entity, rs.getObject(cName));

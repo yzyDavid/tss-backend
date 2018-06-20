@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping(path="excel")
+@RequestMapping(path = "excel")
 public class ExportExcelController {
     private final CourseRepository course;
     private final ClassRepository classes;
@@ -99,8 +99,7 @@ public class ExportExcelController {
     //@Authorization
     @ResponseBody
     public ResponseEntity<byte[]> downloadClassExcel(// @CurrentUser UserEntity user,
-            @PathVariable Long classId) throws Exception
-    {
+                                                     @PathVariable Long classId) throws Exception {
 /*
         if (user.readTypeName().equals("Student")) {
             throw new PermissionDeniedException();
@@ -114,11 +113,10 @@ public class ExportExcelController {
         // TODO: Add current user
         ClassEntity cl = classRepository.findById(classId).orElseThrow(ClazzNotFoundException::new);
 
-        List<UserEntity> students = new ArrayList<>() ;
+        List<UserEntity> students = new ArrayList<>();
         List<ExportEntityUtils> exportentities = new ArrayList<>();
-        List<ClassRegistrationEntity>  crs = cl.getClassRegistrations();
-        for (ClassRegistrationEntity cr : crs)
-        {
+        List<ClassRegistrationEntity> crs = cl.getClassRegistrations();
+        for (ClassRegistrationEntity cr : crs) {
             ExportEntityUtils exp = new ExportEntityUtils(cr.getStudent().getUid(), cr.getStudent().getName(),
                     cr.getStudent().getGender(), cr.getStudent().readDepartmentName(), cr.getStudent().readClassName(),
                     cr.getStudent().getTelephone(), cr.getStudent().getEmail());

@@ -38,11 +38,11 @@ public class AuthorizationService {
         for (Field field : entity.getClass().getFields()) {
             if (field.getAnnotation(Id.class) != null) {
                 idName = field.getName();
-                idName = idName.substring(0,1).toUpperCase()+idName.substring(1, idName.length());
+                idName = idName.substring(0, 1).toUpperCase() + idName.substring(1, idName.length());
                 String uri = null;
                 try {
-                    Method idGetter = entity.getClass().getMethod("get"+idName);
-                    uri = entity.getClass().getName()+"/"+idGetter.invoke(entity).toString();
+                    Method idGetter = entity.getClass().getMethod("get" + idName);
+                    uri = entity.getClass().getName() + "/" + idGetter.invoke(entity).toString();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -69,7 +69,7 @@ public class AuthorizationService {
             return false;
         }
         Optional<AuthorityEntity> auth = authorityRepository.findByUri(uri);
-        if(!auth.isPresent()) {
+        if (!auth.isPresent()) {
             return false;
         }
         AuthorityEntity authority = auth.get();
@@ -78,7 +78,7 @@ public class AuthorizationService {
     }
 
     public void authorizeUsers2Resource(AuthorityEntity authority, UserEntity[] users) {
-        for(UserEntity user : users) {
+        for (UserEntity user : users) {
             authority.addUser(user);
         }
         authorityRepository.save(authority);
@@ -86,7 +86,7 @@ public class AuthorizationService {
 
     @Transactional(rollbackFor = {})
     public boolean checkMethodAccessAuthority() {
-        String uid = (String)request.getAttribute(Config.CURRENT_UID_ATTRIBUTE);
+        String uid = (String) request.getAttribute(Config.CURRENT_UID_ATTRIBUTE);
         String uri = request.getRequestURI();
         Optional<UserEntity> user = userRepository.findById(uid);
         Optional<AuthorityEntity> authority = authorityRepository.findByUri(pattern.matcher(uri).replaceAll("*"));
@@ -107,7 +107,7 @@ public class AuthorizationService {
 
     @Transactional(rollbackFor = {})
     public boolean checkDataAccessAuthority(String uri) {
-        String uid = (String)request.getAttribute(Config.CURRENT_UID_ATTRIBUTE);
+        String uid = (String) request.getAttribute(Config.CURRENT_UID_ATTRIBUTE);
         Optional<UserEntity> user = userRepository.findById(uid);
         Optional<AuthorityEntity> authority = authorityRepository.findByUri(uri);
         if (!authority.isPresent()) {
