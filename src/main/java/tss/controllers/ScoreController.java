@@ -199,6 +199,19 @@ public class ScoreController {
         return new ResponseEntity<>(new ProcessModifyResponse("ok"), HttpStatus.OK);
 
     }
+    
+    @PostMapping(path="/getusertype")
+    public ResponseEntity<GetUserTypeResponse>getusertype(@RequestBody GetUserTypeRequest request){
+        String uid = request.getUid();
+        Optional<UserEntity> ret = userRepository.findByUid(uid);
+        if(!ret.isPresent())
+        {
+            return new ResponseEntity<>(new GetUserTypeResponse("no such user"),HttpStatus.BAD_REQUEST);
+        }
+        TypeGroupEntity type = ret.get().getType();
+        String typename = type.getName();
+        return new ResponseEntity<>(new GetUserTypeResponse("ok",typename), HttpStatus.OK);
+    }
 //    @GetMapping(path = "/getstudentclass")
 //    public ResponseEntity<GetStudentClassResponse>getstudentclass(@RequestBody GetStudentClassRequest request)
 //    {
