@@ -53,10 +53,6 @@ public class ClassSelectionController {
         List<Boolean> selected = new ArrayList<>();
         List<Integer> numOfStudents = new ArrayList<>();
 
-        if (user != null && user.readTypeName().equals("Student")) {
-
-        }
-
         // 1. Use ID to search
         if (request.getCourseId() != null) {
             // Error 1: Course not found
@@ -504,6 +500,7 @@ public class ClassSelectionController {
     public ResponseEntity<BasicResponse> adminRegisterClass(@CurrentUser UserEntity user, @RequestBody ConfirmClassRequest request) {
         String studentId = request.getUid();
         long classId = request.getClassId();
+
         // Error 1: The class doesn't exist
         Optional<ClassEntity> classEntityOptional = classRepository.findById(classId);
         if (!classEntityOptional.isPresent()) {
@@ -544,7 +541,7 @@ public class ClassSelectionController {
         }
 
         ClassRegistrationEntity classRegistrationEntity =
-                new ClassRegistrationEntity(0, user, clazz, crid,
+                new ClassRegistrationEntity(0, student, clazz, crid,
                         classStatusEnum, new Timestamp(System.currentTimeMillis()), null);
 
         // Error 6: Classroom is full of students

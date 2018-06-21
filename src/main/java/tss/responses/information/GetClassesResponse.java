@@ -6,6 +6,7 @@ import tss.entities.ClassEntity;
 import tss.entities.ClassroomEntity;
 import tss.entities.SemesterEnum;
 import tss.entities.TimeSlotEntity;
+import tss.models.TimeSlotTypeEnum;
 
 // import tss.entities.ClassInfo;
 import java.util.ArrayList;
@@ -17,8 +18,7 @@ public class GetClassesResponse {
 
     class ClassInfo {
         private Long id;
-        private Integer year;
-        private SemesterEnum semester;
+        private String semester;
         private Integer capacity;
         private Integer numStudent;
         private Float credit;
@@ -33,11 +33,10 @@ public class GetClassesResponse {
         public ClassInfo() {
         }
 
-        public ClassInfo(Long id, Integer year, SemesterEnum semester, Integer capacity, Integer numStudent,
+        public ClassInfo(Long id, String semester, Integer capacity, Integer numStudent,
                          Float credit, String intro, String courseId, String courseName, String teacherName,
                          String timeSlot, String classroom, String status) {
             this.id = id;
-            this.year = year;
             this.semester = semester;
             this.capacity = capacity;
             this.numStudent = numStudent;
@@ -74,17 +73,10 @@ public class GetClassesResponse {
             this.id = id;
         }
 
-        public Integer getYear() {
-            return year;
-        }
-        public void setYear(Integer year) {
-            this.year = year;
-        }
-
-        public SemesterEnum getSemester() {
+        public String getSemester() {
             return semester;
         }
-        public void setSemester(SemesterEnum semester) {
+        public void setSemester(String semester) {
             this.semester = semester;
         }
 
@@ -144,11 +136,25 @@ public class GetClassesResponse {
         public void setStatus(String status) {
             this.status = status;
         }
+        
+        String transferTimeSlot(TimeSlotTypeEnum timeSlotTypeEnum) {
+            String res = "";
+            switch (timeSlotTypeEnum.getDayOfWeek()) {
+                case 1: res = "周一"; break;
+                case 2: res = "周二"; break;
+                case 3: res = "周三"; break;
+                case 4: res = "周四"; break;
+                case 5: res = "周五"; break;
+                case 6: res = "周六"; break;
+                case 7: res = "周日"; break;
+            }
+            res += "第"+timeSlotTypeEnum.getStart()+"至"+timeSlotTypeEnum.getEnd()+"节";
+            return res;
+        }
 
         ClassInfo(ClassEntity clazz, Boolean selected, Integer numOfStudents) {
             id = clazz.getId();
-            year = clazz.getYear();
-            semester = clazz.getSemester();
+            semester = clazz.getYear().toString() + ((clazz.getSemester() == SemesterEnum.FIRST) ? "秋冬" : "春夏");
             capacity = clazz.getCapacity();
             numStudent = numOfStudents;
             credit = clazz.getCourse().getCredit();
@@ -161,7 +167,7 @@ public class GetClassesResponse {
             List<TimeSlotEntity> ts = clazz.getTimeSlots();
             Integer size = ts.size();
             for (TimeSlotEntity t : ts) {
-                timeSlot = timeSlot.concat(t.getType().toString());
+                timeSlot = timeSlot.concat(transferTimeSlot(t.getType()));
                 classroom = classroom.concat(t.getClassroom().getName());
                 if (size > 1) {
                     timeSlot = timeSlot.concat(",");
@@ -169,7 +175,7 @@ public class GetClassesResponse {
                     size--;
                 }
             }
-            status = selected ? "SELECTED" : "NOT_SELECTED";
+            status = selected ? "已选" : "未选";
         }
     }
 
@@ -178,6 +184,14 @@ public class GetClassesResponse {
         this.classes = new ArrayList<>();
         for (int i=0; i<classes.size(); i++)
             this.classes.add(new ClassInfo(classes.get(i), selected.get(i), numOfStudents.get(i)));
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public List<ClassInfo> getClasses() {
