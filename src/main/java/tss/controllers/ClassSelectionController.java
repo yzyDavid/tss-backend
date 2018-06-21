@@ -238,6 +238,20 @@ public class ClassSelectionController {
             return new ResponseEntity<>(new BasicResponse("该教学班人数已满！"),
                     HttpStatus.BAD_REQUEST);
         }
+        // Error 7: Class conflict
+        List<ClassRegistrationEntity> classRegistrationEntities = classRegistrationRepository.findByStudent(user);
+        for (ClassRegistrationEntity classRegistrationEntity1 : classRegistrationEntities) {
+            ClassEntity classEntity = classRegistrationEntity1.getClazz();
+            List<TimeSlotEntity> timeSlotEntities = classEntity.getTimeSlots();
+            for (TimeSlotEntity timeSlotEntity : timeSlotEntities) {
+                for (TimeSlotEntity timeSlotEntity1 : clazz.getTimeSlots())
+                if (timeSlotEntity.getType().equals(timeSlotEntity1.getType())) {
+                    return new ResponseEntity<>(new BasicResponse("与课程“"+classEntity.getCourse().getName()+"”时间冲突！"),
+                            HttpStatus.BAD_REQUEST);
+                }
+            }
+        }
+
         classRepository.save(clazz);
 
         classRegistrationRepository.save(classRegistrationEntity);
@@ -488,6 +502,7 @@ public class ClassSelectionController {
     public ResponseEntity<BasicResponse> adminRegisterClass(@CurrentUser UserEntity user, @RequestBody ConfirmClassRequest request) {
         String studentId = request.getUid();
         long classId = request.getClassId();
+
         // Error 1: The class doesn't exist
         Optional<ClassEntity> classEntityOptional = classRepository.findById(classId);
         if (!classEntityOptional.isPresent()) {

@@ -123,7 +123,7 @@ public class ExportExcelController {
             //students.add(cr.getStudent());
             exportentities.add(exp);
         }
-        return ee.exportExcel(headerss, exportentities, cl.getCourse().getName() + ".xls");
+        return ee.exportExcel(headerss, exportentities, cl.getCourse().getId().toString() + ".xls");
 
 
     }

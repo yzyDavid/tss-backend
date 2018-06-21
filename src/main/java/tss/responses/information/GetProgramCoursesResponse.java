@@ -21,15 +21,27 @@ public class GetProgramCoursesResponse {
         private String courseId;  // courseId
         private String courseName;
         private Float credit;
-        private CourseTypeEnum type;
-        private ClassStatusEnum status;
+        private String type;  //CourseTypeEnum type;
+        private String status; // ClassStatusEnum status;
 
-        public CourseInfo(String courseId, String courseName, Float credit, CourseTypeEnum type, ClassStatusEnum status) {
-            this.courseId = courseId;
-            this.courseName = courseName;
-            this.credit = credit;
-            this.type = type;
-            this.status = status;
+        String transferCourseType(CourseTypeEnum type) {
+            switch (type) {
+                case COMPULSORY: return "必修";
+                case PUBLIC: return "公选";
+                case SELECTIVE: return "选修";
+            }
+            return "";
+        }
+
+        String transferClassStatus(ClassStatusEnum type) {
+            switch (type) {
+                case NOT_IN_PROGRAM: return "不在培养方案中";
+                case SELECTED: return "已选课";
+                case NOT_SELECTED: return "在培养方案中，未选课";
+                case FAILED: return "不及格";
+                case FINISHED: return "通过";
+            }
+            return "";
         }
 
         public String getCourseId() {
@@ -56,19 +68,19 @@ public class GetProgramCoursesResponse {
             this.credit = credit;
         }
 
-        public CourseTypeEnum getType() {
+        public String getType() {
             return type;
         }
 
-        public void setType(CourseTypeEnum type) {
+        public void setType(String type) {
             this.type = type;
         }
 
-        public ClassStatusEnum getStatus() {
+        public String getStatus() {
             return status;
         }
 
-        public void setStatus(ClassStatusEnum status) {
+        public void setStatus(String status) {
             this.status = status;
         }
 
@@ -76,8 +88,8 @@ public class GetProgramCoursesResponse {
             courseId = course.getId();
             courseName = course.getName();
             credit = course.getCredit();
-            this.status = status;
-            this.type = type;
+            this.type = transferCourseType(type);
+            this.status = transferClassStatus(status);
         }
     }
 

@@ -29,6 +29,8 @@ public class SessionEntity {
     @GeneratedValue()
     private Timestamp timestamp;
 
+    private Timestamp opt;
+
     private String token;
 
     public Long getId() {
@@ -53,6 +55,14 @@ public class SessionEntity {
 
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Timestamp getOpt() {
+        return opt;
+    }
+
+    public void setOpt(Timestamp opt) {
+        this.opt = opt;
     }
 
     public String getToken() {

@@ -2,150 +2,92 @@ package tss.responses.information;
 
 import tss.entities.SelectionTimeEntity;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GetSelectionTimeResponse {
 
-    private final List<SelectionTimeEntity> timeList;
-/*
+    private final List<SelectionTimeInfo> timeList;
+
     class SelectionTimeInfo {
         private Long id;
-        private Integer year;
-        private SemesterEnum semester;
-        private Integer capacity;
-        private Integer numStudent;
-        private String courseId;
-        private String courseName;
-        private String teacherName;
-        private String timeSlot;
-        private String classroom;
+        private String start;
+        private String end;
+        private Boolean register; // registrationPermissive
+        private Boolean drop; // dropPerm
+        private Boolean complement; // complementPermissive
 
-        public ClassInfo(Long id, Integer year, SemesterEnum semester, Integer capacity,
-                         Integer numStudent, String courseId, String courseName, String teacherName,
-                         String timeSlot, String classroom) {
-            this.id = id;
-            this.year = year;
-            this.semester = semester;
-            this.capacity = capacity;
-            this.numStudent = numStudent;
-            this.courseId = courseId;
-            this.courseName = courseName;
-            this.teacherName = teacherName;
-            this.timeSlot = timeSlot;
-            this.classroom = classroom;
+        SelectionTimeInfo(SelectionTimeEntity selectionTimeEntity) {
+            id = selectionTimeEntity.getId();
+            DateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            start = sdf.format(selectionTimeEntity.getStart());
+            end = sdf.format(selectionTimeEntity.getEnd());
+            register = selectionTimeEntity.isRegister();
+            drop = selectionTimeEntity.isDrop();
+            complement = selectionTimeEntity.isComplement();
         }
 
         public Long getId() {
             return id;
         }
+
         public void setId(Long id) {
             this.id = id;
         }
 
-        public Integer getYear() {
-            return year;
-        }
-        public void setYear(Integer year) {
-            this.year = year;
+        public String getStart() {
+            return start;
         }
 
-        public SemesterEnum getSemester() {
-            return semester;
-        }
-        public void setSemester(SemesterEnum semester) {
-            this.semester = semester;
+        public void setStart(String start) {
+            this.start = start;
         }
 
-        public Integer getCapacity() {
-            return capacity;
-        }
-        public void setCapacity(Integer capacity) {
-            this.capacity = capacity;
+        public String getEnd() {
+            return end;
         }
 
-        public Integer getNumStudent() {
-            return numStudent;
-        }
-        public void setNumStudent(Integer numStudent) {
-            this.numStudent = numStudent;
+        public void setEnd(String end) {
+            this.end = end;
         }
 
-        public String getCourseId() {
-            return courseId;
-        }
-        public void setCourseId(String courseId) {
-            this.courseId = courseId;
+        public Boolean getRegister() {
+            return register;
         }
 
-        public String getCourseName() {
-            return courseName;
-        }
-        public void setCourseName(String courseName) {
-            this.courseName = courseName;
+        public void setRegister(Boolean register) {
+            this.register = register;
         }
 
-        public String getTeacherName() {
-            return teacherName;
-        }
-        public void setTeacherName(String teacherName) {
-            this.teacherName = teacherName;
+        public Boolean getDrop() {
+            return drop;
         }
 
-        public String getTimeSlot() {
-            return timeSlot;
-        }
-        public void setTimeSlot(String timeSlot) {
-            this.timeSlot = timeSlot;
+        public void setDrop(Boolean drop) {
+            this.drop = drop;
         }
 
-        public String getClassroom() {
-            return classroom;
-        }
-        public void setClassroom(String classroom) {
-            this.classroom = classroom;
+        public Boolean getComplement() {
+            return complement;
         }
 
-        ClassInfo(ClassEntity clazz) {
-            id = clazz.getId();
-            year = clazz.getYear();
-            semester = clazz.getSemester();
-            capacity = clazz.getCapacity();
-            numStudent = clazz.getNumStudent();
-            courseId = clazz.getCourse().getId();
-            courseName = clazz.getCourse().getName();
-            teacherName = clazz.getTeacher().getName();
-            timeSlot = "";
-            classroom = "";
-            List<TimeSlotEntity> ts = clazz.getTimeSlots();
-            Integer size = ts.size();
-            for (TimeSlotEntity t : ts) {
-                timeSlot = timeSlot.concat(t.getType().toString());
-                classroom = classroom.concat(t.getClassroom().getName());
-                if (size > 1) {
-                    timeSlot = timeSlot.concat(",");
-                    classroom = classroom.concat(",");
-                    size--;
-                }
-            }
+        public void setComplement(Boolean complement) {
+            this.complement = complement;
         }
     }
-
-    public GetClassesResponse(List<ClassEntity> classes) {
-        this.classes = new ArrayList<>();
-        for (ClassEntity clazz : classes)
-            this.classes.add(new GetClassesResponse.ClassInfo(clazz));
-    }
-
-    public List<GetClassesResponse.ClassInfo> getClasses() {
-        return this.classes;
-    }
-    */
 
     public GetSelectionTimeResponse(List<SelectionTimeEntity> timeList) {
-        this.timeList = timeList;
+        this.timeList = new ArrayList<>();
+        for (SelectionTimeEntity selectionTimeEntity : timeList) {
+            SelectionTimeInfo selectionTimeInfo = new SelectionTimeInfo(selectionTimeEntity);
+            this.timeList.add(selectionTimeInfo);
+        }
     }
 
-    public List<SelectionTimeEntity> getTimeList() {
+    public List<SelectionTimeInfo> getTimeList() {
         return timeList;
     }
 }

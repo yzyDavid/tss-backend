@@ -3,6 +3,7 @@ package tss.responses.information;
 import tss.entities.ClassEntity;
 import tss.entities.SemesterEnum;
 import tss.entities.TimeSlotEntity;
+import tss.models.TimeSlotTypeEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +80,21 @@ public class GetSelectedClassesResponse {
             this.classroom = classroom;
         }
 
+        String transferTimeSlot(TimeSlotTypeEnum timeSlotTypeEnum) {
+            String res = "";
+            switch (timeSlotTypeEnum.getDayOfWeek()) {
+                case 1: res = "周一"; break;
+                case 2: res = "周二"; break;
+                case 3: res = "周三"; break;
+                case 4: res = "周四"; break;
+                case 5: res = "周五"; break;
+                case 6: res = "周六"; break;
+                case 7: res = "周日"; break;
+            }
+            res += "第"+timeSlotTypeEnum.getStart()+"至"+timeSlotTypeEnum.getEnd()+"节";
+            return res;
+        }
+
         ClassSelectedInfo(ClassEntity clazz) {
             courseId = clazz.getCourse().getId();
             courseName = clazz.getCourse().getName();
@@ -89,7 +105,7 @@ public class GetSelectedClassesResponse {
             List<TimeSlotEntity> ts = clazz.getTimeSlots();
             Integer size = ts.size();
             for (TimeSlotEntity t : ts) {
-                timeSlot = timeSlot.concat(t.getType().toString());
+                timeSlot = timeSlot.concat(transferTimeSlot(t.getType()));
                 classroom = classroom.concat(t.getClassroom().getName());
                 if (size > 1) {
                     timeSlot = timeSlot.concat(",");
