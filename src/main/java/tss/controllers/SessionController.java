@@ -66,8 +66,8 @@ public class SessionController {
         else {
             session = new SessionEntity();
             session.setUid(login.getUid());
+            session.setToken(SessionUtils.getToken());
         }
-        session.setToken(SessionUtils.getToken());
         session.setTimestamp(Timestamp.valueOf(LocalDateTime.now()));
         sqlSessionRepository.save(session);
 

@@ -43,10 +43,6 @@ public class CourseController {
     @Authorization
     public ResponseEntity<AddCourseResponse> addCourse(@RequestBody AddCourseRequest request) {
         String cid = request.getCid();
-        if(cid == null || cid.length() != 10) {
-            return new ResponseEntity<>(new AddCourseResponse("cid must have 10 characters", cid, null,
-                    null, null, null), HttpStatus.BAD_REQUEST);
-        }
         if (courseRepository.existsById(cid)) {
             return new ResponseEntity<>(new AddCourseResponse("failed with duplicated cid", cid, null,
                     null, null, null), HttpStatus.BAD_REQUEST);
@@ -64,10 +60,6 @@ public class CourseController {
         }
         CourseEntity course = new CourseEntity();
         course.setId(request.getCid());
-        if(request.getName() == null || request.getName().length() == 0) {
-            return new ResponseEntity<>(new AddCourseResponse("Course name mustn't be empty", cid, null,
-                    null, null, null), HttpStatus.BAD_REQUEST);
-        }
         course.setName(request.getName());
         course.setCredit(request.getCredit());
         course.setNumLessonsEachWeek(request.getNumLessonsEachWeek());

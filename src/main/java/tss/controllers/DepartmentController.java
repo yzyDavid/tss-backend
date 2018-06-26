@@ -38,9 +38,6 @@ public class DepartmentController {
     @PutMapping(path = "/department/add")
     @Authorization
     public ResponseEntity<AddDepartmentResponse> addDepartment(@RequestBody AddDepartmentRequest request) {
-        if(request.getName() == null || request.getName().length() == 0) {
-            new ResponseEntity<>(new AddDepartmentResponse("Name mustn't be empty", null), HttpStatus.BAD_REQUEST);
-        }
         if (departmentRepository.existsByName(request.getName())) {
             return new ResponseEntity<>(new AddDepartmentResponse("Duplicated name", request.getName()), HttpStatus.BAD_REQUEST);
         }
@@ -128,7 +125,7 @@ public class DepartmentController {
         DepartmentEntity department = ret.get();
         if (request.getNewName() != null) {
             if(request.getNewName().length() == 0) {
-                return new ResponseEntity<>(new ModifyDepartmentResponse("Name mustn't be empty",null), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new ModifyDepartmentResponse("Name mustn't be empty string",null), HttpStatus.BAD_REQUEST);
 
             }
             department.setName(request.getNewName());
