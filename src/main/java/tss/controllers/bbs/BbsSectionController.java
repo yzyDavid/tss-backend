@@ -9,33 +9,34 @@ import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.configs.Config;
+import tss.entities.TakesEntity;
 import tss.entities.UserEntity;
 import tss.entities.bbs.BbsSectionEntity;
+import tss.entities.bbs.BbsTakeEntity;
 import tss.repositories.UserRepository;
 import tss.repositories.bbs.BbsSectionRepository;
+import tss.repositories.bbs.BbsTakeRepository;
 import tss.requests.information.bbs.AddBbsSectionRequest;
 import tss.requests.information.bbs.AddSectionNoticeRequest;
+import tss.requests.information.bbs.BbsBookRequest;
 import tss.requests.information.bbs.DeleteBbsSectionRequest;
-import tss.responses.information.bbs.AddBbsSectionResponse;
-import tss.responses.information.bbs.AddSectionNoticeResponse;
-import tss.responses.information.bbs.DeleteBbsSectionResponse;
-import tss.responses.information.bbs.GetInfoBbsSectionResponse;
+import tss.responses.information.bbs.*;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import javax.annotation.Resource;
+import java.util.*;
 
 @Controller
 @RequestMapping(path = "/section")
 public class BbsSectionController {
     private final BbsSectionRepository bbsSectionRepository;
     private final UserRepository userRepository;
+    private final BbsTakeRepository bbstakeRepository;
 
     @Autowired
-    public BbsSectionController(BbsSectionRepository bbsSectionRepository, UserRepository userRepository) {
+    public BbsSectionController(BbsSectionRepository bbsSectionRepository, UserRepository userRepository, BbsTakeRepository bbstakeRepository) {
         this.bbsSectionRepository = bbsSectionRepository;
         this.userRepository = userRepository;
+        this.bbstakeRepository = bbstakeRepository;
     }
 
     /**
@@ -138,4 +139,57 @@ public class BbsSectionController {
         return new ResponseEntity<>(new AddSectionNoticeResponse("add notice ok"), HttpStatus.OK);
     }
 
+
+    @PostMapping(path = "/book")
+    //@Authorization
+    public ResponseEntity<BbsBookResponse> bookSection(//@CurrentUser UserEntity user,
+                                                       @RequestBody BbsBookRequest request) {
+        UserEntity user = userRepository.findById("3150102242").get();
+        BbsTakeEntity take = new BbsTakeEntity();
+        take.setUid(user.getUid());
+        /* find success to do */
+        long sid = Long.valueOf(request.getBoardID());
+        take.setSid(sid);
+
+        bbstakeRepository.save(take);
+        return new ResponseEntity<>(new BbsBookResponse("book ok"), HttpStatus.OK);
+    }
+
+
+    @PostMapping(path = "/unbook")
+    //@Authorization
+    public ResponseEntity<BbsBookResponse> unbookSection(//@CurrentUser UserEntity user,
+                                                         @RequestBody BbsBookRequest request){
+        UserEntity user = userRepository.findById("315012242").get();
+
+        Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(Long.valueOf(request.getBoardID()));
+        if(!ret.isPresent()) {
+            return new ResponseEntity<>(new BbsBookResponse("no such section!"), HttpStatus.BAD_REQUEST);
+        }
+        String uid = user.getUid();
+        Long sid = ret.get().getId();
+
+        BbsTakeEntity take = bbstakeRepository.findByUidAndSid(uid, sid).get();
+        bbstakeRepository.delete(take);
+        return new ResponseEntity<>(new BbsBookResponse("book ok"), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/showbook")
+    //@Authorization
+    public ResponseEntity<BbsShowBookResponse> showBookSection(//@CurrentUser UserEntity use
+                                                                ){
+        UserEntity user = userRepository.findById("3150102242").get();
+
+        String uid = user.getUid();
+
+        Set<BbsTakeEntity> takes = bbstakeRepository.findByUid(uid);
+        List<String> boardNames = new ArrayList<>();
+        List<String> boardIDs = new ArrayList<>();
+
+        for(BbsTakeEntity t : takes){
+            boardNames.add(bbsSectionRepository.findById(t.getSid()).get().getName());
+            boardIDs.add(String.valueOf(t.getSid()));
+        }
+        return new ResponseEntity<>(new BbsShowBookResponse(boardNames, boardIDs), HttpStatus.OK);
+    }
 }

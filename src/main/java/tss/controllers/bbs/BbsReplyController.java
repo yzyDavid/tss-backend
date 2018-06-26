@@ -60,7 +60,7 @@ public class BbsReplyController {
         BbsReplyEntity reply = new BbsReplyEntity();
 
         // FIXME
-        UserEntity user = userRepository.findById("3150102222").get();
+        UserEntity user = userRepository.findById("3150102242").get();
 
         reply.setAuthor(user);
         reply.setBelongedTopic(topic);
@@ -286,7 +286,7 @@ public class BbsReplyController {
     @GetMapping(path = "/unread")
     // @Authorization
     public ResponseEntity<CountUnreadResponse> countUnread() {
-        UserEntity user = userRepository.findById("3150104800").get();
+        UserEntity user = userRepository.findById("3150102242").get();
 
         Integer unMeg = 0;
         Integer unReply = 0;
@@ -317,7 +317,7 @@ public class BbsReplyController {
     //@Authorization
     public ResponseEntity<ShowReplytoMeResponse> showReplytoMe(//@CurrentUser UserEntity user,
                                                                @RequestBody ShowReplytoMeRequest request) {
-        UserEntity user = userRepository.findById("3150104800").get();
+        UserEntity user = userRepository.findById("3150102242").get();
 
         String currentPage = request.getPage();
         String totalPage;

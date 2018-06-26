@@ -204,7 +204,7 @@ public class BbsSearchController {
 
         Optional<List<BbsTopicEntity>> ret = bbsTopicRepository.findByAuthor(user);
         if (!ret.isPresent()) {
-            return new ResponseEntity<>(new SearchTopicPublishedByUidResponse(null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new SearchTopicPublishedByUidResponse(user.getName(), request.getPage(), null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
         }
 
         List<BbsTopicEntity> topics = ret.get();

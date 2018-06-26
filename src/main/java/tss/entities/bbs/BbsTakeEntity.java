@@ -6,19 +6,21 @@ import javax.persistence.*;
 @Entity
 @Table(name = "bbstake")
 public class BbsTakeEntity {
-    private String id;
+    private Integer tid;
     private String uid;
     private long sid;
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public String getId() {
-        return id;
+    public Integer getTid() {
+        return tid;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setTid(Integer tid) {
+        this.tid = tid;
     }
+
 
     @Column(name = "user_id")
     public String getUid() {
