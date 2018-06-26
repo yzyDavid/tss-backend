@@ -85,15 +85,24 @@ public class UserController {
 
         for (int i = 0; i < uids.length; i++) {
             UserEntity user = users[i] = new UserEntity();
+            if(uids[i] == null || uids[i].length() != 10) {
+                return new ResponseEntity<>(new AddUserResponse("Uid must have 10 characters", uids[i], names[i], genders[i], type), HttpStatus.BAD_REQUEST);
+            }
             user.setUid(uids[i]);
+            if(names[i] == null || names[i].length() == 0) {
+                return new ResponseEntity<>(new AddUserResponse("Name mustn't be empty", uids[i], names[i], genders[i], type), HttpStatus.BAD_REQUEST);
+            }
             user.setName(names[i]);
             String salt = getSalt();
             user.setSalt(salt);
-            String password = null;
+            String password;
             if (passwords[i] != null) {
                 password = passwords[i];
             } else {
                 password = Config.INIT_PWD;
+            }
+            if(password.length() < 6) {
+                return new ResponseEntity<>(new AddUserResponse("password must have at least 6 characters", uids[i], names[i], genders[i], type), HttpStatus.BAD_REQUEST);
             }
             String hashedPassword = getHashedPasswordByPasswordAndSalt(password, salt);
             user.setHashedPassword(hashedPassword);
@@ -103,6 +112,9 @@ public class UserController {
                     return new ResponseEntity<>(new AddUserResponse("No such user type", uids[i], names[i], genders[i], type), HttpStatus.BAD_REQUEST);
                 }
                 user.setType(typeGroup.get());
+            }
+            if(!genders[i].equals("男") && !genders[i].equals("女")) {
+                return new ResponseEntity<>(new AddUserResponse("No such gender", uids[i], names[i], genders[i], type), HttpStatus.BAD_REQUEST);
             }
             user.setGender(genders[i]);
             user.setYear(year);
@@ -151,7 +163,9 @@ public class UserController {
         String name = user.getName();
         if (!user.getHashedPassword().equals(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getOldPwd(), user.getSalt()))) {
             return new ResponseEntity<>(new ModifyPwdResponse("incorrect password", user.getUid(), name), HttpStatus.UNAUTHORIZED);
-
+        }
+        else if(request.getNewPwd().length() < 6) {
+            return new ResponseEntity<>(new ModifyPwdResponse("password must have at least 6 characters", user.getUid(), name), HttpStatus.UNAUTHORIZED);
         }
         user.setHashedPassword(SecurityUtils.getHashedPasswordByPasswordAndSalt(request.getNewPwd(), user.getSalt()));
         userRepository.save(user);
