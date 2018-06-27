@@ -116,19 +116,15 @@ public class DepartmentController {
         if (!department.isPresent()) {
             return new ResponseEntity<>(new DeleteDepartmentResponse("Non-exist department", request.getName()), HttpStatus.BAD_REQUEST);
         }
-        Set<UserEntity> users = department.get().getUsers();
-        for (UserEntity user : users) {
-            user.setDepartment(null);
-            user.setMajorClass(null);
+        else if(department.get().getMajors().size() > 0) {
+            return new ResponseEntity<>(new DeleteDepartmentResponse("Department still has majors", request.getName()), HttpStatus.BAD_REQUEST);
         }
-        userRepository.saveAll(users);
-
-        Set<CourseEntity> courses = department.get().getCourses();
-        for (CourseEntity course : courses) {
-            course.setDepartment(null);
+        else if(department.get().getUsers().size() > 0) {
+            return new ResponseEntity<>(new DeleteDepartmentResponse("Department still has teachers or students", request.getName()), HttpStatus.BAD_REQUEST);
         }
-        courseRepository.saveAll(courses);
-
+        else if(department.get().getCourses().size() > 0) {
+            return new ResponseEntity<>(new DeleteDepartmentResponse("Department still has courses", request.getName()), HttpStatus.BAD_REQUEST);
+        }
         departmentRepository.delete(department.get());
         return new ResponseEntity<>(new DeleteDepartmentResponse("ok", request.getName()), HttpStatus.OK);
     }
@@ -204,10 +200,15 @@ public class DepartmentController {
 
     @DeleteMapping(path = "/major/delete")
     @Authorization
+    @Transactional(rollbackFor = {})
     public ResponseEntity<DeleteMajorResponse> deleteMajor(@RequestBody DeleteMajorRequest request) {
         Optional<MajorEntity> major = majorRepository.findByName(request.getName());
         if (!major.isPresent()) {
             return new ResponseEntity<>(new DeleteMajorResponse("Non-exist major", request.getName()), HttpStatus.BAD_REQUEST);
+        }
+        else if(major.get().getClasses().size() > 0) {
+            return new ResponseEntity<>(new DeleteMajorResponse("Major still has classes", request.getName()), HttpStatus.BAD_REQUEST);
+
         }
         majorRepository.delete(major.get());
         return new ResponseEntity<>(new DeleteMajorResponse("ok", request.getName()), HttpStatus.OK);
@@ -334,18 +335,16 @@ public class DepartmentController {
 
     @DeleteMapping(path = "/class/delete")
     @Authorization
+    @Transactional(rollbackFor = {})
     public ResponseEntity<DeleteMajorClassResponse> deleteMajorClass(@RequestBody DeleteMajorClassRequest request) {
         Optional<MajorClassEntity> majorClass = majorClassRepository.findByName(request.getName());
         if (!majorClass.isPresent()) {
             return new ResponseEntity<>(new DeleteMajorClassResponse("Non-exist class", null), HttpStatus.BAD_REQUEST);
         }
+        else if(majorClass.get().getStudents().size() > 0) {
+            return new ResponseEntity<>(new DeleteMajorClassResponse("Class still has students", null), HttpStatus.BAD_REQUEST);
 
-        Set<UserEntity> users = majorClass.get().getStudents();
-        for (UserEntity user : users) {
-            user.setDepartment(null);
-            user.setMajorClass(null);
         }
-        userRepository.saveAll(users);
 
         majorClassRepository.delete(majorClass.get());
         return new ResponseEntity<>(new DeleteMajorClassResponse("ok", request.getName()), HttpStatus.OK);
