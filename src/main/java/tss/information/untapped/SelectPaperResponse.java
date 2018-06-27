@@ -15,6 +15,7 @@ public class SelectPaperResponse {
     public String getStatus() {
         return status;
     }
+
     public PaperResponseStruct getPaperInfo() {
         return paperInfo;
     }

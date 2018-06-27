@@ -5,5 +5,6 @@ public enum ClassStatusEnum {
      * @author ljh
      */
 
-    NOT_SELECTED, REGISTERED, SELECTED, FINISHED;
+    /*CONFIRMED, */
+    NOT_SELECTED, SELECTED, FINISHED, FAILED, NOT_IN_PROGRAM;
 }

@@ -96,7 +96,7 @@ public class BbsRetrieveController {
 
         List<BbsRetrieveEntity> messages = bbsRetrieveRepository.findByReceiver(user);
 
-        String totalPage = String.valueOf(messages.size()/20+1);
+        String totalPage = String.valueOf(messages.size() / 20 + 1);
 
         List<String> destinations = new ArrayList<>();
         List<String> titles = new ArrayList<>();
@@ -107,7 +107,7 @@ public class BbsRetrieveController {
         List<String> letterIDs = new ArrayList<>();
 
         int count = 0;
-        for(BbsRetrieveEntity mess : messages){
+        for (BbsRetrieveEntity mess : messages) {
             count++;
             if (count < (Integer.valueOf(currentPage) - 1) * 10 + 1) {
                 continue;
@@ -138,14 +138,14 @@ public class BbsRetrieveController {
     @PostMapping(path = "/outbox")
     //@Authorization
     public ResponseEntity<CheckOutBoxResponse> checkOutBox(//@CurrentUser UserEntity user,
-                                                           @RequestBody CheckOutBoxRequest request){
+                                                           @RequestBody CheckOutBoxRequest request) {
         String currentPage = request.getPage();
 
         UserEntity user = userRepository.findById("3150102242").get();
 
         List<BbsRetrieveEntity> messages = bbsRetrieveRepository.findBySender(user);
 
-        String totalPage = String.valueOf(messages.size()/20+1);
+        String totalPage = String.valueOf(messages.size() / 20 + 1);
 
         List<String> destinations = new ArrayList<>();
         List<String> titles = new ArrayList<>();
@@ -155,7 +155,7 @@ public class BbsRetrieveController {
 
 
         int count = 0;
-        for(BbsRetrieveEntity mess : messages){
+        for (BbsRetrieveEntity mess : messages) {
             count++;
             if (count < (Integer.valueOf(currentPage) - 1) * 10 + 1) {
                 continue;

@@ -4,6 +4,7 @@ import org.springframework.data.repository.CrudRepository;
 import tss.entities.UserEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author yzy
@@ -16,7 +17,10 @@ public interface UserRepository extends CrudRepository<UserEntity, String> {
      */
     List<UserEntity> findByName(String name);
 
+    Optional<UserEntity> findByUid(String uid);
+
     List<UserEntity> findByNameAndType_Name(String name, String typeName);
+
     List<UserEntity> findByNameLikeAndType_Name(String name, String typeName);
 
 }

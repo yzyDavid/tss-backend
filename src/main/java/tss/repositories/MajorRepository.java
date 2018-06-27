@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface MajorRepository extends CrudRepository<MajorEntity, Short> {
     boolean existsByName(String name);
+
     Optional<MajorEntity> findByName(String name);
 }

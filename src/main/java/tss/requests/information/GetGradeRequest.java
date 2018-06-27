@@ -4,7 +4,9 @@ package tss.requests.information;
 
 public class GetGradeRequest {
 
-    public enum QueryType {SID,PID, QTYPE, QUNIT};
+    public enum QueryType {SID, PID, QTYPE, QUNIT}
+
+    ;
     private QueryType type;
     private String sid;
     private String pid;
@@ -12,10 +14,10 @@ public class GetGradeRequest {
     private String qunit;
 
 
-
     public QueryType getType() {
         return type;
     }
+
     public void setType(QueryType type) {
         this.type = type;
     }
@@ -31,6 +33,7 @@ public class GetGradeRequest {
     public String getPid() {
         return pid;
     }
+
     public void setPid(String pid) {
         this.pid = pid;
     }
@@ -38,6 +41,7 @@ public class GetGradeRequest {
     public String getQtype() {
         return qtype;
     }
+
     public void setQtype(String qType) {
         this.qtype = qType;
     }
@@ -45,6 +49,7 @@ public class GetGradeRequest {
     public String getQunit() {
         return qunit;
     }
+
     public void setQunit(String qUnit) {
         this.qunit = qUnit;
     }

@@ -85,11 +85,19 @@ public class AddPaperRequest {
         this.score = score;
     }
 
-    public String getPunit() {return punit; }
+    public String getPunit() {
+        return punit;
+    }
 
-    public void setPunit(String punit) {this.punit = punit;}
+    public void setPunit(String punit) {
+        this.punit = punit;
+    }
 
-    public String getPcount() {return pcount; }
+    public String getPcount() {
+        return pcount;
+    }
 
-    public void setPcount(String pcount) {this.pcount = pcount; }
+    public void setPcount(String pcount) {
+        this.pcount = pcount;
+    }
 }

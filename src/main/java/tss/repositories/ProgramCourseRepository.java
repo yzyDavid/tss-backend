@@ -3,9 +3,9 @@ package tss.repositories;
 import org.springframework.data.repository.CrudRepository;
 import tss.entities.CourseEntity;
 import tss.entities.ProgramCourseEntity;
-import tss.entities.ProgramEntity;
 import tss.entities.UserEntity;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,8 +15,13 @@ import java.util.Optional;
 
 public interface ProgramCourseRepository extends CrudRepository<ProgramCourseEntity, Short> {
     boolean existsByCourse(CourseEntity course);
-    boolean existsByProgram(ProgramEntity program);
+
+    boolean existsByStudent(UserEntity student);
+
+    boolean existsByCourseAndStudent(CourseEntity course, UserEntity student);
+
     List<CourseEntity> findById(Integer pid);
-    Optional<ProgramCourseEntity> findByCourseAndProgram(CourseEntity course, ProgramEntity program);
+
+    Optional<ProgramCourseEntity> findByCourseAndStudent(CourseEntity course, UserEntity student);
 
 }

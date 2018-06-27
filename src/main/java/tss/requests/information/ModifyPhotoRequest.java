@@ -3,22 +3,13 @@ package tss.requests.information;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ModifyPhotoRequest {
-    private String uid;
-    private MultipartFile file;
+    private byte[] file;
 
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public MultipartFile getFile() {
+    public byte[] getFile() {
         return file;
     }
 
-    public void setFile(MultipartFile file) {
+    public void setFile(byte[] file) {
         this.file = file;
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class GetAllClassResponse {
     private String status;
-    List<String> courses_name=new ArrayList<>();
+    List<String> courses_name = new ArrayList<>();
     List<Long> class_id = new ArrayList<>();
 
     public GetAllClassResponse(String status) {

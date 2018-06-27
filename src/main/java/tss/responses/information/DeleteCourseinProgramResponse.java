@@ -9,8 +9,7 @@ public class DeleteCourseinProgramResponse {
     private final String cname;
     private final String uid;
 
-    public DeleteCourseinProgramResponse(String status, String cid, String cname, String uid)
-    {
+    public DeleteCourseinProgramResponse(String status, String cid, String cname, String uid) {
         this.status = status;
         this.cid = cid;
         this.cname = cname;

@@ -3,6 +3,7 @@ package tss.entities;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Mingqi Yi
@@ -23,6 +24,10 @@ public class CourseEntity {
     private MajorEntity major;
     private DepartmentEntity department;
     private List<ClassEntity> classes = new ArrayList<>();
+
+    private Set<MajorEntity> majorCompulsory;
+    private Set<MajorEntity> majorSelective;
+    private Set<MajorEntity> majorPublic;
 
     @Id
     @Column(name = "id", length = 10)
@@ -105,6 +110,33 @@ public class CourseEntity {
 
     public void setMajor(MajorEntity major) {
         this.major = major;
+    }
+
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "setOfCompulsory")
+    public Set<MajorEntity> getMajorCompulsory() {
+        return majorCompulsory;
+    }
+
+    public void setMajorCompulsory(Set<MajorEntity> majorCompulsory) {
+        this.majorCompulsory = majorCompulsory;
+    }
+
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "setOfSelective")
+    public Set<MajorEntity> getMajorSelective() {
+        return majorSelective;
+    }
+
+    public void setMajorSelective(Set<MajorEntity> majorSelective) {
+        this.majorSelective = majorSelective;
+    }
+
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "setOfPublic")
+    public Set<MajorEntity> getMajorPublic() {
+        return majorPublic;
+    }
+
+    public void setMajorPublic(Set<MajorEntity> majorPublic) {
+        this.majorPublic = majorPublic;
     }
 
     @Override

@@ -14,13 +14,16 @@ public class GetCoursesResponse {
         private Float credit;
         private String brief;
 
-        CourseInfo() {}
+        CourseInfo() {
+        }
+
         CourseInfo(String cid, String name, Float credit, String brief) {
             this.cid = cid;
             this.name = name;
             this.credit = credit;
             this.brief = brief;
         }
+
         CourseInfo(CourseEntity course) {
             this.cid = course.getId();
             this.name = course.getName();
@@ -31,23 +34,31 @@ public class GetCoursesResponse {
         public void setCid(String cid) {
             this.cid = cid;
         }
+
         public void setName(String name) {
             this.name = name;
         }
+
         public void setCredit(Float credit) {
             this.credit = credit;
         }
-        public void setBrief(String brief) { this.brief = brief; }
+
+        public void setBrief(String brief) {
+            this.brief = brief;
+        }
 
         public String getCid() {
             return cid;
         }
+
         public String getName() {
             return name;
         }
+
         public Float getCredit() {
             return credit;
         }
+
         public String getBrief() {
             return brief;
         }
@@ -55,8 +66,9 @@ public class GetCoursesResponse {
 
     public GetCoursesResponse(List<CourseEntity> courses) {
         this.courses = new ArrayList<>();
-        for (CourseEntity clazz : courses)
+        for (CourseEntity clazz : courses) {
             this.courses.add(new CourseInfo(clazz));
+        }
     }
 
     public List<CourseInfo> getCourses() {

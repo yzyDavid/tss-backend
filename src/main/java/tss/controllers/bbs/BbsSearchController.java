@@ -49,7 +49,8 @@ public class BbsSearchController {
         this.userRepository = userRepository;
     }
 
-    /** match String function
+    /**
+     * match String function
      */
     private static boolean contentMatch(String key, String content) {
         int match = 0;

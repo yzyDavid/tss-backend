@@ -3,7 +3,8 @@ package tss.responses.information;
 import org.jetbrains.annotations.Nls;
 
 public class AddUsersToMajorClassResponse {
-    @Nls private final String status;
+    @Nls
+    private final String status;
     private final String majorClass;
     private final String uid;
 

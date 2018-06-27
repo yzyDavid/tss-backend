@@ -4,9 +4,9 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "Results")
-      //  @Index(name = "StudentID_Index", columnList = "StudentID"),
-       // @Index(name = "PaperID_Index", columnList = "PaperID"),
-       // @Index(name = "QuestionID_Index", columnList = "QuestionID"),
+//  @Index(name = "StudentID_Index", columnList = "StudentID"),
+// @Index(name = "PaperID_Index", columnList = "PaperID"),
+// @Index(name = "QuestionID_Index", columnList = "QuestionID"),
 
 public class ResultEntity {
 
@@ -112,8 +112,6 @@ public class ResultEntity {
         Ans = ans;
     }
 */
-
-
 
 
 }

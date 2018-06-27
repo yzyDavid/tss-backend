@@ -10,7 +10,7 @@ public class RandomSet {
             System.out.println("Not enough num.");
             return;
         }
-        while(set.size() < n){
+        while (set.size() < n) {
             // 调用Math.random()方法
             int num = (int) (Math.random() * (max - min + 0.4)) + min;      //防止因为random达不到1而造成无法取得max
             set.add(num);// 将不同的数存入HashSet中

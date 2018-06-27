@@ -7,7 +7,7 @@ import java.util.Set;
 @Entity
 @Table(name = "paper")
 
-public class PapersEntity{
+public class PapersEntity {
     private String pid;
     private String begin;
     private String end;
@@ -33,9 +33,13 @@ public class PapersEntity{
 
 
     @Column(name = "paper_begin")
-    public String getBegin() { return begin; }
+    public String getBegin() {
+        return begin;
+    }
 
-    public void setBegin(String begin) { this.begin = begin;}
+    public void setBegin(String begin) {
+        this.begin = begin;
+    }
 
     @Column(name = "paper_end")
     public String getEnd() {
@@ -47,27 +51,40 @@ public class PapersEntity{
     }
 
     @Column(name = "paper_last")
-    public String getLast(){return last;}
-
-    public void setLast(String last){this.last = last;}
-
-    @Column(name = "paper_count")
-    public  String getCount(){
-        return  count;
+    public String getLast() {
+        return last;
     }
 
-    public void setCount(String count){
+    public void setLast(String last) {
+        this.last = last;
+    }
+
+    @Column(name = "paper_count")
+    public String getCount() {
+        return count;
+    }
+
+    public void setCount(String count) {
         this.count = count;
     }
 
     @Column(name = "paper_papername")
-    public String getPapername(){return papername;}
+    public String getPapername() {
+        return papername;
+    }
 
-    public void setPapername(String papername){this.papername = papername;}
+    public void setPapername(String papername) {
+        this.papername = papername;
+    }
 
     @Column(name = "paper_isauto")
-    public boolean getIsauto(){return isauto;}
-    public void setIsauto(boolean isauto){this.isauto = isauto;}
+    public boolean getIsauto() {
+        return isauto;
+    }
+
+    public void setIsauto(boolean isauto) {
+        this.isauto = isauto;
+    }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "paper")
     public Set<PaperContainsQuestionEntity> getPaperquestion() {
@@ -77,8 +94,6 @@ public class PapersEntity{
     public void setPaperquestion(Set<PaperContainsQuestionEntity> paperquestion) {
         this.paperquestion = paperquestion;
     }
-
-
 
 
     /*

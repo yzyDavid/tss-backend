@@ -5,10 +5,10 @@ import org.jetbrains.annotations.Nls;
 public class DeleteResultResponse {
 
     @Nls
-    private  final String status;
+    private final String status;
 
-    public  DeleteResultResponse(String status) {
-        this.status= status;
+    public DeleteResultResponse(String status) {
+        this.status = status;
     }
 
     public String getStatus() {

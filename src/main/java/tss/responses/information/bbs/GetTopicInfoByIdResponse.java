@@ -16,7 +16,7 @@ public class GetTopicInfoByIdResponse {
     private final int replyNum;
 
     public GetTopicInfoByIdResponse(String status, long id, String name, String content,
-                                    Date time, String authorName, String sectionName, int replyNum){
+                                    Date time, String authorName, String sectionName, int replyNum) {
         this.status = status;
         this.id = id;
         this.name = name;
