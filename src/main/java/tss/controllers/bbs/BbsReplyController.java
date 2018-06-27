@@ -1,6 +1,5 @@
 package tss.controllers.bbs;
 
-import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,7 +17,6 @@ import tss.repositories.bbs.BbsTopicRepository;
 import tss.requests.information.bbs.*;
 import tss.responses.information.bbs.*;
 
-import javax.persistence.Column;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -45,8 +43,8 @@ public class BbsReplyController {
      * v1.0, done
      */
     @PostMapping(path = "/add")
-    //@Authorization
-    public ResponseEntity<AddBbsReplyResponse> addReply(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<AddBbsReplyResponse> addReply(@CurrentUser UserEntity user,
                                                         @RequestBody AddBbsReplyRequest request) {
         /* permission error & invalid topic id error */
         long topicId = Long.valueOf(request.getTid());
@@ -59,8 +57,6 @@ public class BbsReplyController {
 
         BbsReplyEntity reply = new BbsReplyEntity();
 
-        // FIXME
-        UserEntity user = userRepository.findById("3150102242").get();
 
         reply.setAuthor(user);
         reply.setBelongedTopic(topic);
@@ -179,9 +175,7 @@ public class BbsReplyController {
      * v1.0, done
      */
     @PostMapping(path = "/info")
-    //@Authorization
-    public ResponseEntity<GetAllReplyResponse> getAllReplyInfo(//@CurrentUser UserEntity user,
-                                                               @RequestBody GetAllReplyRequest request) {
+    public ResponseEntity<GetAllReplyResponse> getAllReplyInfo(@RequestBody GetAllReplyRequest request) {
         Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTid()));
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
@@ -261,8 +255,8 @@ public class BbsReplyController {
      * v1.0, done
      */
     @PostMapping(path = "/confirm")
-    //@Authorization
-    public ResponseEntity<ConfirmReplyReadResponse> confirmReplyRead(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<ConfirmReplyReadResponse> confirmReplyRead(@CurrentUser UserEntity user,
                                                                      @RequestBody ConfirmReplyReadRequest request) {
         Integer index = Integer.valueOf(request.getReplyPos());
         BbsTopicEntity topic = bbsTopicRepository.findById(Long.valueOf(request.getTopicID())).get();
@@ -284,10 +278,8 @@ public class BbsReplyController {
      * v1.0, done
      */
     @GetMapping(path = "/unread")
-    // @Authorization
-    public ResponseEntity<CountUnreadResponse> countUnread() {
-        UserEntity user = userRepository.findById("3150102242").get();
-
+    @Authorization
+    public ResponseEntity<CountUnreadResponse> countUnread(@CurrentUser UserEntity user) {
         Integer unMeg = 0;
         Integer unReply = 0;
 
@@ -314,11 +306,9 @@ public class BbsReplyController {
 
 
     @PostMapping(path = "/show")
-    //@Authorization
-    public ResponseEntity<ShowReplytoMeResponse> showReplytoMe(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<ShowReplytoMeResponse> showReplytoMe(@CurrentUser UserEntity user,
                                                                @RequestBody ShowReplytoMeRequest request) {
-        UserEntity user = userRepository.findById("3150102242").get();
-
         String currentPage = request.getPage();
         String totalPage;
         List<String> times = new ArrayList<>();

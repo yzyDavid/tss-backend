@@ -69,7 +69,8 @@ public class BbsTopicController {
      * FIXME
      */
     @PostMapping(path = "/add")
-    public ResponseEntity<AddBbsTopicResponse> addBbsTopic(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<AddBbsTopicResponse> addBbsTopic(@CurrentUser UserEntity user,
                                                            @RequestBody AddBbsTopicRequest request) {
         /*
          * invalid section id error
@@ -81,9 +82,6 @@ public class BbsTopicController {
         }
 
         BbsTopicEntity topic = new BbsTopicEntity();
-
-        /* FIXME */
-        UserEntity user = userRepository.findById("3150102242").get();
 
 
         topic.setAuthor(user);
@@ -118,8 +116,8 @@ public class BbsTopicController {
      * TODO check permission
      */
     @PostMapping(path = "/delete")
-    //@Authorization
-    public ResponseEntity<DeleteBbsTopicResponse> deleteBbsTopic(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<DeleteBbsTopicResponse> deleteBbsTopic(@CurrentUser UserEntity user,
                                                                  @RequestBody DeleteBbsTopicRequest request) {
         /* invalid topic id error */
         Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTopicID()));
@@ -180,10 +178,9 @@ public class BbsTopicController {
      * v1.0, done
      */
     @GetMapping(path = "/published")
-    public ResponseEntity<GetUserPublishedResponse> getUserPublished(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<GetUserPublishedResponse> getUserPublished(@CurrentUser UserEntity user,
                                                                      @RequestParam String page) {
-
-        UserEntity user = userRepository.findById("3150102242").get();
         Optional<List<BbsTopicEntity>> ret = bbsTopicRepository.findByAuthor(user);
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetUserPublishedResponse(null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
@@ -230,11 +227,9 @@ public class BbsTopicController {
      * v1.0, done
      */
     @PostMapping(path = "/topinfo")
-    //@Authorization
-    public ResponseEntity<GetAllTopicsPublicResponse> getAllTopTopics(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<GetAllTopicsPublicResponse> getAllTopTopics(@CurrentUser UserEntity user,
                                                                       @RequestBody GetAllTopicsPublicRequest request) {
-        UserEntity user = userRepository.findById("3150102242").get();
-
         /* haven't deal with not found situation */
         Optional<BbsSectionEntity> sret = bbsSectionRepository.findById(Long.valueOf(request.getBoardID()));
 
@@ -244,18 +239,6 @@ public class BbsTopicController {
 
         BbsSectionEntity section = sret.get();
         String watched = "false";
-        Set<BbsTakeEntity> takes = bbsTakeRepository.findByUid(user.getUid());
-        for (BbsTakeEntity t : takes) {
-            if (t.getSid() == section.getId()) {
-                watched = "true";
-            }
-        }
-
-        if (bbsTakeRepository.findByUidAndSid(user.getUid(), section.getId()).isPresent()) {
-            watched = "true";
-        } else {
-            watched = "false";
-        }
 
         String boardName = section.getName();
         String boardID = String.valueOf(section.getId());
@@ -292,7 +275,8 @@ public class BbsTopicController {
      * v1.0, done
      */
     @PostMapping(path = "/info")
-    public ResponseEntity<GetAllNotTopTopicsResponse> getAllNotTopTopics(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<GetAllNotTopTopicsResponse> getAllNotTopTopics(@CurrentUser UserEntity user,
                                                                          @RequestBody GetAllNotTopTopicsRequest request) {
         /* haven't deal with not found situation */
         Optional<BbsSectionEntity> sret = bbsSectionRepository.findById(Long.valueOf(request.getBoardID()));
@@ -349,8 +333,8 @@ public class BbsTopicController {
      * v1.0,
      */
     @PostMapping(path = "/settop")
-    //@Authorization
-    public ResponseEntity<SetTopicTopResponse> setTopicTop(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<SetTopicTopResponse> setTopicTop(@CurrentUser UserEntity user,
                                                            @RequestBody SetTopicTopRequest request) {
         /* invalid topic id error */
         Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTopicID()));
@@ -372,8 +356,8 @@ public class BbsTopicController {
 
 
     @PostMapping(path = "/setntop")
-    //@Authorization
-    public ResponseEntity<SetTopicNotTopResponse> setTopicNotTop(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<SetTopicNotTopResponse> setTopicNotTop(@CurrentUser UserEntity user,
                                                                  @RequestBody SetTopicNotTopRequest request) {
         /* invalid topic id error */
         Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTopicID()));

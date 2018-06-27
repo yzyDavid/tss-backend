@@ -71,8 +71,6 @@ public class BbsSectionController {
         long id = request.getId();
         Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(id);
 
-        /* permission error */
-        // TODO
 
         /* no such section with request id */
         if (!ret.isPresent()) {
@@ -119,8 +117,8 @@ public class BbsSectionController {
      * v1.0, done
      */
     @PostMapping(path = "/addnotice")
-    //@Authorization
-    public ResponseEntity<AddSectionNoticeResponse> addSectionNotice(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<AddSectionNoticeResponse> addSectionNotice(@CurrentUser UserEntity user,
                                                                      @RequestBody AddSectionNoticeRequest request) {
         Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(Long.valueOf(request.getBoardID()));
         if (!ret.isPresent()) {
@@ -141,10 +139,9 @@ public class BbsSectionController {
 
 
     @PostMapping(path = "/book")
-    //@Authorization
-    public ResponseEntity<BbsBookResponse> bookSection(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<BbsBookResponse> bookSection(@CurrentUser UserEntity user,
                                                        @RequestBody BbsBookRequest request) {
-        UserEntity user = userRepository.findById("3150102242").get();
         BbsTakeEntity take = new BbsTakeEntity();
         take.setUid(user.getUid());
         /* find success to do */
@@ -157,11 +154,9 @@ public class BbsSectionController {
 
 
     @PostMapping(path = "/unbook")
-    //@Authorization
-    public ResponseEntity<BbsBookResponse> unbookSection(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<BbsBookResponse> unbookSection(@CurrentUser UserEntity user,
                                                          @RequestBody BbsBookRequest request){
-        UserEntity user = userRepository.findById("315012242").get();
-
         Optional<BbsSectionEntity> ret = bbsSectionRepository.findById(Long.valueOf(request.getBoardID()));
         if(!ret.isPresent()) {
             return new ResponseEntity<>(new BbsBookResponse("no such section!"), HttpStatus.BAD_REQUEST);
@@ -175,11 +170,8 @@ public class BbsSectionController {
     }
 
     @GetMapping(path = "/showbook")
-    //@Authorization
-    public ResponseEntity<BbsShowBookResponse> showBookSection(//@CurrentUser UserEntity use
-                                                                ){
-        UserEntity user = userRepository.findById("3150102242").get();
-
+    @Authorization
+    public ResponseEntity<BbsShowBookResponse> showBookSection(@CurrentUser UserEntity user){
         String uid = user.getUid();
 
         Set<BbsTakeEntity> takes = bbstakeRepository.findByUid(uid);
