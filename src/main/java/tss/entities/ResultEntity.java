@@ -2,6 +2,10 @@ package tss.entities;
 
 import javax.persistence.*;
 
+/**
+ * @author yzy
+ *  TODO: AutoInc PRI key
+ */
 @Entity
 @Table(name = "Results")
 //  @Index(name = "StudentID_Index", columnList = "StudentID"),

@@ -2,6 +2,9 @@ package tss.entities;
 
 import javax.persistence.*;
 
+/**
+ * @author yzy
+ */
 @Entity
 @Table(name = "contains", indexes = {
         @Index(name = "paper_pid_index", columnList = "paper_pid"),

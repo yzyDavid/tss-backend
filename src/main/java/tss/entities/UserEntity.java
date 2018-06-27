@@ -21,6 +21,9 @@ import java.util.Set;
         }
 )
 public class UserEntity {
+    /**
+     * NO GeneratedValue Annotation for this type.
+     */
     @Id
     @Column(name = "user_id", length = 10)
     private String uid;

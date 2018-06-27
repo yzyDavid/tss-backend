@@ -52,9 +52,6 @@ public class InitController {
 
     @GetMapping
     public ResponseEntity run() throws Exception {
-        ResourceBundle bundle = ResourceBundle.getBundle("application");
-        String ddlAuto = bundle.getString("spring.jpa.hibernate.ddl-auto");
-
         initRole();
 
         String uid = "0000000000";

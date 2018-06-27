@@ -4,6 +4,10 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * @author yzy
+ *  TODO: AutoInc PRI key
+ */
 @Entity
 @Table(name = "paper")
 

@@ -10,6 +10,6 @@ source course.sql;
 source class.sql;
 source program_course.sql;
 source class_registration.sql;
-source time_slot.sql;
+source time_slot_less.sql;
 source testsys.sql;
 source question.sql;
