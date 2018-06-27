@@ -321,7 +321,13 @@ public class UserController {
             }
             typeId = type.get().getId();
         }
-        List<UserEntity> ret = queryService.queryUsers(request.getUid(), request.getName(), departmentId, typeId);
+
+        String uidLike = (request.getUid() != null) ? "%" + request.getUid() + "%" : "%";
+        String nameLike = (request.getName() != null) ? "%" + request.getName() + "%" : "%";
+        List<UserEntity> ret = userRepository.findByUidLikeAndNameLike(uidLike, nameLike);
+
+
+        // List<UserEntity> ret = queryService.queryUsers(request.getUid(), request.getName(), departmentId, typeId);
         List<String> uids = new ArrayList<>();
 
         List<String> names = new ArrayList<>();
@@ -330,7 +336,12 @@ public class UserController {
         List<String> types = new ArrayList<>();
         List<Integer> years = new ArrayList<>();
         for (UserEntity user : ret) {
-            user = userRepository.findById(user.getUid()).get();
+            DepartmentEntity dept = user.getDepartment();
+            TypeGroupEntity type = user.getType();
+            if ((departmentId != null && (dept == null || dept.getId() != departmentId)) ||
+                    (typeId != null && (type == null || type.getId().equals(typeId)))) {
+                continue;
+            }
             uids.add(user.getUid());
             names.add(user.getName());
             depts.add(user.readDepartmentName());
@@ -395,7 +406,7 @@ public class UserController {
                     if (fin != null) {
                         fin.close();
                     }
-                    if(stream != null) {
+                    if (stream != null) {
                         stream.close();
                     }
                 } catch (IOException e) {

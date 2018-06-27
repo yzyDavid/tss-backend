@@ -7,10 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
-import tss.entities.DepartmentEntity;
-import tss.entities.MajorClassEntity;
-import tss.entities.MajorEntity;
-import tss.entities.UserEntity;
+import tss.entities.*;
 import tss.repositories.*;
 import tss.requests.information.*;
 import tss.responses.information.*;
@@ -25,14 +22,17 @@ public class DepartmentController {
     private final MajorRepository majorRepository;
     private final MajorClassRepository majorClassRepository;
     private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
 
     @Autowired
     public DepartmentController(DepartmentRepository departmentRepository, MajorRepository majorRepository,
-                                MajorClassRepository majorClassRepository, UserRepository userRepository) {
+                                MajorClassRepository majorClassRepository, UserRepository userRepository,
+                                CourseRepository courseRepository) {
         this.departmentRepository = departmentRepository;
         this.majorRepository = majorRepository;
         this.majorClassRepository = majorClassRepository;
         this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
     }
 
     @PutMapping(path = "/department/add")
@@ -110,11 +110,25 @@ public class DepartmentController {
 
     @DeleteMapping(path = "/department/delete")
     @Authorization
+    @Transactional(rollbackFor = {})
     public ResponseEntity<DeleteDepartmentResponse> deleteDepartment(@RequestBody DeleteDepartmentRequest request) {
         Optional<DepartmentEntity> department = departmentRepository.findByName(request.getName());
         if (!department.isPresent()) {
             return new ResponseEntity<>(new DeleteDepartmentResponse("Non-exist department", request.getName()), HttpStatus.BAD_REQUEST);
         }
+        Set<UserEntity> users = department.get().getUsers();
+        for (UserEntity user : users) {
+            user.setDepartment(null);
+            user.setMajorClass(null);
+        }
+        userRepository.saveAll(users);
+
+        Set<CourseEntity> courses = department.get().getCourses();
+        for (CourseEntity course : courses) {
+            course.setDepartment(null);
+        }
+        courseRepository.saveAll(courses);
+
         departmentRepository.delete(department.get());
         return new ResponseEntity<>(new DeleteDepartmentResponse("ok", request.getName()), HttpStatus.OK);
     }
@@ -325,6 +339,14 @@ public class DepartmentController {
         if (!majorClass.isPresent()) {
             return new ResponseEntity<>(new DeleteMajorClassResponse("Non-exist class", null), HttpStatus.BAD_REQUEST);
         }
+
+        Set<UserEntity> users = majorClass.get().getStudents();
+        for (UserEntity user : users) {
+            user.setDepartment(null);
+            user.setMajorClass(null);
+        }
+        userRepository.saveAll(users);
+
         majorClassRepository.delete(majorClass.get());
         return new ResponseEntity<>(new DeleteMajorClassResponse("ok", request.getName()), HttpStatus.OK);
     }

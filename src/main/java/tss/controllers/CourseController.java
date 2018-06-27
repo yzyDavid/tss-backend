@@ -167,12 +167,18 @@ public class CourseController {
             deptId = dept.get().getId();
         }
 
-        List<CourseEntity> ret = queryService.queryCourses(request.getCid(), request.getName(), deptId);
+        // List<CourseEntity> ret = queryService.queryCourses(request.getCid(), request.getName(), deptId);
+        String idLike = (request.getCid() != null) ? "%" + request.getCid() + "%" : "%";
+        String nameLike = (request.getName() != null) ? "%" + request.getName() + "%" : "%";
+        List<CourseEntity> ret = courseRepository.findByIdLikeAndNameLike(idLike, nameLike);
+
         for (CourseEntity course : ret) {
-            course = courseRepository.findById(course.getId()).get();
+            DepartmentEntity dept = course.getDepartment();
+            if (deptId != null && (dept == null || dept.getId() != deptId)) {
+                continue;
+            }
             cids.add(course.getId());
             names.add(course.getName());
-            DepartmentEntity dept = course.getDepartment();
             String deptName = null;
             if (dept != null) {
                 deptName = dept.getName();

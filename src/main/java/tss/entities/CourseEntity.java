@@ -30,7 +30,7 @@ public class CourseEntity {
     private Set<MajorEntity> majorPublic;
 
     @Id
-    @Column(name = "id", length = 10)
+    @Column(name = "id", length = 8)
     public String getId() {
         return id;
     }
