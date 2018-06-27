@@ -244,11 +244,12 @@ public class ClassSelectionController {
             ClassEntity classEntity = classRegistrationEntity1.getClazz();
             List<TimeSlotEntity> timeSlotEntities = classEntity.getTimeSlots();
             for (TimeSlotEntity timeSlotEntity : timeSlotEntities) {
-                for (TimeSlotEntity timeSlotEntity1 : clazz.getTimeSlots())
+                for (TimeSlotEntity timeSlotEntity1 : clazz.getTimeSlots()) {
                     if (timeSlotEntity.getType().equals(timeSlotEntity1.getType())) {
                         return new ResponseEntity<>(new BasicResponse("与课程“" + classEntity.getCourse().getName() + "”时间冲突！"),
                                 HttpStatus.BAD_REQUEST);
                     }
+                }
             }
         }
 

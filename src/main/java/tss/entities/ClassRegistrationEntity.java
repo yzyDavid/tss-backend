@@ -1,9 +1,6 @@
 package tss.entities;
 
-import org.apache.catalina.User;
-
 import javax.persistence.*;
-import java.sql.Time;
 import java.sql.Timestamp;
 
 /**
@@ -12,7 +9,6 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "class_registration")
 public class ClassRegistrationEntity {
-    //private ClassRegistrationId id;
     @Id
     @Column(name = "crid")
     private String crid;
@@ -51,7 +47,7 @@ public class ClassRegistrationEntity {
 
     public ClassRegistrationEntity(Integer score, UserEntity student, ClassEntity clazz, String crid, ClassStatusEnum status,
                                    Timestamp selectTime, Timestamp confirmTime) {
-        this.crid = crid; //= new ClassRegistrationId(student, clazz);
+        this.crid = crid;
         this.score = score;
         this.status = status;
         this.student = student;
@@ -76,38 +72,6 @@ public class ClassRegistrationEntity {
     public void setCrid(String crid) {
         this.crid = crid;
     }
-
-    /*
-        @EmbeddedId
-        @AttributeOverrides({
-                @AttributeOverride(name = "studentId", column = @Column(name = "student_id", nullable = false)),
-                @AttributeOverride(name = "classId", column = @Column(name = "class_id", nullable = false))}
-        )
-
-
-        public ClassRegistrationId getId() {
-            return this.id;
-        }
-
-    public void setId(ClassRegistrationId id) {
-        this.id = id;
-    }
-
-    public void setStudent(UserEntity student) {
-        this.id.setStudent(student);
-    }
-
-    public void setClazz(ClassEntity clazz) {
-        this.id.setClazz(clazz);
-    }
-
-    public UserEntity getStudent() {
-        return this.id.getStudent();
-    }
-
-    public ClassEntity getClazz() {
-        return this.id.getClazz();
-    }*/
 
     public UserEntity getStudent() {
         return student;
