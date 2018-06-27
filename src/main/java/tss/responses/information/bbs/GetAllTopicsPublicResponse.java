@@ -13,8 +13,9 @@ public class GetAllTopicsPublicResponse {
     private final List<String> topReplys;
     private final List<String> topTopicIDs;
     private final List<String> topLastReplyTimes;
+    private final String watched;
 
-    public GetAllTopicsPublicResponse(String boardName, String boardID, String boardText, List<String> topTitles, List<String> topAuthors, List<String> topTimes, List<String> topReplys, List<String> topTopicIDs, List<String> topLastReplyTimes) {
+    public GetAllTopicsPublicResponse(String boardName, String boardID, String boardText, List<String> topTitles, List<String> topAuthors, List<String> topTimes, List<String> topReplys, List<String> topTopicIDs, List<String> topLastReplyTimes, String watched) {
         this.boardName = boardName;
         this.boardID = boardID;
         this.boardText = boardText;
@@ -24,6 +25,7 @@ public class GetAllTopicsPublicResponse {
         this.topReplys = topReplys;
         this.topTopicIDs = topTopicIDs;
         this.topLastReplyTimes = topLastReplyTimes;
+        this.watched = watched;
     }
 
     public String getBoardName() {
@@ -61,4 +63,9 @@ public class GetAllTopicsPublicResponse {
     public List<String> getTopLastReplyTimes() {
         return topLastReplyTimes;
     }
+
+    public String getWatched() {
+        return watched;
+    }
 }
+

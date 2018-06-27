@@ -46,16 +46,10 @@ public class BbsRetrieveController {
      * v1.0, done
      */
     @PostMapping(path = "/send")
-    //@Authorization
-    public ResponseEntity<AddBbsRetrieveResponse> sendRetrieve(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<AddBbsRetrieveResponse> sendRetrieve(@CurrentUser UserEntity user,
                                                                @RequestBody AddBbsRetrieveRequest request) {
-        //UserEntity sender = user;
-        UserEntity sender = new UserEntity();
-        sender.setUid("0101");
-        sender.setName("Iamsender");
-        sender.setHashedPassword("324");
-        sender.setSalt("32");
-
+        UserEntity sender = user;
 
         Optional<UserEntity> retd = userRepository.findById(request.getDestination());
         if (!retd.isPresent()) {
@@ -92,12 +86,11 @@ public class BbsRetrieveController {
      * v1.0, done
      */
     @PostMapping(path = "/inbox")
-    //@Authorization
-    public ResponseEntity<CheckInBoxResponse> checkInBox(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<CheckInBoxResponse> checkInBox(@CurrentUser UserEntity user,
                                                          @RequestBody CheckInBoxRequest request) {
         String currentPage = request.getPage();
 
-        UserEntity user = userRepository.findById("2242").get();
 
         List<BbsRetrieveEntity> messages = bbsRetrieveRepository.findByReceiver(user);
 
@@ -108,6 +101,8 @@ public class BbsRetrieveController {
         List<String> texts = new ArrayList<>();
         List<String> times = new ArrayList<>();
         List<String> reads = new ArrayList<>();
+        List<String> userIDs = new ArrayList<>();
+        List<String> letterIDs = new ArrayList<>();
 
         int count = 0;
         for (BbsRetrieveEntity mess : messages) {
@@ -123,9 +118,11 @@ public class BbsRetrieveController {
             texts.add(mess.getContent());
             times.add(mess.getTime().toString());
             reads.add(String.valueOf(mess.getIsChecked()));
+            userIDs.add(mess.getSender().getUid().toString());
+            letterIDs.add(String.valueOf(mess.getId()));
         }
 
-        return new ResponseEntity<>(new CheckInBoxResponse(currentPage, totalPage, destinations, titles, texts, times, reads), HttpStatus.OK);
+        return new ResponseEntity<>(new CheckInBoxResponse(currentPage, totalPage, destinations, titles, texts, times, reads, userIDs, letterIDs), HttpStatus.OK);
     }
 
 
@@ -137,12 +134,10 @@ public class BbsRetrieveController {
      * v1.0, done
      */
     @PostMapping(path = "/outbox")
-    //@Authorization
-    public ResponseEntity<CheckOutBoxResponse> checkOutBox(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<CheckOutBoxResponse> checkOutBox(@CurrentUser UserEntity user,
                                                            @RequestBody CheckOutBoxRequest request) {
         String currentPage = request.getPage();
-
-        UserEntity user = userRepository.findById("0101").get();
 
         List<BbsRetrieveEntity> messages = bbsRetrieveRepository.findBySender(user);
 
@@ -152,6 +147,8 @@ public class BbsRetrieveController {
         List<String> titles = new ArrayList<>();
         List<String> texts = new ArrayList<>();
         List<String> times = new ArrayList<>();
+        List<String> userIDs = new ArrayList<>();
+
 
         int count = 0;
         for (BbsRetrieveEntity mess : messages) {
@@ -166,9 +163,10 @@ public class BbsRetrieveController {
             titles.add(mess.getTitle());
             texts.add(mess.getContent());
             times.add(mess.getTime().toString());
+            userIDs.add(mess.getReceiver().getUid());
         }
 
-        return new ResponseEntity<>(new CheckOutBoxResponse(currentPage, totalPage, destinations, titles, texts, times), HttpStatus.OK);
+        return new ResponseEntity<>(new CheckOutBoxResponse(currentPage, totalPage, destinations, titles, texts, times, userIDs), HttpStatus.OK);
     }
 
 
@@ -178,8 +176,8 @@ public class BbsRetrieveController {
      * v1.0, done
      */
     @PostMapping(path = "/read")
-    //@Authorization
-    public ResponseEntity<ReadBbsRetrieveResponse> readRetrieveById(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<ReadBbsRetrieveResponse> readRetrieveById(@CurrentUser UserEntity user,
                                                                     @RequestBody ReadBbsRetrieveRequest request) {
         /* invalid id */
         Optional<BbsRetrieveEntity> ret = bbsRetrieveRepository.findById(Long.valueOf(request.getLetterId()));

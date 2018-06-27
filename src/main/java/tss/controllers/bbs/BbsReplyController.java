@@ -1,6 +1,5 @@
 package tss.controllers.bbs;
 
-import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,7 +17,6 @@ import tss.repositories.bbs.BbsTopicRepository;
 import tss.requests.information.bbs.*;
 import tss.responses.information.bbs.*;
 
-import javax.persistence.Column;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -45,8 +43,8 @@ public class BbsReplyController {
      * v1.0, done
      */
     @PostMapping(path = "/add")
-    //@Authorization
-    public ResponseEntity<AddBbsReplyResponse> addReply(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<AddBbsReplyResponse> addReply(@CurrentUser UserEntity user,
                                                         @RequestBody AddBbsReplyRequest request) {
         /* permission error & invalid topic id error */
         long topicId = Long.valueOf(request.getTid());
@@ -59,8 +57,6 @@ public class BbsReplyController {
 
         BbsReplyEntity reply = new BbsReplyEntity();
 
-        // FIXME
-        UserEntity user = userRepository.findById("6162").get();
 
         reply.setAuthor(user);
         reply.setBelongedTopic(topic);
@@ -179,9 +175,7 @@ public class BbsReplyController {
      * v1.0, done
      */
     @PostMapping(path = "/info")
-    //@Authorization
-    public ResponseEntity<GetAllReplyResponse> getAllReplyInfo(//@CurrentUser UserEntity user,
-                                                               @RequestBody GetAllReplyRequest request) {
+    public ResponseEntity<GetAllReplyResponse> getAllReplyInfo(@RequestBody GetAllReplyRequest request) {
         Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTid()));
         if (!ret.isPresent()) {
             return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
@@ -250,11 +244,6 @@ public class BbsReplyController {
             quoteTimes.add(quoteReply.getTime().toString());
             quoteIndexs.add(quoteReply.getIndex().toString());
         }
-
-        if (ids.isEmpty()) {
-            return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
-        }
-
         return new ResponseEntity<>(new GetAllReplyResponse(title, totalPage, currentPage, postTime, boardName, boardID, topicID, lzid, lztext, lzphoto, lztime, lzname, ids, texts, quotes, times, photos, indexs, quoteAuthors, quoteTimes, quoteIndexs, names), HttpStatus.OK);
     }
 
@@ -266,8 +255,8 @@ public class BbsReplyController {
      * v1.0, done
      */
     @PostMapping(path = "/confirm")
-    //@Authorization
-    public ResponseEntity<ConfirmReplyReadResponse> confirmReplyRead(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<ConfirmReplyReadResponse> confirmReplyRead(@CurrentUser UserEntity user,
                                                                      @RequestBody ConfirmReplyReadRequest request) {
         Integer index = Integer.valueOf(request.getReplyPos());
         BbsTopicEntity topic = bbsTopicRepository.findById(Long.valueOf(request.getTopicID())).get();
@@ -317,11 +306,9 @@ public class BbsReplyController {
 
 
     @PostMapping(path = "/show")
-    //@Authorization
-    public ResponseEntity<ShowReplytoMeResponse> showReplytoMe(//@CurrentUser UserEntity user,
+    @Authorization
+    public ResponseEntity<ShowReplytoMeResponse> showReplytoMe(@CurrentUser UserEntity user,
                                                                @RequestBody ShowReplytoMeRequest request) {
-        UserEntity user = userRepository.findById("3150102242").get();
-
         String currentPage = request.getPage();
         String totalPage;
         List<String> times = new ArrayList<>();
@@ -330,10 +317,11 @@ public class BbsReplyController {
         List<String> topicIDs = new ArrayList<>();
         List<String> replyPos = new ArrayList<>();
         List<String> reads = new ArrayList<>();
+        List<String> titles = new ArrayList<>();
 
         Optional<List<BbsReplyEntity>> ret = bbsReplyRepository.findByAuthor(user);
         if (!ret.isPresent()) {
-            return new ResponseEntity<>(new ShowReplytoMeResponse(null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ShowReplytoMeResponse(null, null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
         }
 
         List<BbsReplyEntity> replsAsAuthor = ret.get();
@@ -361,11 +349,12 @@ public class BbsReplyController {
                     topicIDs.add(String.valueOf(reply.getBelongedTopic().getId()));
                     replyPos.add(reply.getIndex().toString());
                     reads.add(reply.getStatus().toString());
+                    titles.add(reply.getBelongedTopic().getName());
                 }
             }
         }
         totalPage = String.valueOf(count / 20 + 1);
 
-        return new ResponseEntity<>(new ShowReplytoMeResponse(currentPage, totalPage, times, userIDs, userNames, topicIDs, replyPos, reads), HttpStatus.OK);
+        return new ResponseEntity<>(new ShowReplytoMeResponse(currentPage, totalPage, times, userIDs, userNames, topicIDs, replyPos, reads, titles), HttpStatus.OK);
     }
 }
