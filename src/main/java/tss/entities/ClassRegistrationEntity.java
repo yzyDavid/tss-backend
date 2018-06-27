@@ -10,6 +10,9 @@ import java.sql.Timestamp;
 @Table(name = "class_registration")
 public class ClassRegistrationEntity {
     @Id
+    @GeneratedValue
+    private Integer id;
+
     @Column(name = "crid")
     private String crid;
 
@@ -104,5 +107,13 @@ public class ClassRegistrationEntity {
 
     public void setConfirmTime(Timestamp confirmTime) {
         this.confirmTime = confirmTime;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

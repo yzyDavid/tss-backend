@@ -10,6 +10,7 @@ import java.util.Objects;
  * @author reeve
  */
 @Embeddable
+@Deprecated
 public class ClassRegistrationId implements Serializable {
 
     @ManyToOne(optional = false)

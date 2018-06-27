@@ -6,5 +6,5 @@ package tss.entities;
 
 public enum SemesterEnum {
 
-    FIRST, SECOND;
+    FIRST, SECOND
 }

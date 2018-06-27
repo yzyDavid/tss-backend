@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * @author reeve
  */
-public interface ClassRegistrationRepository extends JpaRepository<ClassRegistrationEntity, ClassRegistrationId> {
+public interface ClassRegistrationRepository extends JpaRepository<ClassRegistrationEntity, Integer> {
     boolean existsByCrid(String crid);
 
     boolean existsByStudentAndClazz_Course(UserEntity student, CourseEntity course);

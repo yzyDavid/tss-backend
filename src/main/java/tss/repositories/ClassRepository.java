@@ -2,12 +2,13 @@ package tss.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import tss.entities.ClassEntity;
-import tss.entities.ClassRegistrationEntity;
-import tss.entities.CourseEntity;
 import tss.entities.SemesterEnum;
 
 import java.util.List;
 
+/**
+ * @author
+ */
 public interface ClassRepository extends JpaRepository<ClassEntity, Long> {
 
     List<ClassEntity> findByCourse_Name(String name);
