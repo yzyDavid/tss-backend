@@ -31,7 +31,9 @@
     "prefix": "dept",
     "paths": [
       "department/add",
+      "department/add/user",
       "department/delete",
+      "department/delete/user",
       "department/get/info",
       "department/get/list",
       "department/modify",
@@ -40,7 +42,9 @@
       "major/get/info",
       "major/modify",
       "class/add",
+      "class/add/user",
       "class/delete",
+      "class/delete/user",
       "class/get/info",
       "class/modify",
       "selection_time/register"

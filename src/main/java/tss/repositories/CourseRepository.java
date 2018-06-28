@@ -10,4 +10,6 @@ public interface CourseRepository extends CrudRepository<CourseEntity, String> {
     List<CourseEntity> findByName(String name);
 
     List<CourseEntity> findByNameLike(String name);
+
+    List<CourseEntity> findByIdLikeAndNameLike(String id, String name);
 }

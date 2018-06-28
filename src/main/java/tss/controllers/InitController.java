@@ -1,10 +1,14 @@
-package tss.configs;
+package tss.controllers;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import tss.configs.Config;
 import tss.entities.*;
 import tss.repositories.*;
 import tss.services.QueryService;
@@ -21,8 +25,9 @@ import static tss.utils.SecurityUtils.getSalt;
 /**
  * @author Mingqi Yi
  */
-@Component
-public class RoleConfiguration implements CommandLineRunner {
+@Controller
+@RequestMapping(path = "/init")
+public class InitController {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final AuthorityRepository authorityRepository;
@@ -34,7 +39,7 @@ public class RoleConfiguration implements CommandLineRunner {
     private static Pattern pattern = Pattern.compile("\\{.*}");
 
     @Autowired
-    public RoleConfiguration(UserRepository userRepository, RoleRepository roleRepository, AuthorityRepository authorityRepository, TypeGroupRepository typeGroupRepository, QueryService queryService, DepartmentRepository departmentRepository, MajorRepository majorRepository, MajorClassRepository majorClassRepository) {
+    public InitController(UserRepository userRepository, RoleRepository roleRepository, AuthorityRepository authorityRepository, TypeGroupRepository typeGroupRepository, QueryService queryService, DepartmentRepository departmentRepository, MajorRepository majorRepository, MajorClassRepository majorClassRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.authorityRepository = authorityRepository;
@@ -45,16 +50,9 @@ public class RoleConfiguration implements CommandLineRunner {
         this.majorClassRepository = majorClassRepository;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        ResourceBundle bundle = ResourceBundle.getBundle("application");
-        String ddlAuto = bundle.getString("spring.jpa.hibernate.ddl-auto");
+    @GetMapping
+    public ResponseEntity run() throws Exception {
         initRole();
-        if ("create".equals(ddlAuto)) {
-            //initRole();
-            /*generateMajorClass();
-            generateUser();*/
-        }
 
         String uid = "0000000000";
         String pwd = Config.INIT_PWD;
@@ -70,6 +68,7 @@ public class RoleConfiguration implements CommandLineRunner {
             typeGroup.ifPresent(user::setType);
             userRepository.save(user);
         }
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     private void generateMajorClass() {

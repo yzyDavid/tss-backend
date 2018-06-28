@@ -2,6 +2,9 @@ package tss.entities;
 
 import javax.persistence.*;
 
+/**
+ * @author
+ */
 @Entity
 @Table(name = "ManageScore")
 public class ModifyEntity {
