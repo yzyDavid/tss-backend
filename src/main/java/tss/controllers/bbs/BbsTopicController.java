@@ -66,7 +66,6 @@ public class BbsTopicController {
      * permission: anyone login
      * return: id, name, content, time
      * v1.0, done
-     * FIXME
      */
     @PostMapping(path = "/add")
     @Authorization
@@ -239,6 +238,9 @@ public class BbsTopicController {
 
         BbsSectionEntity section = sret.get();
         String watched = "false";
+        if (bbsTakeRepository.findByUidAndSid(user.getUid(), section.getId()).isPresent()) {
+            watched = "true";
+        }
 
         String boardName = section.getName();
         String boardID = String.valueOf(section.getId());

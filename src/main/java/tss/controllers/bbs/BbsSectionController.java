@@ -166,7 +166,7 @@ public class BbsSectionController {
 
         BbsTakeEntity take = bbstakeRepository.findByUidAndSid(uid, sid).get();
         bbstakeRepository.delete(take);
-        return new ResponseEntity<>(new BbsBookResponse("book ok"), HttpStatus.OK);
+        return new ResponseEntity<>(new BbsBookResponse("unbook ok"), HttpStatus.OK);
     }
 
     @GetMapping(path = "/showbook")

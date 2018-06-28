@@ -1,30 +1,24 @@
 package tss.controllers.bbs;
 
 
+import org.aspectj.weaver.ast.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import tss.annotations.session.Authorization;
 import tss.annotations.session.CurrentUser;
 import tss.entities.UserEntity;
+import tss.entities.bbs.BbsReplyEntity;
 import tss.entities.bbs.BbsSectionEntity;
 import tss.entities.bbs.BbsTopicEntity;
 import tss.repositories.UserRepository;
 import tss.repositories.bbs.BbsReplyRepository;
 import tss.repositories.bbs.BbsSectionRepository;
 import tss.repositories.bbs.BbsTopicRepository;
-import tss.requests.information.bbs.SearchInSectionRequest;
-import tss.requests.information.bbs.SearchSectionRequest;
-import tss.requests.information.bbs.SearchTopicPublishedByUidRequest;
-import tss.requests.information.bbs.SearchUserRequest;
-import tss.responses.information.bbs.SearchInSectionResponse;
-import tss.responses.information.bbs.SearchSectionResponse;
-import tss.responses.information.bbs.SearchTopicPublishedByUidResponse;
-import tss.responses.information.bbs.SearchUserResponse;
+import tss.requests.information.bbs.*;
+import tss.responses.information.bbs.*;
 
 import java.util.*;
 
@@ -72,6 +66,26 @@ public class BbsSearchController {
         return match == keys.length;
     }
 
+    private static boolean contentMatchNew(String key, String content) {
+        boolean match = false;
+        String[] keys = key.split(" ");
+        for (String k : keys) {
+            int begin;
+            for (begin = 0; begin + k.length() <= content.length(); begin++) {
+                String compared = content.substring(begin, begin + k.length());
+                if (compared.equals(k)) {
+                    match = true;
+                }
+            }
+        }
+        return match;
+    }
+
+    @GetMapping(path = "/test")
+    public ResponseEntity<TestResponse> searchTest(String key) {
+        String status = String.valueOf(contentMatchNew(key, "作业问题"));
+        return new ResponseEntity<>(new TestResponse(status), HttpStatus.OK);
+    }
 
     /**
      * search user
@@ -88,7 +102,7 @@ public class BbsSearchController {
         Iterator<UserEntity> iterator = userRepository.findAll().iterator();
         while (iterator.hasNext()) {
             UserEntity account = iterator.next();
-            if (request.getKey().equals(account.getName())) {
+            if (BbsSearchController.contentMatchNew(request.getKey(), account.getName())) {
                 userNames.add(account.getName());
                 userIDs.add(account.getUid());
                 photoURLs.add(account.getPhoto());
@@ -132,7 +146,8 @@ public class BbsSearchController {
             for (BbsTopicEntity t : topics) {
                 /* search topic */
                 /* topic content match */
-                if (BbsSearchController.contentMatch(key, t.getContent())) {
+                if (BbsSearchController.contentMatchNew(key, t.getContent())
+                        || BbsSearchController.contentMatchNew(key, t.getName())) {
                     count++;
                     if (count < (Integer.valueOf(currentPage) - 1) * 10 + 1) {
                         continue;
@@ -168,14 +183,16 @@ public class BbsSearchController {
      * v1.0, done
      */
     @PostMapping(path = "/section")
-    public ResponseEntity<SearchSectionResponse> searchSection(@RequestBody SearchSectionRequest request) {
+    @Authorization
+    public ResponseEntity<SearchSectionResponse> searchSection(@CurrentUser UserEntity user,
+                                                               @RequestBody SearchSectionRequest request) {
         List<String> boardNames = new ArrayList<>();
         List<String> boardIDs = new ArrayList<>();
 
         Iterator<BbsSectionEntity> iter = bbsSectionRepository.findAll().iterator();
         while (iter.hasNext()) {
             BbsSectionEntity section = iter.next();
-            if (contentMatch(request.getKey(), section.getName())) {
+            if (contentMatchNew(request.getKey(), section.getName())) {
                 boardNames.add(section.getName());
                 boardIDs.add(String.valueOf(section.getId()));
             }
@@ -245,4 +262,35 @@ public class BbsSearchController {
         return new ResponseEntity<>(new SearchTopicPublishedByUidResponse(userName, currentPage, totalPage, times, boardNames, boardIDs, titles, topicIDs), HttpStatus.OK);
     }
 
+    @PostMapping(path = "/userinfo")
+    @Authorization
+    public ResponseEntity<ShowUserInfoResponse> searchUserInfo(@CurrentUser UserEntity user,
+                                                               @RequestBody ShowUserInfoRequest request) {
+        String userID = request.getUserID();
+        UserEntity findu = userRepository.findByUid(userID).get();
+        int postNum = 0;
+        Iterator<BbsTopicEntity> itor = bbsTopicRepository.findAll().iterator();
+        while (itor.hasNext()) {
+            BbsTopicEntity topic = itor.next();
+            if (topic.getAuthor().getUid().equals(findu.getUid())) {
+                postNum++;
+            }
+        }
+        return new ResponseEntity<>(new ShowUserInfoResponse(findu.getName(), findu.getPhoto(), findu.getEmail(), findu.getTelephone(), findu.getIntro(), String.valueOf(postNum)), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/selfinfo")
+    @Authorization
+    public ResponseEntity<ShowUserInfoResponse> searchSelfInfo(@CurrentUser UserEntity findu) {
+        int postNum = 0;
+        Iterator<BbsTopicEntity> itor = bbsTopicRepository.findAll().iterator();
+        while (itor.hasNext()) {
+            BbsTopicEntity topic = itor.next();
+            if (topic.getAuthor().getUid().equals(findu.getUid())) {
+                postNum++;
+            }
+        }
+        return new ResponseEntity<>(new ShowUserInfoResponse(findu.getName(), findu.getPhoto(), findu.getEmail(), findu.getTelephone(), findu.getIntro(), String.valueOf(postNum)), HttpStatus.OK);
+
+    }
 }

@@ -178,10 +178,17 @@ public class BbsReplyController {
     public ResponseEntity<GetAllReplyResponse> getAllReplyInfo(@RequestBody GetAllReplyRequest request) {
         Optional<BbsTopicEntity> ret = bbsTopicRepository.findById(Long.valueOf(request.getTid()));
         if (!ret.isPresent()) {
-            return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new GetAllReplyResponse(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null), HttpStatus.BAD_REQUEST);
         }
 
         BbsTopicEntity topic = ret.get();
+
+        String top;
+        if (topic.getIsTop()) {
+            top = "1";
+        } else {
+            top = "0";
+        }
 
         String title = topic.getName();
         String totalPage = String.valueOf(topic.getReplyNum() / 10 + 1);
@@ -244,7 +251,7 @@ public class BbsReplyController {
             quoteTimes.add(quoteReply.getTime().toString());
             quoteIndexs.add(quoteReply.getIndex().toString());
         }
-        return new ResponseEntity<>(new GetAllReplyResponse(title, totalPage, currentPage, postTime, boardName, boardID, topicID, lzid, lztext, lzphoto, lztime, lzname, ids, texts, quotes, times, photos, indexs, quoteAuthors, quoteTimes, quoteIndexs, names), HttpStatus.OK);
+        return new ResponseEntity<>(new GetAllReplyResponse(title, totalPage, currentPage, postTime, boardName, boardID, topicID, lzid, lztext, lzphoto, lztime, lzname, ids, texts, quotes, times, photos, indexs, quoteAuthors, quoteTimes, quoteIndexs, names, top), HttpStatus.OK);
     }
 
 

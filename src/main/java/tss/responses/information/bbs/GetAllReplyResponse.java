@@ -12,7 +12,8 @@ public class GetAllReplyResponse {
     private final String boardID;
     private final String topicID;
 
-    /* topic information */
+    /**
+     *  topic information */
     private final String lzid;
     private final String lztext;
     private final String lzphoto;
@@ -29,8 +30,9 @@ public class GetAllReplyResponse {
     private final List<String> quoteTimes;
     private final List<String> quoteIndexs;
     private final List<String> names;
+    private final String top;
 
-    public GetAllReplyResponse(String title, String totalPage, String currentPage, String postTime, String boardName, String boardID, String topicID, String lzid, String lztext, String lzphoto, String lztime, String lzname, List<String> ids, List<String> texts, List<String> quotes, List<String> times, List<String> photos, List<String> indexs, List<String> quoteAuthors, List<String> quoteTimes, List<String> quoteIndexs, List<String> names) {
+    public GetAllReplyResponse(String title, String totalPage, String currentPage, String postTime, String boardName, String boardID, String topicID, String lzid, String lztext, String lzphoto, String lztime, String lzname, List<String> ids, List<String> texts, List<String> quotes, List<String> times, List<String> photos, List<String> indexs, List<String> quoteAuthors, List<String> quoteTimes, List<String> quoteIndexs, List<String> names, String top) {
         this.title = title;
         this.totalPage = totalPage;
         this.currentPage = currentPage;
@@ -53,6 +55,7 @@ public class GetAllReplyResponse {
         this.quoteTimes = quoteTimes;
         this.quoteIndexs = quoteIndexs;
         this.names = names;
+        this.top = top;
     }
 
     public String getTitle() {
@@ -141,5 +144,9 @@ public class GetAllReplyResponse {
 
     public List<String> getNames() {
         return names;
+    }
+
+    public String getTop() {
+        return top;
     }
 }
