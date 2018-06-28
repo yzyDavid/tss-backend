@@ -13,3 +13,8 @@ source class_registration.sql;
 source time_slot_less.sql;
 source testsys.sql;
 source question.sql;
+source bbsuser.sql;
+source bbssection.sql;
+source bbstopic.sql;
+source bbsreply.sql;
+source bbstake.sql;
